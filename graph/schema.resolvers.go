@@ -7,47 +7,22 @@ import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
 	"context"
-	"fmt"
 )
 
-// UpsertCharacter is the resolver for the upsertCharacter field.
-func (r *mutationResolver) UpsertCharacter(ctx context.Context, input model.CharacterInput) (*model.Character, error) {
-	id := input.ID
-	var character model.Character
-	character.Name = input.Name
-
-	n := len(r.Resolver.CharacterStore)
-	if n == 0 {
-		r.Resolver.CharacterStore = make(map[string]model.Character)
-	}
-
-	if id != nil {
-		_, ok := r.Resolver.CharacterStore[*id]
-		if !ok {
-			return nil, fmt.Errorf("not found")
-		}
-	}
-
-	return &character, nil
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
+	return "kikoo", nil
 }
 
-// Character is the resolver for the character field.
-func (r *queryResolver) Character(ctx context.Context, id string) (*model.Character, error) {
-	character, ok := r.Resolver.CharacterStore[id]
-	if !ok {
-		return nil, fmt.Errorf("not found")
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	var users []*model.User
+	user := model.User{
+		ID:   "1",
+		Name: "polo",
 	}
-	return &character, nil
-}
-
-// Pogues is the resolver for the pogues field.
-func (r *queryResolver) Pogues(ctx context.Context) ([]*model.Character, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-// Kooks is the resolver for the kooks field.
-func (r *queryResolver) Kooks(ctx context.Context) ([]*model.Character, error) {
-	panic(fmt.Errorf("not implemented"))
+	users = append(users, &user)
+	return users, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

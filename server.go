@@ -1,9 +1,16 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"back_go/graph"
+	"back_go/graph/generated"
 	"log"
+	"net/http"
+	"os"
+
+	database "back_go/internal/pkg/db/mysql"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -11,26 +18,14 @@ import (
 const defaultPort = "8000"
 
 func main() {
-	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp(35.180.101.96:3306)/testgo")
-	defer db.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var version string
-
-	err2 := db.QueryRow("SELECT VERSION()").Scan(&version)
-
-	if err2 != nil {
-		log.Fatal(err2)
-	}
-
-	fmt.Println(version)
-	/*port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
+
+	database.InitDB()
+	defer database.CloseDB()
+	database.Migrate()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
@@ -38,5 +33,5 @@ func main() {
 	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))*/
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

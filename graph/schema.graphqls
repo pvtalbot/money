@@ -2,33 +2,20 @@
 #
 # https://gqlgen.com/getting-started/
 
+type User {
+  id: ID!
+  name: String!
+}
+
+input Login  {
+  username: String!
+  password: String!
+}
+
 type Query {
-  character(id:ID!): Character
-  pogues: [Character]!
-  kooks: [Character]!
+  users: [User]!
 }
 
 type Mutation {
-  upsertCharacter(input: CharacterInput!): Character!
-}
-
-enum CliqueType {
-  "People who are elite with parents having money"
-  KOOKS
-  "People who desperate to move up the social ladder to become new versions of themselves and establish new beginnings"
-  POGUES
-}
-
-type Character {
-  id: ID!
-  name: String!
-  isHero: Boolean!
-  cliqueType: CliqueType!
-}
-
-input CharacterInput {
-  name: String!
-  id: String
-  isHero: Boolean
-  cliqueType: CliqueType!
+  login(input: Login!): String!
 }

@@ -33,7 +33,11 @@ func (r *mutationResolver) UpsertCharacter(ctx context.Context, input model.Char
 
 // Character is the resolver for the character field.
 func (r *queryResolver) Character(ctx context.Context, id string) (*model.Character, error) {
-	panic(fmt.Errorf("not implemented"))
+	character, ok := r.Resolver.CharacterStore[id]
+	if !ok {
+		return nil, fmt.Errorf("not found")
+	}
+	return &character, nil
 }
 
 // Pogues is the resolver for the pogues field.

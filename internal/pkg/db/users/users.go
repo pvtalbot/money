@@ -6,17 +6,18 @@ import (
 )
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 func (user User) Save() int64 {
-	stmt, err := database.Db.Prepare("INSERT INTO Users(Name) VALUES (?)")
+	stmt, err := database.Db.Prepare("INSERT INTO Users(Name, Password) VALUES (?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(user.Name)
+	res, err := stmt.Exec(user.Name, user.Password)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -20,6 +20,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	var user users.User
 	user.Name = input.Name
+	user.Password = input.Password
 	userId := user.Save()
 	return &model.User{
 		ID:   strconv.FormatInt(userId, 10),

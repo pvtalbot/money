@@ -5,6 +5,7 @@
 type User {
   id: ID!
   name: String!
+  password: String!
 }
 
 input Login  {
@@ -23,4 +24,5 @@ type Mutation {
 
 input CreateUserInput {
   name: String!
+  password: String!
 }

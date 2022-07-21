@@ -30,8 +30,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var resultUsers []*model.User
-	var dbUsers []users.User
-	dbUsers = users.GetAll()
+	dbUsers := users.GetAll()
 	for _, user := range dbUsers {
 		resultUsers = append(resultUsers, &model.User{ID: user.ID, Name: user.Name})
 	}

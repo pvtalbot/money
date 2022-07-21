@@ -1,8 +1,9 @@
 package users
 
 import (
-	database "back_go/internal/pkg/db/mysql"
 	"log"
+
+	database "back_go/internal/pkg/db/mysql"
 )
 
 type User struct {

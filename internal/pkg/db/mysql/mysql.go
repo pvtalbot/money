@@ -8,12 +8,15 @@ import (
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/mysql"
 	_ "github.com/golang-migrate/migrate/source/file"
+
+	config "back_go/pkg/config"
 )
 
 var Db *sql.DB
 
 func InitDB() {
-	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp(15.237.58.187:3306)/testgo")
+	database_host := config.GetConfig().Database_host
+	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp("+database_host+":3306)/testgo")
 	if err != nil {
 		log.Panic(err)
 	}

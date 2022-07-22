@@ -7,13 +7,19 @@ import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
 	"back_go/internal/pkg/users"
+	"back_go/pkg/jwt"
 	"context"
+	"log"
 	"strconv"
 )
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	return "kikoo", nil
+	if !users.Authenticate(input.Username, input.Password) {
+		log.Fatal("Error")
+	}
+
+	return jwt.GenerateToken(input.Username)
 }
 
 // CreateUser is the resolver for the CreateUser field.

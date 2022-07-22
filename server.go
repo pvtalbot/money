@@ -3,6 +3,7 @@ package main
 import (
 	"back_go/graph"
 	"back_go/graph/generated"
+	"back_go/internal/auth"
 
 	database "back_go/internal/pkg/db/mysql"
 
@@ -35,6 +36,7 @@ func main() {
 	database.Migrate()
 
 	r := gin.Default()
+	r.Use(auth.AuthMiddleware())
 	r.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
 	r.Run()

@@ -40,9 +40,25 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func Authenticate(username, claimedPassword string) bool {
+	stmt, err := database.Db.Prepare("select Password from Users where Name = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	row := stmt.QueryRow(username)
+	var hashedPassword string
+
+	err = row.Scan(&hashedPassword)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return checkPasswordHash(claimedPassword, hashedPassword)
 }
 
 func GetAll() []User {
@@ -71,21 +87,23 @@ func GetAll() []User {
 	return users
 }
 
-func GetUserIdByName(username string) (int, error) {
+func GetUserByName(username string) (*User, error) {
 	stmt, err := database.Db.Prepare("select ID from Users where Name = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 	row := stmt.QueryRow(username)
 
-	var Id int
-	err = row.Scan(&Id)
+	var user User
+	err = row.Scan(&user.ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Print(err)
 		}
-		return 0, err
+		return nil, err
 	}
 
-	return Id, nil
+	user.Name = username
+
+	return &user, nil
 }

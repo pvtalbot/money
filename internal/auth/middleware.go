@@ -3,50 +3,33 @@ package auth
 import (
 	"back_go/internal/pkg/users"
 	"back_go/pkg/jwt"
-	"context"
 	"net/http"
-	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-var userCtxKey = &contextKey{"user"}
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		header := c.Request.Header.Get("Authorization")
 
-type contextKey struct {
-	name string
-}
+		if header == "" {
+			c.Next()
+			return
+		}
 
-func Middleware() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			header := r.Header.Get("Authorization")
+		tokenStr := header
+		username, err := jwt.ParseToken(tokenStr)
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
-			if header == "" {
-				next.ServeHTTP(w, r)
-				return
-			}
+		user, err := users.GetUserByName(username)
+		if err != nil {
+			c.Next()
+		}
 
-			tokenStr := header
-			username, err := jwt.ParseToken(tokenStr)
-			if err != nil {
-				http.Error(w, "Invalid token", http.StatusForbidden)
-				return
-			}
-
-			user := users.User{Name: username}
-			id, err := users.GetUserIdByName(username)
-			if err != nil {
-				next.ServeHTTP(w, r)
-				return
-			}
-			user.ID = strconv.Itoa(id)
-			ctx := context.WithValue(r.Context(), userCtxKey, &user)
-
-			r = r.WithContext(ctx)
-			next.ServeHTTP(w, r)
-		})
+		c.Set("user", &user)
+		c.Next()
 	}
-}
-
-func ForContext(ctx context.Context) *users.User {
-	raw, _ := ctx.Value(userCtxKey).(*users.User)
-	return raw
 }

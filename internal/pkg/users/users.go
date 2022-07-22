@@ -1,9 +1,12 @@
 package users
 
 import (
+	"database/sql"
 	"log"
 
 	database "back_go/internal/pkg/db/mysql"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -18,7 +21,8 @@ func (user User) Save() int64 {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(user.Name, user.Password)
+	hashedPassword, _ := HashPassword(user.Password)
+	res, err := stmt.Exec(user.Name, hashedPassword)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,8 +32,17 @@ func (user User) Save() int64 {
 		log.Fatal("Error:", err.Error())
 	}
 
-	log.Print("Done!")
 	return id
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func GetAll() []User {
@@ -56,4 +69,23 @@ func GetAll() []User {
 		log.Fatal(err)
 	}
 	return users
+}
+
+func GetUserIdByName(username string) (int, error) {
+	stmt, err := database.Db.Prepare("select ID from Users where Name = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	row := stmt.QueryRow(username)
+
+	var Id int
+	err = row.Scan(&Id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return 0, err
+	}
+
+	return Id, nil
 }

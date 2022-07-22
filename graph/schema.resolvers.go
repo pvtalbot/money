@@ -6,7 +6,7 @@ package graph
 import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
-	"back_go/internal/pkg/db/users"
+	"back_go/internal/pkg/users"
 	"context"
 	"strconv"
 )

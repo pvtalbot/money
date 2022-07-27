@@ -16,9 +16,11 @@ func NewUserManager(r model.UserRepository) UserManager {
 	}
 }
 
-func (m UserManager) Create(username, clearPassword string) *model.User {
+func (m UserManager) Create(username, clearPassword, firstName, lastName string) *model.User {
 	u := &model.User{
-		Name: username,
+		Name:      username,
+		FirstName: firstName,
+		LastName:  lastName,
 	}
 	u.SetPassword(clearPassword)
 

@@ -17,11 +17,13 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 // CreateUser is the resolver for the CreateUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	userService := r.UserService
-	user := userService.Create(input.Name, input.Password)
+	user := userService.Create(input.Name, input.Password, input.FirstName, input.LastName)
 
 	return &model.User{
-		ID:   user.ID,
-		Name: user.Name,
+		ID:        user.ID,
+		Name:      user.Name,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}, nil
 }
 
@@ -31,7 +33,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	internalUsers := r.UserService.FindAll()
 
 	for _, user := range internalUsers {
-		resultUsers = append(resultUsers, &model.User{ID: user.ID, Name: user.Name})
+		resultUsers = append(resultUsers, &model.User{ID: user.ID, Name: user.Name, FirstName: user.FirstName, LastName: user.LastName})
 	}
 
 	return resultUsers, nil

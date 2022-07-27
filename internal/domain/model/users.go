@@ -3,13 +3,15 @@ package model
 import "back_go/pkg/utils"
 
 type User struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	password string
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	password  string
 }
 
 type UserServiceInterface interface {
-	Create(username, password string) *User
+	Create(username, password, firstName, LastName string) *User
 	FindAll() []*User
 	FindByName(username string) (*User, error)
 	Login(username, claimedPassword string) (string, error)

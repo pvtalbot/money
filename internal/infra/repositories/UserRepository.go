@@ -19,12 +19,12 @@ func NewUserMariaRepository(db *sql.DB) UserMariaRepository {
 }
 
 func (r UserMariaRepository) Create(user *model.User) *model.User {
-	stmt, err := r.db.Prepare("insert into Users(Name, Password) values (?, ?)")
+	stmt, err := r.db.Prepare("insert into Users(Name, Password, first_name, last_name) values (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(user.Name, user.GetHashedPassword())
+	res, err := stmt.Exec(user.Name, user.GetHashedPassword(), user.FirstName, user.LastName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func (r UserMariaRepository) Create(user *model.User) *model.User {
 }
 
 func (r UserMariaRepository) FindAll() []*model.User {
-	stmt, err := r.db.Prepare("select id, name from Users")
+	stmt, err := r.db.Prepare("select id, name, first_name, last_name from Users")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func (r UserMariaRepository) FindAll() []*model.User {
 	var users []*model.User
 	for rows.Next() {
 		var user model.User
-		err := rows.Scan(&user.ID, &user.Name)
+		err := rows.Scan(&user.ID, &user.Name, &user.FirstName, &user.LastName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -70,14 +70,14 @@ func (r UserMariaRepository) FindAll() []*model.User {
 }
 
 func (r UserMariaRepository) FindByName(username string) (*model.User, error) {
-	stmt, err := r.db.Prepare("select id from Users where Name = ?")
+	stmt, err := r.db.Prepare("select id, first_name, last_name from Users where Name = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 	row := stmt.QueryRow(username)
 
 	var user model.User
-	err = row.Scan(&user.ID)
+	err = row.Scan(&user.ID, &user.FirstName, &user.LastName)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Print(err)

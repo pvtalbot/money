@@ -3,8 +3,10 @@
 package model
 
 type CreateUserInput struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Name      string `json:"name"`
+	Password  string `json:"password"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
 type Login struct {
@@ -13,6 +15,9 @@ type Login struct {
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Password  string `json:"password"`
 }

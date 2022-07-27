@@ -3,10 +3,10 @@ package main
 import (
 	"back_go/graph"
 	"back_go/graph/generated"
-	"back_go/internal/auth"
 	"back_go/internal/domain/managers"
 	"back_go/internal/domain/model"
 	"back_go/internal/infra/repositories"
+	"back_go/internal/middlewares"
 
 	database "back_go/internal/pkg/db/mysql"
 
@@ -43,7 +43,10 @@ func main() {
 	u := managers.NewUserManager(repositories.NewUserMariaRepository(dbContainer.Db))
 
 	r := gin.Default()
-	r.Use(auth.AuthMiddleware(u))
+
+	r.Use(middlewares.GinContextToContextMiddleware())
+	r.Use(middlewares.AuthMiddleware(u))
+
 	r.POST("/query", graphqlHandler(u))
 	r.GET("/", playgroundHandler())
 	r.Run()

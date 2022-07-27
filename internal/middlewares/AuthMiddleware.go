@@ -1,4 +1,4 @@
-package auth
+package middlewares
 
 import (
 	"back_go/internal/domain/managers"

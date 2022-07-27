@@ -27,6 +27,17 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	}, nil
 }
 
+// CreateExpense is the resolver for the createExpense field.
+func (r *mutationResolver) CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error) {
+	expenseService := r.ExpenseService
+	expense := expenseService.Create(input.Amount)
+
+	return &model.Expense{
+		ID:     expense.ID,
+		Amount: expense.Amount,
+	}, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var resultUsers []*model.User

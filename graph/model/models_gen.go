@@ -2,11 +2,20 @@
 
 package model
 
+type CreateExpenseInput struct {
+	Amount int `json:"amount"`
+}
+
 type CreateUserInput struct {
 	Name      string `json:"name"`
 	Password  string `json:"password"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
+}
+
+type Expense struct {
+	ID     string `json:"id"`
+	Amount int    `json:"amount"`
 }
 
 type Login struct {

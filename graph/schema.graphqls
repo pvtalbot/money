@@ -10,9 +10,9 @@ type User {
   password: String!
 }
 
-input Login  {
-  username: String!
-  password: String!
+type Expense {
+  id: ID!
+  amount: Int!
 }
 
 type Query {
@@ -22,6 +22,7 @@ type Query {
 type Mutation {
   login(input: Login!): String!
   createUser(input: CreateUserInput!): User!
+  createExpense(input: CreateExpenseInput!): Expense!
 }
 
 input CreateUserInput {
@@ -29,4 +30,13 @@ input CreateUserInput {
   password: String!
   firstName: String!
   lastName: String!
+}
+
+input CreateExpenseInput {
+  amount: Int!
+}
+
+input Login  {
+  username: String!
+  password: String!
 }

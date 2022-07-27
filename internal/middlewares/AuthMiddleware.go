@@ -29,7 +29,7 @@ func AuthMiddleware(um managers.UserManager) gin.HandlerFunc {
 			c.Next()
 		}
 
-		c.Set("user", &user)
+		c.Set("user", user)
 		c.Next()
 	}
 }

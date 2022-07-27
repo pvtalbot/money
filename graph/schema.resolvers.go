@@ -6,7 +6,10 @@ package graph
 import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
+	internalModel "back_go/internal/domain/model"
+	"back_go/internal/middlewares"
 	"context"
+	"errors"
 )
 
 // Login is the resolver for the login field.
@@ -48,6 +51,31 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	}
 
 	return resultUsers, nil
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	ginContext, err := middlewares.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	u, ok := ginContext.Get("user")
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	user, ok := u.(*internalModel.User)
+	if !ok {
+		return nil, errors.New("user has wrong type")
+	}
+
+	return &model.User{
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Name:      user.Name,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

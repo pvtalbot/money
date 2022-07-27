@@ -12,9 +12,11 @@ import (
 	config "back_go/pkg/config"
 )
 
-var Db *sql.DB
+type DbContainer struct {
+	Db *sql.DB
+}
 
-func InitDB() {
+func NewDbContainer() DbContainer {
 	database_host := config.GetConfig().Database_host
 	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp("+database_host+":3306)/testgo")
 	if err != nil {
@@ -25,23 +27,27 @@ func InitDB() {
 		log.Panic(err)
 	}
 
-	Db = db
+	return DbContainer{
+		Db: db,
+	}
 }
 
-func CloseDB() error {
-	return Db.Close()
+func (c DbContainer) CloseDB() error {
+	return c.Db.Close()
 }
 
-func Migrate() {
-	if err := Db.Ping(); err != nil {
+func (c DbContainer) Migrate() {
+	if err := c.Db.Ping(); err != nil {
 		log.Fatal(err)
 	}
-	driver, _ := mysql.WithInstance(Db, &mysql.Config{})
+
+	driver, _ := mysql.WithInstance(c.Db, &mysql.Config{})
 	m, _ := migrate.NewWithDatabaseInstance(
 		"file://internal/pkg/db/migrations/mysql",
 		"mysql",
 		driver,
 	)
+
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}

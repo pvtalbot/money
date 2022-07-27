@@ -6,30 +6,21 @@ package graph
 import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
-	"back_go/internal/pkg/users"
-	"back_go/pkg/jwt"
 	"context"
-	"log"
-	"strconv"
 )
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	if !users.Authenticate(input.Username, input.Password) {
-		log.Fatal("Error")
-	}
-
-	return jwt.GenerateToken(input.Username)
+	return r.UserService.Login(input.Username, input.Password)
 }
 
 // CreateUser is the resolver for the CreateUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	var user users.User
-	user.Name = input.Name
-	user.Password = input.Password
-	userId := user.Save()
+	userService := r.UserService
+	user := userService.Create(input.Name, input.Password)
+
 	return &model.User{
-		ID:   strconv.FormatInt(userId, 10),
+		ID:   user.ID,
 		Name: user.Name,
 	}, nil
 }
@@ -37,8 +28,9 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var resultUsers []*model.User
-	dbUsers := users.GetAll()
-	for _, user := range dbUsers {
+	internalUsers := r.UserService.FindAll()
+
+	for _, user := range internalUsers {
 		resultUsers = append(resultUsers, &model.User{ID: user.ID, Name: user.Name})
 	}
 

@@ -1,0 +1,9 @@
+BEGIN;
+
+ALTER TABLE Users
+DROP COLUMN first_name IF EXISTS;
+
+ALTER TABLE Users
+DROP COLUMN last_name IF EXISTS;
+
+COMMIT;

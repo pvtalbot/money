@@ -1,9 +1,9 @@
 package managers
 
 import (
-	"back_go/internal/auth"
 	"back_go/internal/domain/model"
 	"back_go/pkg/jwt"
+	"back_go/pkg/utils"
 )
 
 type UserManager struct {
@@ -39,7 +39,7 @@ func (m UserManager) Login(username, claimedPassword string) (string, error) {
 		return "", err
 	}
 
-	err = auth.CheckPasswordHash(claimedPassword, hashedPassword)
+	err = utils.CheckPasswordHash(claimedPassword, hashedPassword)
 
 	if err != nil {
 		return "", err

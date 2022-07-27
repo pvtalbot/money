@@ -1,6 +1,6 @@
 package model
 
-import "back_go/internal/auth"
+import "back_go/pkg/utils"
 
 type User struct {
 	ID       string `json:"id"`
@@ -23,7 +23,7 @@ type UserRepository interface {
 }
 
 func (u *User) SetPassword(clearPassword string) (*User, error) {
-	hashedPassword, err := auth.HashPassword(clearPassword)
+	hashedPassword, err := utils.HashPassword(clearPassword)
 	if err != nil {
 		return u, err
 	}

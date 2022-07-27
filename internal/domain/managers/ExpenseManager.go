@@ -12,10 +12,10 @@ func NewExpenseManager(r model.ExpenseRepository) ExpenseManager {
 	}
 }
 
-func (m ExpenseManager) Create(amount int) *model.Expense {
+func (m ExpenseManager) Create(amount int, user *model.User) *model.Expense {
 	exp := &model.Expense{
 		Amount: amount,
 	}
 
-	return m.r.Create(exp)
+	return m.r.Create(exp, user)
 }

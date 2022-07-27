@@ -1,12 +1,15 @@
 package model
 
-import "back_go/pkg/utils"
+import (
+	"back_go/pkg/utils"
+)
 
 type User struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Expenses  []Expense `json:"expenses"`
 	password  string
 }
 

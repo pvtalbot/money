@@ -6,10 +6,8 @@ package graph
 import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
-	internalModel "back_go/internal/domain/model"
 	"back_go/internal/middlewares"
 	"context"
-	"errors"
 )
 
 // Login is the resolver for the login field.
@@ -32,8 +30,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	expenseService := r.ExpenseService
-	expense := expenseService.Create(input.Amount)
+	expense := expenseService.Create(input.Amount, user)
 
 	return &model.Expense{
 		ID:     expense.ID,
@@ -55,19 +58,9 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	ginContext, err := middlewares.GinContextFromContext(ctx)
+	user, err := middlewares.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	u, ok := ginContext.Get("user")
-	if !ok {
-		return nil, errors.New("not found")
-	}
-
-	user, ok := u.(*internalModel.User)
-	if !ok {
-		return nil, errors.New("user has wrong type")
 	}
 
 	return &model.User{

@@ -6,9 +6,9 @@ type Expense struct {
 }
 
 type ExpenseRepository interface {
-	Create(expense *Expense) *Expense
+	Create(expense *Expense, user *User) *Expense
 }
 
 type ExpenseServiceInterface interface {
-	Create(amount int) *Expense
+	Create(amount int, user *User) *Expense
 }

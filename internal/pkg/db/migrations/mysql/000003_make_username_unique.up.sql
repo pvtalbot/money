@@ -1,2 +1,2 @@
-ALTER TABLE Users
-ADD UNIQUE (Name)
+ALTER TABLE users
+ADD UNIQUE (name)

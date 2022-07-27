@@ -1,2 +1,2 @@
-ALTER TABLE Users
-ADD Password VARCHAR (127) not null
+ALTER TABLE users
+ADD password VARCHAR (127) not null

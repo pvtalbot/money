@@ -71,6 +71,21 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	}, nil
 }
 
+// Expenses is the resolver for the expenses field.
+func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var expenses []*model.Expense
+	for _, e := range r.UserService.GetAllExpensesFromUser(user) {
+		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount})
+	}
+
+	return expenses, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

@@ -17,6 +17,7 @@ type Expense {
 type Query {
   users: [User]!
   me: User!
+  expenses: [Expense]!
 }
 
 type Mutation {

@@ -7,6 +7,7 @@ type Expense struct {
 
 type ExpenseRepository interface {
 	Create(expense *Expense, user *User) *Expense
+	GetAllExpensesFromUser(user *User) []*Expense
 }
 
 type ExpenseServiceInterface interface {

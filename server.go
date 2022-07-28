@@ -41,8 +41,11 @@ func main() {
 	defer dbContainer.CloseDB()
 	dbContainer.Migrate()
 
-	u := managers.NewUserManager(repositories.NewUserMariaRepository(dbContainer.Db))
-	e := managers.NewExpenseManager(repositories.NewExpenseMariaRepository(dbContainer.Db))
+	expenseRepository := repositories.NewExpenseMariaRepository(dbContainer.Db)
+	userRepository := repositories.NewUserMariaRepository(dbContainer.Db)
+
+	u := managers.NewUserManager(userRepository, expenseRepository)
+	e := managers.NewExpenseManager(expenseRepository)
 
 	r := gin.Default()
 

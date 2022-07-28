@@ -7,12 +7,14 @@ import (
 )
 
 type UserManager struct {
-	r model.UserRepository
+	r                 model.UserRepository
+	expenseRepository model.ExpenseRepository
 }
 
-func NewUserManager(r model.UserRepository) UserManager {
+func NewUserManager(r model.UserRepository, expenseRepository model.ExpenseRepository) UserManager {
 	return UserManager{
-		r: r,
+		r:                 r,
+		expenseRepository: expenseRepository,
 	}
 }
 
@@ -48,4 +50,8 @@ func (m UserManager) Login(username, claimedPassword string) (string, error) {
 	}
 
 	return jwt.GenerateToken(username)
+}
+
+func (m UserManager) GetAllExpensesFromUser(user *model.User) []*model.Expense {
+	return m.expenseRepository.GetAllExpensesFromUser(user)
 }

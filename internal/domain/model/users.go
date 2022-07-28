@@ -18,6 +18,7 @@ type UserServiceInterface interface {
 	FindAll() []*User
 	FindByName(username string) (*User, error)
 	Login(username, claimedPassword string) (string, error)
+	GetAllExpensesFromUser(user *User) []*Expense
 }
 
 type UserRepository interface {

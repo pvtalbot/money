@@ -36,11 +36,12 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 	}
 
 	expenseService := r.ExpenseService
-	expense := expenseService.Create(input.Amount, user)
+	expense := expenseService.Create(input.Amount, input.Date, user)
 
 	return &model.Expense{
 		ID:     expense.ID,
 		Amount: expense.Amount,
+		Date:   expense.Date,
 	}, nil
 }
 
@@ -72,15 +73,15 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 }
 
 // Expenses is the resolver for the expenses field.
-func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) {
+func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var expenses []*model.Expense
-	for _, e := range r.UserService.GetAllExpensesFromUser(user) {
-		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount})
+	for _, e := range r.UserService.GetAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
+		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount, Date: e.Date})
 	}
 
 	return expenses, nil

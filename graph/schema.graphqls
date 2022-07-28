@@ -12,12 +12,18 @@ type User {
 type Expense {
   id: ID!
   amount: Int!
+  date: Time!
 }
 
 type Query {
   users: [User]!
   me: User!
-  expenses: [Expense]!
+  expenses(input: GetExpensesInput!): [Expense]!
+}
+
+input GetExpensesInput {
+  startDate: Time!
+  endDate: Time!
 }
 
 type Mutation {
@@ -35,9 +41,12 @@ input CreateUserInput {
 
 input CreateExpenseInput {
   amount: Int!
+  date: Time!
 }
 
 input Login  {
   username: String!
   password: String!
 }
+
+scalar Time

@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -46,6 +47,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Expense struct {
 		Amount func(childComplexity int) int
+		Date   func(childComplexity int) int
 		ID     func(childComplexity int) int
 	}
 
@@ -56,7 +58,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Expenses func(childComplexity int) int
+		Expenses func(childComplexity int, input model.GetExpensesInput) int
 		Me       func(childComplexity int) int
 		Users    func(childComplexity int) int
 	}
@@ -77,7 +79,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
 	Me(ctx context.Context) (*model.User, error)
-	Expenses(ctx context.Context) ([]*model.Expense, error)
+	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
 }
 
 type executableSchema struct {
@@ -101,6 +103,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expense.Amount(childComplexity), true
+
+	case "Expense.date":
+		if e.complexity.Expense.Date == nil {
+			break
+		}
+
+		return e.complexity.Expense.Date(childComplexity), true
 
 	case "Expense.id":
 		if e.complexity.Expense.ID == nil {
@@ -150,7 +159,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Expenses(childComplexity), true
+		args, err := ec.field_Query_expenses_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Expenses(childComplexity, args["input"].(model.GetExpensesInput)), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -204,6 +218,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateExpenseInput,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputGetExpensesInput,
 		ec.unmarshalInputLogin,
 	)
 	first := true
@@ -279,12 +294,18 @@ type User {
 type Expense {
   id: ID!
   amount: Int!
+  date: Time!
 }
 
 type Query {
   users: [User]!
   me: User!
-  expenses: [Expense]!
+  expenses(input: GetExpensesInput!): [Expense]!
+}
+
+input GetExpensesInput {
+  startDate: Time!
+  endDate: Time!
 }
 
 type Mutation {
@@ -302,12 +323,15 @@ input CreateUserInput {
 
 input CreateExpenseInput {
   amount: Int!
+  date: Time!
 }
 
 input Login  {
   username: String!
   password: String!
-}`, BuiltIn: false},
+}
+
+scalar Time`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -372,6 +396,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_expenses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.GetExpensesInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNGetExpensesInput2back_goᚋgraphᚋmodelᚐGetExpensesInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -496,6 +535,50 @@ func (ec *executionContext) fieldContext_Expense_amount(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Expense_date(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Expense_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Expense",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -664,6 +747,8 @@ func (ec *executionContext) fieldContext_Mutation_createExpense(ctx context.Cont
 				return ec.fieldContext_Expense_id(ctx, field)
 			case "amount":
 				return ec.fieldContext_Expense_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Expense_date(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -804,7 +889,7 @@ func (ec *executionContext) _Query_expenses(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Expenses(rctx)
+		return ec.resolvers.Query().Expenses(rctx, fc.Args["input"].(model.GetExpensesInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -833,9 +918,22 @@ func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, fie
 				return ec.fieldContext_Expense_id(ctx, field)
 			case "amount":
 				return ec.fieldContext_Expense_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Expense_date(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_expenses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -2925,7 +3023,7 @@ func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"amount"}
+	fieldsInOrder := [...]string{"amount", "date"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2937,6 +3035,14 @@ func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
 			it.Amount, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2989,6 +3095,42 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
 			it.LastName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetExpensesInput(ctx context.Context, obj interface{}) (model.GetExpensesInput, error) {
+	var it model.GetExpensesInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"startDate", "endDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "startDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			it.StartDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			it.EndDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3062,6 +3204,13 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 		case "amount":
 
 			out.Values[i] = ec._Expense_amount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+
+			out.Values[i] = ec._Expense_date(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3689,6 +3838,11 @@ func (ec *executionContext) marshalNExpense2ᚖback_goᚋgraphᚋmodelᚐExpense
 	return ec._Expense(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNGetExpensesInput2back_goᚋgraphᚋmodelᚐGetExpensesInput(ctx context.Context, v interface{}) (model.GetExpensesInput, error) {
+	res, err := ec.unmarshalInputGetExpensesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3731,6 +3885,21 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

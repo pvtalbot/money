@@ -4,6 +4,7 @@ import (
 	"back_go/internal/domain/model"
 	"back_go/pkg/jwt"
 	"back_go/pkg/utils"
+	"time"
 )
 
 type UserManager struct {
@@ -52,6 +53,9 @@ func (m UserManager) Login(username, claimedPassword string) (string, error) {
 	return jwt.GenerateToken(username)
 }
 
-func (m UserManager) GetAllExpensesFromUser(user *model.User) []*model.Expense {
-	return m.expenseRepository.GetAllExpensesFromUser(user)
+func (m UserManager) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.Expense {
+	roundedStartDate := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
+	roundedEndDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, endDate.Location())
+
+	return m.expenseRepository.GetAllExpensesFromUserBetweenDates(user, roundedStartDate, roundedEndDate)
 }

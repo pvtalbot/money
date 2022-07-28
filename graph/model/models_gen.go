@@ -2,8 +2,13 @@
 
 package model
 
+import (
+	"time"
+)
+
 type CreateExpenseInput struct {
-	Amount int `json:"amount"`
+	Amount int       `json:"amount"`
+	Date   time.Time `json:"date"`
 }
 
 type CreateUserInput struct {
@@ -14,8 +19,14 @@ type CreateUserInput struct {
 }
 
 type Expense struct {
-	ID     string `json:"id"`
-	Amount int    `json:"amount"`
+	ID     string    `json:"id"`
+	Amount int       `json:"amount"`
+	Date   time.Time `json:"date"`
+}
+
+type GetExpensesInput struct {
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 }
 
 type Login struct {

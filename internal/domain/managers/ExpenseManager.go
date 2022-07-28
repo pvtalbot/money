@@ -24,3 +24,10 @@ func (m ExpenseManager) Create(amount int, date time.Time, user *model.User) *mo
 
 	return m.r.Create(exp, user)
 }
+
+func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.Expense {
+	roundedStartDate := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
+	roundedEndDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, endDate.Location())
+
+	return m.r.GetAllExpensesFromUserBetweenDates(user, roundedStartDate, roundedEndDate)
+}

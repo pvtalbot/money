@@ -2,7 +2,6 @@ package model
 
 import (
 	"back_go/pkg/utils"
-	"time"
 )
 
 type User struct {
@@ -19,7 +18,6 @@ type UserServiceInterface interface {
 	FindAll() []*User
 	FindByName(username string) (*User, error)
 	Login(username, claimedPassword string) (string, error)
-	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense
 }
 
 type UserRepository interface {

@@ -15,4 +15,5 @@ type ExpenseRepository interface {
 
 type ExpenseServiceInterface interface {
 	Create(amount int, date time.Time, user *User) *Expense
+	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense
 }

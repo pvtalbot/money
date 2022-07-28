@@ -80,7 +80,7 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 	}
 
 	var expenses []*model.Expense
-	for _, e := range r.UserService.GetAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
+	for _, e := range r.ExpenseService.GetAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
 		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount, Date: e.Date})
 	}
 

@@ -54,6 +54,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateExpense func(childComplexity int, input model.CreateExpenseInput) int
 		CreateUser    func(childComplexity int, input model.CreateUserInput) int
+		DeleteExpense func(childComplexity int, input model.DeleteExpenseInput) int
 		Login         func(childComplexity int, input model.Login) int
 	}
 
@@ -75,6 +76,7 @@ type MutationResolver interface {
 	Login(ctx context.Context, input model.Login) (string, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
 	CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error)
+	DeleteExpense(ctx context.Context, input model.DeleteExpenseInput) (*model.Expense, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
@@ -141,6 +143,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.CreateUserInput)), true
+
+	case "Mutation.deleteExpense":
+		if e.complexity.Mutation.DeleteExpense == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteExpense_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteExpense(childComplexity, args["input"].(model.DeleteExpenseInput)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -218,6 +232,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateExpenseInput,
 		ec.unmarshalInputCreateUserInput,
+		ec.unmarshalInputDeleteExpenseInput,
 		ec.unmarshalInputGetExpensesInput,
 		ec.unmarshalInputLogin,
 	)
@@ -312,6 +327,11 @@ type Mutation {
   login(input: Login!): String!
   createUser(input: CreateUserInput!): User!
   createExpense(input: CreateExpenseInput!): Expense!
+  deleteExpense(input: DeleteExpenseInput!): Expense!
+}
+
+input DeleteExpenseInput {
+  id: ID!
 }
 
 input CreateUserInput {
@@ -361,6 +381,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateUserInput2back_goᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteExpense_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DeleteExpenseInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDeleteExpenseInput2back_goᚋgraphᚋmodelᚐDeleteExpenseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -761,6 +796,69 @@ func (ec *executionContext) fieldContext_Mutation_createExpense(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createExpense_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteExpense(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteExpense(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteExpense(rctx, fc.Args["input"].(model.DeleteExpenseInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Expense)
+	fc.Result = res
+	return ec.marshalNExpense2ᚖback_goᚋgraphᚋmodelᚐExpense(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteExpense(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Expense_id(ctx, field)
+			case "amount":
+				return ec.fieldContext_Expense_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Expense_date(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteExpense_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3104,6 +3202,34 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteExpenseInput(ctx context.Context, obj interface{}) (model.DeleteExpenseInput, error) {
+	var it model.DeleteExpenseInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGetExpensesInput(ctx context.Context, obj interface{}) (model.GetExpensesInput, error) {
 	var it model.GetExpensesInput
 	asMap := map[string]interface{}{}
@@ -3267,6 +3393,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createExpense(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteExpense":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteExpense(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -3783,6 +3918,11 @@ func (ec *executionContext) unmarshalNCreateExpenseInput2back_goᚋgraphᚋmodel
 
 func (ec *executionContext) unmarshalNCreateUserInput2back_goᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
 	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNDeleteExpenseInput2back_goᚋgraphᚋmodelᚐDeleteExpenseInput(ctx context.Context, v interface{}) (model.DeleteExpenseInput, error) {
+	res, err := ec.unmarshalInputDeleteExpenseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

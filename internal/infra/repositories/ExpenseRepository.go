@@ -76,3 +76,39 @@ func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User)
 
 	return expense
 }
+
+func (r ExpenseMariaRepository) Find(id int64) (*model.Expense, error) {
+	stmt, err := r.db.Prepare("SELECT id, amount, date, user_id FROM expenses WHERE id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	row := stmt.QueryRow(id)
+
+	var expense model.Expense
+	var userId string
+	err = row.Scan(&expense.ID, &expense.Amount, &expense.Date, &userId)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return nil, err
+	}
+
+	expense.User = model.User{ID: userId}
+
+	return &expense, nil
+}
+
+func (r ExpenseMariaRepository) Delete(id int64) error {
+	stmt, err := r.db.Prepare("DELETE FROM expenses WHERE id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

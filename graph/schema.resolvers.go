@@ -45,6 +45,26 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 	}, nil
 }
 
+// DeleteExpense is the resolver for the deleteExpense field.
+func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.DeleteExpenseInput) (*model.Expense, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	expense, err := r.ExpenseService.Delete(input.ID, user.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Expense{
+		ID:     expense.ID,
+		Amount: expense.Amount,
+		Date:   expense.Date,
+	}, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var resultUsers []*model.User

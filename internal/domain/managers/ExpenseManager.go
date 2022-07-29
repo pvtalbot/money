@@ -2,6 +2,8 @@ package managers
 
 import (
 	"back_go/internal/domain/model"
+	"errors"
+	"strconv"
 	"time"
 )
 
@@ -30,4 +32,20 @@ func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, sta
 	roundedEndDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, endDate.Location())
 
 	return m.r.GetAllExpensesFromUserBetweenDates(user, roundedStartDate, roundedEndDate)
+}
+
+func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
+	intId, _ := strconv.ParseInt(id, 10, 64)
+
+	expense, err := m.r.Find(intId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if userID != expense.User.ID {
+		return nil, errors.New("user cannot delete expense")
+	}
+
+	return expense, m.r.Delete(intId)
 }

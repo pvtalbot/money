@@ -18,6 +18,10 @@ type CreateUserInput struct {
 	LastName  string `json:"lastName"`
 }
 
+type DeleteExpenseInput struct {
+	ID string `json:"id"`
+}
+
 type Expense struct {
 	ID     string    `json:"id"`
 	Amount int       `json:"amount"`

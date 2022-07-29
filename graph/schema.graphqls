@@ -30,6 +30,11 @@ type Mutation {
   login(input: Login!): String!
   createUser(input: CreateUserInput!): User!
   createExpense(input: CreateExpenseInput!): Expense!
+  deleteExpense(input: DeleteExpenseInput!): Expense!
+}
+
+input DeleteExpenseInput {
+  id: ID!
 }
 
 input CreateUserInput {

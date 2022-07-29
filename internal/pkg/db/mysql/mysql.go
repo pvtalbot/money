@@ -17,7 +17,11 @@ type DbContainer struct {
 }
 
 func NewDbContainer() DbContainer {
-	database_host := config.GetConfig().Database_host
+	database_host, err := config.GetDatabaseHost()
+	if err != nil {
+		log.Panic(err)
+	}
+
 	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp("+database_host+":3306)/testgo?multiStatements=true&parseTime=true")
 	if err != nil {
 		log.Panic(err)

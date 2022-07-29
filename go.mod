@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.13
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/vektah/gqlparser/v2 v2.4.6
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519

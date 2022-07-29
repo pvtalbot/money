@@ -49,6 +49,7 @@ func main() {
 
 	r := gin.Default()
 
+	r.Use(middlewares.CORSMiddleware())
 	r.Use(middlewares.GinContextToContextMiddleware())
 	r.Use(middlewares.AuthMiddleware(u))
 

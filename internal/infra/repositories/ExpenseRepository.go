@@ -41,10 +41,12 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *model.U
 	var expenses []*model.Expense
 	for rows.Next() {
 		var expense model.Expense
-		err := rows.Scan(&expense.ID, &expense.Amount, &expense.Date)
+		var expenseDate time.Time
+		err := rows.Scan(&expense.ID, &expense.Amount, &expenseDate)
 		if err != nil {
 			log.Fatal(err)
 		}
+		expense.SetDate(expenseDate)
 		expenses = append(expenses, &expense)
 	}
 
@@ -103,7 +105,7 @@ func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User)
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(expense.Amount, expense.Date, user.ID)
+	res, err := stmt.Exec(expense.Amount, expense.GetDate(), user.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,7 +120,22 @@ func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User)
 	return expense
 }
 
-func (r ExpenseMariaRepository) Find(id int64) (*model.Expense, error) {
+func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, error) {
+	stmt, err := r.db.Prepare("UPDATE expenses SET amount = ?, date = ? WHERE id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = stmt.Exec(expense.Amount, expense.GetDate(), expense.ID)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return expense, nil
+}
+
+func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
 	stmt, err := r.db.Prepare("SELECT id, amount, date, user_id FROM expenses WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
@@ -126,8 +143,9 @@ func (r ExpenseMariaRepository) Find(id int64) (*model.Expense, error) {
 	row := stmt.QueryRow(id)
 
 	var expense model.Expense
+	var expenseDate time.Time
 	var userId string
-	err = row.Scan(&expense.ID, &expense.Amount, &expense.Date, &userId)
+	err = row.Scan(&expense.ID, &expense.Amount, &expenseDate, &userId)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Print(err)
@@ -135,12 +153,13 @@ func (r ExpenseMariaRepository) Find(id int64) (*model.Expense, error) {
 		return nil, err
 	}
 
+	expense.SetDate(expenseDate)
 	expense.User = model.User{ID: userId}
 
 	return &expense, nil
 }
 
-func (r ExpenseMariaRepository) Delete(id int64) error {
+func (r ExpenseMariaRepository) Delete(id string) error {
 	stmt, err := r.db.Prepare("DELETE FROM expenses WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)

@@ -41,7 +41,7 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 	return &model.Expense{
 		ID:     expense.ID,
 		Amount: expense.Amount,
-		Date:   expense.Date,
+		Date:   expense.GetDate(),
 	}, nil
 }
 
@@ -61,7 +61,27 @@ func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.Delete
 	return &model.Expense{
 		ID:     expense.ID,
 		Amount: expense.Amount,
-		Date:   expense.Date,
+		Date:   expense.GetDate(),
+	}, nil
+}
+
+// UpdateExpense is the resolver for the updateExpense field.
+func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	expense, err := r.ExpenseService.Update(input.ID, user.ID, input.Amount, input.Date)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Expense{
+		ID:     expense.ID,
+		Amount: expense.Amount,
+		Date:   expense.GetDate(),
 	}, nil
 }
 
@@ -101,7 +121,7 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 
 	var expenses []*model.Expense
 	for _, e := range r.ExpenseService.GetAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
-		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount, Date: e.Date})
+		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount, Date: e.GetDate()})
 	}
 
 	return expenses, nil

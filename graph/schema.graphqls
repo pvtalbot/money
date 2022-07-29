@@ -43,10 +43,17 @@ type Mutation {
   createUser(input: CreateUserInput!): User!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
+  updateExpense(input: UpdateExpenseInput!): Expense!
 }
 
 input DeleteExpenseInput {
   id: ID!
+}
+
+input UpdateExpenseInput {
+  id: ID!
+  amount: Int
+  date: Time
 }
 
 input CreateUserInput {

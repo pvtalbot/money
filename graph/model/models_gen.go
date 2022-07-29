@@ -49,6 +49,12 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+type UpdateExpenseInput struct {
+	ID     string     `json:"id"`
+	Amount *int       `json:"amount"`
+	Date   *time.Time `json:"date"`
+}
+
 type User struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`

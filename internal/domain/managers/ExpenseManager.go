@@ -3,7 +3,6 @@ package managers
 import (
 	"back_go/internal/domain/model"
 	"errors"
-	"strconv"
 	"time"
 )
 
@@ -18,13 +17,33 @@ func NewExpenseManager(r model.ExpenseRepository) ExpenseManager {
 }
 
 func (m ExpenseManager) Create(amount int, date time.Time, user *model.User) *model.Expense {
-	roundedDate := time.Date(date.Year(), date.Month(), date.Day(), 12, 0, 0, 0, date.Location())
 	exp := &model.Expense{
 		Amount: amount,
-		Date:   roundedDate,
 	}
+	exp.SetDate(date)
 
 	return m.r.Create(exp, user)
+}
+
+func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) (*model.Expense, error) {
+	expense, err := m.r.Find(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if userId != expense.User.ID {
+		return nil, errors.New("user cannot update expense")
+	}
+
+	if amount != nil {
+		expense.Amount = *amount
+	}
+	if date != nil {
+		expense.SetDate(*date)
+	}
+
+	return m.r.Update(expense)
+
 }
 
 func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.Expense {
@@ -35,9 +54,7 @@ func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, sta
 }
 
 func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
-	intId, _ := strconv.ParseInt(id, 10, 64)
-
-	expense, err := m.r.Find(intId)
+	expense, err := m.r.Find(id)
 
 	if err != nil {
 		return nil, err
@@ -47,7 +64,7 @@ func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
 		return nil, errors.New("user cannot delete expense")
 	}
 
-	return expense, m.r.Delete(intId)
+	return expense, m.r.Delete(id)
 }
 
 func (m ExpenseManager) SumAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.ExpenseSum {

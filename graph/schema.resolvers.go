@@ -107,6 +107,21 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 	return expenses, nil
 }
 
+// ExpensesSum is the resolver for the expensesSum field.
+func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var expensesSum []*model.ExpenseSum
+	for _, e := range r.ExpenseService.SumAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
+		expensesSum = append(expensesSum, &model.ExpenseSum{Amount: e.Amount, StartDate: e.StartDate, EndDate: e.EndDate})
+	}
+
+	return expensesSum, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

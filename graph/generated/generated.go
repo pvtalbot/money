@@ -51,6 +51,12 @@ type ComplexityRoot struct {
 		ID     func(childComplexity int) int
 	}
 
+	ExpenseSum struct {
+		Amount    func(childComplexity int) int
+		EndDate   func(childComplexity int) int
+		StartDate func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateExpense func(childComplexity int, input model.CreateExpenseInput) int
 		CreateUser    func(childComplexity int, input model.CreateUserInput) int
@@ -59,9 +65,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Expenses func(childComplexity int, input model.GetExpensesInput) int
-		Me       func(childComplexity int) int
-		Users    func(childComplexity int) int
+		Expenses    func(childComplexity int, input model.GetExpensesInput) int
+		ExpensesSum func(childComplexity int, input model.GetExpensesSumInput) int
+		Me          func(childComplexity int) int
+		Users       func(childComplexity int) int
 	}
 
 	User struct {
@@ -82,6 +89,7 @@ type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
 	Me(ctx context.Context) (*model.User, error)
 	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
+	ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error)
 }
 
 type executableSchema struct {
@@ -119,6 +127,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expense.ID(childComplexity), true
+
+	case "ExpenseSum.amount":
+		if e.complexity.ExpenseSum.Amount == nil {
+			break
+		}
+
+		return e.complexity.ExpenseSum.Amount(childComplexity), true
+
+	case "ExpenseSum.endDate":
+		if e.complexity.ExpenseSum.EndDate == nil {
+			break
+		}
+
+		return e.complexity.ExpenseSum.EndDate(childComplexity), true
+
+	case "ExpenseSum.startDate":
+		if e.complexity.ExpenseSum.StartDate == nil {
+			break
+		}
+
+		return e.complexity.ExpenseSum.StartDate(childComplexity), true
 
 	case "Mutation.createExpense":
 		if e.complexity.Mutation.CreateExpense == nil {
@@ -180,6 +209,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Expenses(childComplexity, args["input"].(model.GetExpensesInput)), true
 
+	case "Query.expensesSum":
+		if e.complexity.Query.ExpensesSum == nil {
+			break
+		}
+
+		args, err := ec.field_Query_expensesSum_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ExpensesSum(childComplexity, args["input"].(model.GetExpensesSumInput)), true
+
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
 			break
@@ -234,6 +275,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputDeleteExpenseInput,
 		ec.unmarshalInputGetExpensesInput,
+		ec.unmarshalInputGetExpensesSumInput,
 		ec.unmarshalInputLogin,
 	)
 	first := true
@@ -312,13 +354,25 @@ type Expense {
   date: Time!
 }
 
+type ExpenseSum {
+  amount: Int!
+  startDate: Time!
+  endDate: Time!
+}
+
 type Query {
   users: [User]!
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
+  expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
 }
 
 input GetExpensesInput {
+  startDate: Time!
+  endDate: Time!
+}
+
+input GetExpensesSumInput {
   startDate: Time!
   endDate: Time!
 }
@@ -431,6 +485,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_expensesSum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.GetExpensesSumInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNGetExpensesSumInput2back_goᚋgraphᚋmodelᚐGetExpensesSumInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -609,6 +678,138 @@ func (ec *executionContext) _Expense_date(ctx context.Context, field graphql.Col
 func (ec *executionContext) fieldContext_Expense_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Expense",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExpenseSum_amount(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseSum) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseSum_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseSum_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseSum",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExpenseSum_startDate(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseSum) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseSum_startDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseSum_startDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseSum",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExpenseSum_endDate(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseSum) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseSum_endDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseSum_endDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseSum",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1030,6 +1231,69 @@ func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_expenses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_expensesSum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_expensesSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ExpensesSum(rctx, fc.Args["input"].(model.GetExpensesSumInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ExpenseSum)
+	fc.Result = res
+	return ec.marshalNExpenseSum2ᚕᚖback_goᚋgraphᚋmodelᚐExpenseSum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_expensesSum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "amount":
+				return ec.fieldContext_ExpenseSum_amount(ctx, field)
+			case "startDate":
+				return ec.fieldContext_ExpenseSum_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_ExpenseSum_endDate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExpenseSum", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_expensesSum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3266,6 +3530,42 @@ func (ec *executionContext) unmarshalInputGetExpensesInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetExpensesSumInput(ctx context.Context, obj interface{}) (model.GetExpensesSumInput, error) {
+	var it model.GetExpensesSumInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"startDate", "endDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "startDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			it.StartDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			it.EndDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
 	var it model.Login
 	asMap := map[string]interface{}{}
@@ -3337,6 +3637,48 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 		case "date":
 
 			out.Values[i] = ec._Expense_date(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var expenseSumImplementors = []string{"ExpenseSum"}
+
+func (ec *executionContext) _ExpenseSum(ctx context.Context, sel ast.SelectionSet, obj *model.ExpenseSum) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, expenseSumImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExpenseSum")
+		case "amount":
+
+			out.Values[i] = ec._ExpenseSum_amount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startDate":
+
+			out.Values[i] = ec._ExpenseSum_startDate(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "endDate":
+
+			out.Values[i] = ec._ExpenseSum_endDate(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3493,6 +3835,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_expenses(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "expensesSum":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_expensesSum(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3978,8 +4343,51 @@ func (ec *executionContext) marshalNExpense2ᚖback_goᚋgraphᚋmodelᚐExpense
 	return ec._Expense(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNExpenseSum2ᚕᚖback_goᚋgraphᚋmodelᚐExpenseSum(ctx context.Context, sel ast.SelectionSet, v []*model.ExpenseSum) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOExpenseSum2ᚖback_goᚋgraphᚋmodelᚐExpenseSum(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNGetExpensesInput2back_goᚋgraphᚋmodelᚐGetExpensesInput(ctx context.Context, v interface{}) (model.GetExpensesInput, error) {
 	res, err := ec.unmarshalInputGetExpensesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNGetExpensesSumInput2back_goᚋgraphᚋmodelᚐGetExpensesSumInput(ctx context.Context, v interface{}) (model.GetExpensesSumInput, error) {
+	res, err := ec.unmarshalInputGetExpensesSumInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4384,6 +4792,13 @@ func (ec *executionContext) marshalOExpense2ᚖback_goᚋgraphᚋmodelᚐExpense
 		return graphql.Null
 	}
 	return ec._Expense(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOExpenseSum2ᚖback_goᚋgraphᚋmodelᚐExpenseSum(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseSum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ExpenseSum(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

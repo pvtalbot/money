@@ -15,13 +15,25 @@ type Expense {
   date: Time!
 }
 
+type ExpenseSum {
+  amount: Int!
+  startDate: Time!
+  endDate: Time!
+}
+
 type Query {
   users: [User]!
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
+  expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
 }
 
 input GetExpensesInput {
+  startDate: Time!
+  endDate: Time!
+}
+
+input GetExpensesSumInput {
   startDate: Time!
   endDate: Time!
 }

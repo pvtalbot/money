@@ -28,7 +28,18 @@ type Expense struct {
 	Date   time.Time `json:"date"`
 }
 
+type ExpenseSum struct {
+	Amount    int       `json:"amount"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+}
+
 type GetExpensesInput struct {
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+}
+
+type GetExpensesSumInput struct {
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
 }

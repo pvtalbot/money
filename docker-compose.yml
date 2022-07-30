@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  money-front:
+    build:
+      context: docker/web/
+    working_dir: /web
+    hostname: front_money
+    container_name: front_money
+    tty: true
+    depends_on:
+      - money-back
+    ports:
+      - 5173:5173
+    stdin_open: true
+    volumes:
+      - ./web/:/web/
+      - /web/node_modules/
+    networks:
+      - net
+    
+  money-back:
+    depends_on:
+      - maria
+    build:
+      context: docker/app
+    container_name: back_money
+    hostname: back_money
+    networks:
+      - net
+    ports:
+      - 80:8080
+    environment:
+      - DB_USER=admin_money
+      - DB_PASSWORD=sixmillekangourous
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=money
+      - GOCACHE=/go-cache
+    deploy:
+      restart_policy:
+        condition: on-failure
+    working_dir: /internal
+    volumes:
+      - ./internal/:/internal/
+      - ./.go-cache/:/go-cache/
+      - ./.go/pkg/:/go/pkg/
+      
+  maria:
+    image: mariadb:latest
+    container_name: maria-container
+    hostname: db
+    networks:
+      - net
+    ports:
+      - 3306:3306
+    volumes:
+      - maria-volume:/var/lib/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD=polo
+      - MARIADB_DATABASE=money
+      - MARIADB_USER=admin_money
+      - MARIADB_PASSWORD=sixmillekangourous
+
+volumes:
+  maria-volume:
+
+networks:
+  net:
+    driver: bridge

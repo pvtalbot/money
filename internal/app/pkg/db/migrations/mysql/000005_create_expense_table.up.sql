@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS expenses(
+    id INT NOT NULL UNIQUE AUTO_INCREMENT,
+    amount INT NOT NULL,
+    user_id INT NOT NULL,
+    date DATETIME NOT NULL DEFAULT(CURRENT_TIMESTAMP),
+    PRIMARY KEY(id),
+    CONSTRAINT `fk_expense_user`
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE
+);

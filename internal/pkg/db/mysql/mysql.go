@@ -22,7 +22,7 @@ func NewDbContainer() DbContainer {
 		log.Panic(err)
 	}
 
-	db, err := sql.Open("mysql", "admin_go:deuxmillekangourous@tcp("+database_host+":3306)/testgo?multiStatements=true&parseTime=true")
+	db, err := sql.Open("mysql", "admin_go:sixmillekangourous@tcp("+database_host+":3306)/money_go?multiStatements=true&parseTime=true")
 	if err != nil {
 		log.Panic(err)
 	}

@@ -7,6 +7,7 @@ import (
 	"back_go/graph/generated"
 	"back_go/graph/model"
 	"back_go/internal/middlewares"
+	"back_go/pkg/utils"
 	"context"
 )
 
@@ -134,8 +135,14 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 		return nil, err
 	}
 
+	var groupBy utils.Duration
+	switch input.GroupBy {
+	case model.DurationMonth:
+		groupBy = utils.MONTH
+	}
+
 	var expensesSum []*model.ExpenseSum
-	for _, e := range r.ExpenseService.SumAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
+	for _, e := range r.ExpenseService.SumAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate, groupBy) {
 		expensesSum = append(expensesSum, &model.ExpenseSum{Amount: e.Amount, StartDate: e.StartDate, EndDate: e.EndDate})
 	}
 

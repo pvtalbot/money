@@ -3,6 +3,9 @@
 package model
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 )
 
@@ -42,6 +45,7 @@ type GetExpensesInput struct {
 type GetExpensesSumInput struct {
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
+	GroupBy   Duration  `json:"groupBy"`
 }
 
 type Login struct {
@@ -60,4 +64,45 @@ type User struct {
 	Name      string `json:"name"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
+}
+
+type Duration string
+
+const (
+	DurationMonth Duration = "MONTH"
+	DurationYear  Duration = "YEAR"
+)
+
+var AllDuration = []Duration{
+	DurationMonth,
+	DurationYear,
+}
+
+func (e Duration) IsValid() bool {
+	switch e {
+	case DurationMonth, DurationYear:
+		return true
+	}
+	return false
+}
+
+func (e Duration) String() string {
+	return string(e)
+}
+
+func (e *Duration) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Duration(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Duration", str)
+	}
+	return nil
+}
+
+func (e Duration) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

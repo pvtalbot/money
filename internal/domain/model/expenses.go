@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"back_go/pkg/utils"
+	"time"
+)
 
 type Expense struct {
 	ID     string `json:"id"`
@@ -42,5 +45,5 @@ type ExpenseServiceInterface interface {
 	Delete(id string, userID string) (*Expense, error)
 	Update(id, userId string, amount *int, date *time.Time) (*Expense, error)
 	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense
-	SumAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*ExpenseSum
+	SumAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time, groupBy utils.Duration) []*ExpenseSum
 }

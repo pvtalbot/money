@@ -36,6 +36,7 @@ input GetExpensesInput {
 input GetExpensesSumInput {
   startDate: Time!
   endDate: Time!
+  groupBy: Duration!
 }
 
 type Mutation {
@@ -74,3 +75,8 @@ input Login  {
 }
 
 scalar Time
+
+enum Duration {
+  MONTH,
+  YEAR,
+}

@@ -390,6 +390,7 @@ input GetExpensesInput {
 input GetExpensesSumInput {
   startDate: Time!
   endDate: Time!
+  groupBy: Duration!
 }
 
 type Mutation {
@@ -427,7 +428,12 @@ input Login  {
   password: String!
 }
 
-scalar Time`, BuiltIn: false},
+scalar Time
+
+enum Duration {
+  MONTH,
+  YEAR,
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -3637,7 +3643,7 @@ func (ec *executionContext) unmarshalInputGetExpensesSumInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"startDate", "endDate"}
+	fieldsInOrder := [...]string{"startDate", "endDate", "groupBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3657,6 +3663,14 @@ func (ec *executionContext) unmarshalInputGetExpensesSumInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
 			it.EndDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "groupBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupBy"))
+			it.GroupBy, err = ec.unmarshalNDuration2back_goᚋgraphᚋmodelᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4442,6 +4456,16 @@ func (ec *executionContext) unmarshalNCreateUserInput2back_goᚋgraphᚋmodelᚐ
 func (ec *executionContext) unmarshalNDeleteExpenseInput2back_goᚋgraphᚋmodelᚐDeleteExpenseInput(ctx context.Context, v interface{}) (model.DeleteExpenseInput, error) {
 	res, err := ec.unmarshalInputDeleteExpenseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNDuration2back_goᚋgraphᚋmodelᚐDuration(ctx context.Context, v interface{}) (model.Duration, error) {
+	var res model.Duration
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDuration2back_goᚋgraphᚋmodelᚐDuration(ctx context.Context, sel ast.SelectionSet, v model.Duration) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNExpense2back_goᚋgraphᚋmodelᚐExpense(ctx context.Context, sel ast.SelectionSet, v model.Expense) graphql.Marshaler {

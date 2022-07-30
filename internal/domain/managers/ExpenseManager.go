@@ -2,6 +2,7 @@ package managers
 
 import (
 	"back_go/internal/domain/model"
+	"back_go/pkg/utils"
 	"errors"
 	"time"
 )
@@ -67,8 +68,13 @@ func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
 	return expense, m.r.Delete(id)
 }
 
-func (m ExpenseManager) SumAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.ExpenseSum {
-	return m.sumAllExpensesFromUserBetweenDatesByMonth(user, startDate, endDate)
+func (m ExpenseManager) SumAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time, groupBy utils.Duration) []*model.ExpenseSum {
+	switch groupBy {
+	case utils.MONTH:
+		return m.sumAllExpensesFromUserBetweenDatesByMonth(user, startDate, endDate)
+	default:
+		return m.sumAllExpensesFromUserBetweenDatesByMonth(user, startDate, endDate)
+	}
 }
 
 func (m ExpenseManager) sumAllExpensesFromUserBetweenDatesByMonth(user *model.User, startDate, endDate time.Time) []*model.ExpenseSum {

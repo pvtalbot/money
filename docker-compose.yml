@@ -15,7 +15,7 @@ services:
     stdin_open: true
     volumes:
       - ./web/:/web/
-      - /web/node_modules/
+      - node_modules-volume:/web/node_modules/
     networks:
       - net
     
@@ -64,6 +64,7 @@ services:
 
 volumes:
   maria-volume:
+  node_modules-volume:
 
 networks:
   net:

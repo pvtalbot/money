@@ -12,8 +12,8 @@ import { useExpenseStore } from '@/stores/expense.js'
 
 // Vue
 import { computed, ref } from 'vue'
-import ExpenseCard from './ExpenseCard.vue';
-import MonthPicker from './MonthPicker.vue';
+import ExpenseCard from '@/components/expenses-list/ExpenseCard.vue';
+import MonthPicker from '@/components/utils/MonthPicker.vue';
 
 const expenseStore = useExpenseStore();
 

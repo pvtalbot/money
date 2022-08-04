@@ -4,15 +4,15 @@
 <template>
   <header>
     <div class="logo-container logo-container--head">
-      <img src="../assets/euro-money-bag.svg" alt="logo"/>
+      <img src="@/assets/euro-money-bag.svg" alt="logo"/>
     </div>
 
     <div class="logo-container">
-      <img src="../assets/hamburger-menu.svg" alt="expense list"/>
+      <img src="@/assets/hamburger-menu.svg" alt="expense list"/>
     </div>
 
     <div class="logo-container">
-      <img src="../assets/chart.svg" alt="charts"/>
+      <img src="@/assets/chart.svg" alt="charts"/>
     </div>
 
     <div class="divider"></div>

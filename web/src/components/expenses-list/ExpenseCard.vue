@@ -14,7 +14,7 @@ const props = defineProps({
       <p>{{ expense.amount}}</p>
     </div>
     <div class="expense-card__delete-expense" @click="$emit('delete-expense')">
-      <img alt="delete expense" src="../assets/bin_icon.svg"/>
+      <img alt="delete expense" src="@/assets/bin_icon.svg"/>
     </div>
   </div>
 </template>

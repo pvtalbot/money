@@ -1,7 +1,7 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
 import { computed } from 'vue';
-import ExpensesList from '../components/ExpensesList.vue';
+import ExpensesList from '../components/expenses-list/ExpensesList.vue';
 
 const userStore = useUserStore();
 const firstName = computed(() => userStore.user.firstName)

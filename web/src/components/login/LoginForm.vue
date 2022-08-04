@@ -1,11 +1,15 @@
 <script setup>
+// vue
 import { ref, watch } from 'vue';
-import { useUserStore } from '../stores/user';
+import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
-import VueButton from './VueButton.vue';
 
+// components
+import VueButton from '@/components/utils/VueButton.vue';
+
+// Apollo
 import { useMutation, useLazyQuery } from '@vue/apollo-composable'
-import LoginMutation from '../graphql/mutations/LoginMutation.gql'
+import LoginMutation from '@/graphql/mutations/LoginMutation.gql'
 import Me from '@/graphql/queries/CurrentUser.gql';
 
 const userStore = useUserStore();

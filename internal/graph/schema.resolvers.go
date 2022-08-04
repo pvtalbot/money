@@ -150,6 +150,11 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 	return expensesSum, nil
 }
 
+// ValidateAccessToken is the resolver for the validateAccessToken field.
+func (r *queryResolver) ValidateAccessToken(ctx context.Context, accessToken string) (bool, error) {
+	return r.UserService.ValidateToken(accessToken), nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

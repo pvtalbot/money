@@ -51,3 +51,9 @@ func (m UserManager) Login(username, claimedPassword string) (string, error) {
 
 	return jwt.GenerateToken(username)
 }
+
+func (m UserManager) ValidateToken(token string) bool {
+	_, err := jwt.ParseToken(token)
+
+	return err == nil
+}

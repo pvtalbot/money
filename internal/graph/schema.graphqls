@@ -26,6 +26,7 @@ type Query {
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
+  validateAccessToken(accessToken: String!): Boolean!
 }
 
 input GetExpensesInput {

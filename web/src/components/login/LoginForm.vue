@@ -10,6 +10,7 @@ import VueButton from '@/components/utils/VueButton.vue';
 // Apollo
 import { useMutation, useLazyQuery } from '@vue/apollo-composable'
 import LoginMutation from '@/graphql/mutations/LoginMutation.gql'
+import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql'
 import Me from '@/graphql/queries/CurrentUser.gql';
 
 const userStore = useUserStore();
@@ -22,6 +23,7 @@ const disabled = ref(false);
 
 const {mutate: loginMutation} = useMutation(LoginMutation);
 const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me);
+const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidated} = useLazyQuery(ValidateAccessToken)
 
 const login = () => {
   disabled.value = false;
@@ -34,12 +36,11 @@ const login = () => {
   .then(() => loadCurrentUser())
 
   onCurrentUserSucceeded(() => {
-    if (currentUser.value) {
-      userStore.$patch((store) => {
-        store.user.firstName = currentUser.value.me.firstName;
-        store.user.lastName = currentUser.value.me.lastName;
-      })
-    }
+    if (!currentUser.value) return;
+    userStore.$patch((store) => {
+      store.user.firstName = currentUser.value.me.firstName;
+      store.user.lastName = currentUser.value.me.lastName;
+    })
   })
 }
 
@@ -48,15 +49,23 @@ onMounted(() => {
   const accessToken = localStorage.getItem('accessToken');
 
   if (accessToken == null) return;
+  loadTokenValidity(undefined, {accessToken: accessToken});
+  onTokenValidated(() => {
+    if (!tokenValidity.value) return;
+    if (!tokenValidity.value.validateAccessToken) {
+      localStorage.removeItem('accessToken');
+      return;
+    }
 
-  loadCurrentUser();
-  onCurrentUserSucceeded(() => {
-    if (currentUser.value) {
+    loadCurrentUser();
+    onCurrentUserSucceeded(() => {
+      if (!currentUser.value) return;
+
       userStore.$patch((store) => {
         store.user.firstName = currentUser.value.me.firstName;
         store.user.lastName = currentUser.value.me.lastName;
       })
-    }
+    })
   })
 })
 </script>

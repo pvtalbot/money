@@ -66,10 +66,11 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Expenses    func(childComplexity int, input model.GetExpensesInput) int
-		ExpensesSum func(childComplexity int, input model.GetExpensesSumInput) int
-		Me          func(childComplexity int) int
-		Users       func(childComplexity int) int
+		Expenses            func(childComplexity int, input model.GetExpensesInput) int
+		ExpensesSum         func(childComplexity int, input model.GetExpensesSumInput) int
+		Me                  func(childComplexity int) int
+		Users               func(childComplexity int) int
+		ValidateAccessToken func(childComplexity int, accessToken string) int
 	}
 
 	User struct {
@@ -92,6 +93,7 @@ type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
 	ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error)
+	ValidateAccessToken(ctx context.Context, accessToken string) (bool, error)
 }
 
 type executableSchema struct {
@@ -249,6 +251,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity), true
 
+	case "Query.validateAccessToken":
+		if e.complexity.Query.ValidateAccessToken == nil {
+			break
+		}
+
+		args, err := ec.field_Query_validateAccessToken_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ValidateAccessToken(childComplexity, args["accessToken"].(string)), true
+
 	case "User.firstName":
 		if e.complexity.User.FirstName == nil {
 			break
@@ -380,6 +394,7 @@ type Query {
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
+  validateAccessToken(accessToken: String!): Boolean!
 }
 
 input GetExpensesInput {
@@ -558,6 +573,21 @@ func (ec *executionContext) field_Query_expenses_args(ctx context.Context, rawAr
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_validateAccessToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["accessToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessToken"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["accessToken"] = arg0
 	return args, nil
 }
 
@@ -1400,6 +1430,61 @@ func (ec *executionContext) fieldContext_Query_expensesSum(ctx context.Context, 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_expensesSum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_validateAccessToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_validateAccessToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ValidateAccessToken(rctx, fc.Args["accessToken"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_validateAccessToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_validateAccessToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4025,6 +4110,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_expensesSum(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "validateAccessToken":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_validateAccessToken(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

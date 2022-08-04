@@ -1,0 +1,5 @@
+mutation DeleteExpense($input: DeleteExpenseInput!) {
+  deleteExpense(input: $input) {
+    id
+  }
+}

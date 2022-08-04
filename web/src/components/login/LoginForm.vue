@@ -1,6 +1,6 @@
 <script setup>
 // vue
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 
@@ -44,6 +44,21 @@ const login = () => {
 }
 
 watch(() => userStore.userLoggedIn, () => {router.push({name: 'app'})});
+onMounted(() => {
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (accessToken == null) return;
+
+  loadCurrentUser();
+  onCurrentUserSucceeded(() => {
+    if (currentUser.value) {
+      userStore.$patch((store) => {
+        store.user.firstName = currentUser.value.me.firstName;
+        store.user.lastName = currentUser.value.me.lastName;
+      })
+    }
+  })
+})
 </script>
 
 <template>

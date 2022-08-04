@@ -1,0 +1,7 @@
+query Expenses($input: GetExpensesInput!) {
+  expenses(input: $input) {
+    id
+    amount
+    date
+  }
+}

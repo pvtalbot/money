@@ -1,24 +1,23 @@
 <script setup>
 import { ref, watch } from 'vue';
+import { useUserStore } from '../stores/user';
+import { useRouter } from 'vue-router';
 import VueButton from './VueButton.vue';
 
 import { useMutation, useLazyQuery } from '@vue/apollo-composable'
 import LoginMutation from '../graphql/mutations/LoginMutation.gql'
 import Me from '@/graphql/queries/CurrentUser.gql';
-import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore();
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
 const disabled = ref(false);
 
-const userStore = useUserStore();
 
-const {mutate: loginMutation} = useMutation(LoginMutation, {
-  fetchPolicy: 'no-cache',
-});
-const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me, {
-  fetchPolicy: 'no-cache',
-});
+const {mutate: loginMutation} = useMutation(LoginMutation);
+const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me);
 
 const login = () => {
   disabled.value = false;
@@ -37,8 +36,10 @@ const login = () => {
         store.user.lastName = currentUser.value.me.lastName;
       })
     }
-  });
+  })
 }
+
+watch(() => userStore.userLoggedIn, () => {router.push({name: 'app'})});
 </script>
 
 <template>

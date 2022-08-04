@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
 import { DefaultApolloClient } from '@vue/apollo-composable'
+import { setContext } from '@apollo/client/link/context'
 
 import App from './App.vue'
 import router from './router'
@@ -13,10 +14,21 @@ const httpLink = createHttpLink({
   uri: 'http://localhost/query',
 });
 
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('accessToken');
+
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? token : "",
+    }
+  }
+})
+
 const cache = new InMemoryCache()
 
 const apolloClient = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache,
 })
 

@@ -7,7 +7,7 @@ export const useExpenseStore = defineStore('expenses', () => {
   const expenses = reactive({})
 
   const updateExpenses = (newExpenses) => {
-    for  (const expense of newExpenses) {
+    for (const expense of newExpenses) {
       const date = dayjs(expense.date)
       const year = date.year();
       const month = date.month();
@@ -27,7 +27,10 @@ export const useExpenseStore = defineStore('expenses', () => {
         date: date,
       }
     }
+  }
 
+  const deleteExpense = (expense) => {
+    delete expenses[expense.date.year()][expense.date.month()][expense.id];
   }
 
   const getCurrentExpenses = computed(() => {
@@ -38,6 +41,7 @@ export const useExpenseStore = defineStore('expenses', () => {
     expenses,
     getCurrentExpenses,
     updateExpenses,
+    deleteExpense,
   };
 
 })

@@ -10,6 +10,6 @@ const firstName = computed(() => userStore.user.firstName)
 <template>
   <div class="home">
     <h1>Hello {{firstName}}, this is Expenses manager!</h1>
+    <ExpensesList/>
   </div>
-  <ExpensesList/>
 </template>

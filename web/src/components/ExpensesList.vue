@@ -3,8 +3,9 @@
 import dayjs from 'dayjs';
 
 // Apollo
-import { useQuery } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import Expenses from '@/graphql/queries/ExpenseList.gql';
+import DeleteExpense from '@/graphql/mutations/DeleteExpenseMutation.gql';
 
 // Pinia
 import { useExpenseStore } from '@/stores/expense.js'
@@ -12,8 +13,11 @@ import { useExpenseStore } from '@/stores/expense.js'
 // Vue
 import { computed, ref } from 'vue'
 import ExpenseCard from './ExpenseCard.vue';
+import MonthPicker from './MonthPicker.vue';
 
 const expenseStore = useExpenseStore();
+
+const monthPicker = ref(null)
 
 const startDate = ref(dayjs().day(1).hour(0).minute(0).second(0).millisecond(0))
 const endDate = computed(() => startDate.value.add(1, 'month'))
@@ -29,10 +33,7 @@ const sortedExpenses = computed(() => {
 })
 
 
-const {
-  result: expenses,
-  onResult: onExpenseListSucceeded,
-  loading: expensesLoading,
+const { result: expenses, onResult: onExpenseListSucceeded, loading: expensesLoading,
   } = 
   useQuery(Expenses, {
   input: {
@@ -45,11 +46,19 @@ onExpenseListSucceeded(() => {
   expenseStore.updateExpenses(expenses.value.expenses);
 })
 
+const {mutate: deleteExpenseMutation} = useMutation(DeleteExpense)
+const deleteExpense = function(expense) {
+  deleteExpenseMutation({input: {id: expense.id}})
+    .then(() => expenseStore.deleteExpense(expense))
+    .catch(e => { console.log(e); });
+}
+
 
 </script>
 
 <template>
   <div class="expenses-list">
+    <MonthPicker ref="monthPicker"/>
     <transition name="slide-fade" tag="div" mode="out-in">
       <div v-if="expensesLoading" class="expenses-list__loader" key="waiting">
         <h1>A minute please, I'm gathering everything!</h1>
@@ -57,7 +66,7 @@ onExpenseListSucceeded(() => {
       <div v-else class="expenses_list__list" key="loaded">
         <p>Expenses of the month:</p>
         <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
-          <ExpenseCard :expense="expense"/>
+          <ExpenseCard :expense="expense" @delete-expense="deleteExpense(expense)"/>
         </div>
       </div>
     </transition>

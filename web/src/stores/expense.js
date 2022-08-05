@@ -35,7 +35,7 @@ export const useExpenseStore = defineStore('expenses', () => {
 
   const getCurrentExpenses = computed(() => {
     return (date) => {
-      if (!expenses[date.year()] || expenses[date.year()][date.month()]) return {}
+      if (!expenses[date.year()] || !expenses[date.year()][date.month()]) return {}
 
       return expenses[date.year()][date.month()];
     }

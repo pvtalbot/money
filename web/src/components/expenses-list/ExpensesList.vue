@@ -1,6 +1,7 @@
 <script setup>
 // External libraries
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 // Apollo
 import { useMutation, useQuery } from '@vue/apollo-composable';
@@ -11,15 +12,20 @@ import DeleteExpense from '@/graphql/mutations/DeleteExpenseMutation.gql';
 import { useExpenseStore } from '@/stores/expense.js'
 
 // Vue
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import ExpenseCard from '@/components/expenses-list/ExpenseCard.vue';
 import MonthPicker from '@/components/utils/MonthPicker.vue';
 
-const expenseStore = useExpenseStore();
+dayjs.extend(utc)
 
+const expenseStore = useExpenseStore();
 const monthPicker = ref(null)
 
-const startDate = ref(dayjs().day(1).hour(0).minute(0).second(0).millisecond(0))
+const startDate = computed(() => {
+  if (monthPicker.value == null) return dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
+
+  return monthPicker.value.date;
+})
 const endDate = computed(() => startDate.value.add(1, 'month'))
 
 const displayedExpenses = computed(() => expenseStore.getCurrentExpenses(startDate.value));
@@ -32,19 +38,13 @@ const sortedExpenses = computed(() => {
   })
 })
 
+const { result: expenses, onResult: onExpenseListSucceeded, refetch: refetchExpenses, loading: expensesLoading} = 
+  useQuery(
+    Expenses, 
+    { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}}
+  );
 
-const { result: expenses, onResult: onExpenseListSucceeded, loading: expensesLoading,
-  } = 
-  useQuery(Expenses, {
-  input: {
-    startDate: startDate.value.toISOString(),
-    endDate: endDate.value.toISOString(),
-  }
-});
-
-onExpenseListSucceeded(() => {
-  expenseStore.updateExpenses(expenses.value.expenses);
-})
+onExpenseListSucceeded(() => { expenseStore.updateExpenses(expenses.value.expenses); })
 
 const {mutate: deleteExpenseMutation} = useMutation(DeleteExpense)
 const deleteExpense = function(expense) {
@@ -53,12 +53,20 @@ const deleteExpense = function(expense) {
     .catch(e => { console.log(e); });
 }
 
-
+watch(startDate, () => {
+  refetchExpenses({
+    input: {
+      startDate: startDate.value.toISOString(),
+      endDate: endDate.value.toISOString(),
+    }
+  });
+})
 </script>
 
 <template>
   <div class="expenses-list">
     <MonthPicker ref="monthPicker"/>
+    {{ startDate.format('DD MM YY') }}
     <transition name="slide-fade" tag="div" mode="out-in">
       <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
         <h1>A minute please, I'm gathering everything!</h1>

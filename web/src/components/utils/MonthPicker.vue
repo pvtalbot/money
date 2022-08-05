@@ -1,9 +1,11 @@
 <script setup>
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 import { computed, ref, watch } from 'vue';
 
-const date = ref(dayjs().day(1).hour(0).minute(0).second(0).millisecond(0));
+
+const date = ref(dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0));
 
 const currentDate = computed(() => date.value.format('MMMM YYYY'));
 
@@ -13,6 +15,7 @@ const addMonth = function() {
 const subtractMonth = function() {
   date.value = date.value.subtract(1, 'month');
 }
+defineExpose({date})
 </script>
 
 <template>

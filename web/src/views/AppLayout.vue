@@ -1,13 +1,12 @@
 <script setup>
 import VueHeader from '@/components/layout/VueHeader.vue';
-import HomeView from './HomeView.vue';
 
 </script>
 <template>
   <div class="layout">
     <VueHeader/>
     <main>
-      <HomeView/>
+      <RouterView/>
     </main>
   </div>
 </template>

@@ -13,7 +13,7 @@ import { useExpenseStore } from '@/stores/expense.js'
 
 // Vue
 import { computed, ref, watch } from 'vue'
-import ExpenseCard from '@/components/expenses-list/ExpenseCard.vue';
+import ExpenseCard from '@/components/home/ExpenseCard.vue';
 import MonthPicker from '@/components/utils/MonthPicker.vue';
 
 dayjs.extend(utc)

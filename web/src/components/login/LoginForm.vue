@@ -44,7 +44,7 @@ const login = () => {
   })
 }
 
-watch(() => userStore.userLoggedIn, () => {router.push({name: 'app'})});
+watch(() => userStore.userLoggedIn, () => {router.push({name: 'home'})});
 onMounted(() => {
   const accessToken = localStorage.getItem('accessToken');
 

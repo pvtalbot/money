@@ -1,30 +1,45 @@
 <script setup>
+// Apollo
+import { useQuery } from '@vue/apollo-composable';
+import ExpensesSum from '@/graphql/queries/ExpensesSum.gql';
+
+// External libraries
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
+// Vue
 import { computed, ref, watch } from 'vue';
-
-import { useQuery } from '@vue/apollo-composable';
-import ExpensesSum from '@/graphql/queries/ExpensesSum.gql';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);
 
+// Ref to get the date from the datepicker
 const datePicker = ref(null);
+
+// initial date, start date, end date
 const initialDate = dayjs((new Date()).getFullYear() + '-01-01T00:00:00Z').utc()
-
-const startDate = computed(() => {
-  if (datePicker.value == null) return initialDate;
-
-  return datePicker.value.date;
-})
+const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date )
 const endDate = computed(() => startDate.value.add(1, 'year'));
 
 
+// Apollo Query from expenses sum, hook, watcher
 const {result: expensesSum, refetch: refetchSums, loading: loadingSums, onResult: onExpensesSumSucceed} = useQuery(ExpensesSum, {
   input: {startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString(), groupBy: 'MONTH'}
 }, {fetchPolicy: 'no-cache'});
 
+onExpensesSumSucceed(() => cleanAndSort(expensesSum))
+
+watch(startDate, () => {
+  refetchSums({
+    input: {
+      startDate: startDate.value.toISOString(),
+      endDate: endDate.value.toISOString(),
+      groupBy: 'MONTH',
+    }
+  });
+})
+
+// helper function, transforms the result from Apollo into something usable + sort
 const cleanAndSort = function(s) {
   const res = []
 
@@ -46,19 +61,6 @@ const cleanAndSort = function(s) {
 
   s.value = res;
 }
-
-onExpensesSumSucceed(() => cleanAndSort(expensesSum))
-
-watch(startDate, () => {
-  refetchSums({
-    input: {
-      startDate: startDate.value.toISOString(),
-      endDate: endDate.value.toISOString(),
-      groupBy: 'MONTH',
-    }
-  });
-})
-
 </script>
 
 <template>

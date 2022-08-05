@@ -32,13 +32,13 @@ const router = createRouter({
 })
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   const userStore = useUserStore();
   if (to.name !== 'login' && !userStore.userLoggedIn) next({name: 'login'});
   else next();
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   const userStore = useUserStore();
   if (to.name === 'login' && userStore.userLoggedIn) next({name: 'home'})
   else next();

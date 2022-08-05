@@ -1,8 +1,8 @@
 <script setup>
+// Vue
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
 const goTo = (route) => {router.push({name: route});};
 </script>
 

@@ -1,26 +1,33 @@
 <script setup>
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
-import { ref, computed } from 'vue';
-
+// Apollo
 import { useMutation } from '@vue/apollo-composable';
 import CreateExpenseMutation from '@/graphql/mutations/CreateExpenseMutation.gql';
 
+// External libraries
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+// Pinia
 import { useExpenseStore } from '@/stores/expense.js'
 import { useDrawerStore } from '@/stores/drawer';
+
+// Vue
+import { ref, computed } from 'vue';
 import VueButton from '../utils/VueButton.vue';
 
 dayjs.extend(utc);
-
-const amount = ref(0);
-const disabled = ref(false);
-const date = ref(dayjs().format('YYYY-MM-DD'));
-const formatedDate = computed(() => date.value + 'T00:00:00Z')
 const expenseStore = useExpenseStore();
 const drawerStore = useDrawerStore();
 
+const amount = ref(0);
+const date = ref(dayjs().format('YYYY-MM-DD'));
+const formatedDate = computed(() => date.value + 'T00:00:00Z')
+const disabled = ref(false);
+
+// Apollo Mutation to create an expense
 const { mutate: createExpenseMutation } = useMutation(CreateExpenseMutation)
+
+// Wrapper function
 const createExpense = function() {
   disabled.value = true;
   createExpenseMutation({

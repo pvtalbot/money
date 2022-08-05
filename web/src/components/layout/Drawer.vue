@@ -1,5 +1,8 @@
 <script setup>
+// Pinia
 import { useDrawerStore } from '@/stores/drawer.js'
+
+// Vue
 import { watch, ref } from 'vue';
 
 const drawerStore = useDrawerStore()

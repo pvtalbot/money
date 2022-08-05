@@ -1,12 +1,12 @@
 <script setup>
-// External libraries
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 // Apollo
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import Expenses from '@/graphql/queries/ExpenseList.gql';
 import DeleteExpense from '@/graphql/mutations/DeleteExpenseMutation.gql';
+
+// External libraries
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 // Pinia
 import { useExpenseStore } from '@/stores/expense.js'
@@ -17,17 +17,14 @@ import ExpenseCard from '@/components/home/ExpenseCard.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc)
-
 const expenseStore = useExpenseStore();
+
+// Ref to get the date from the datepicker
 const datePicker = ref(null)
 
+// initial date, start date, end date
 const initialDate = dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
-
-const startDate = computed(() => {
-  if (datePicker.value == null) return initialDate;
-
-  return datePicker.value.date;
-})
+const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date);
 const endDate = computed(() => startDate.value.add(1, 'month'))
 
 const displayedExpenses = computed(() => expenseStore.getCurrentExpenses(startDate.value));
@@ -40,19 +37,13 @@ const sortedExpenses = computed(() => {
   })
 })
 
+// Apollo Query to get expenses list, hook, watcher
 const { result: expenses, onResult: onExpenseListSucceeded, refetch: refetchExpenses, loading: expensesLoading} = 
   useQuery(Expenses, 
     { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}},
   );
 
 onExpenseListSucceeded(() => { expenseStore.updateExpenses(expenses.value.expenses); })
-
-const {mutate: deleteExpenseMutation} = useMutation(DeleteExpense)
-const deleteExpense = function(expense) {
-  deleteExpenseMutation({input: {id: expense.id}})
-    .then(() => expenseStore.deleteExpense(expense))
-    .catch(e => { console.log(e); });
-}
 
 watch(startDate, () => {
   refetchExpenses({
@@ -62,6 +53,16 @@ watch(startDate, () => {
     }
   });
 })
+
+// Apollo Mutation to delete an expense
+const {mutate: deleteExpenseMutation} = useMutation(DeleteExpense)
+// Wrapper function for the mutation
+const deleteExpense = function(expense) {
+  deleteExpenseMutation({input: {id: expense.id}})
+    .then(() => expenseStore.deleteExpense(expense))
+    .catch(e => { console.log(e); });
+}
+
 </script>
 
 <template>

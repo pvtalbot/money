@@ -1,8 +1,10 @@
 <script setup>
+// Pinia
 import { useUserStore } from '@/stores/user.js';
 import { useDrawerStore } from '@/stores/drawer.js';
 
-import { computed, ref } from 'vue';
+// Vue
+import { computed } from 'vue';
 import ExpensesList from '@/components/home/ExpensesList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
 import Drawer from '@/components/layout/Drawer.vue';
@@ -10,6 +12,7 @@ import CreateExpenseForm from '@/components/home/CreateExpenseForm.vue';
 
 const userStore = useUserStore();
 const drawerStore = useDrawerStore();
+
 const firstName = computed(() => userStore.user.firstName)
 
 const openCloseDrawer = () => {

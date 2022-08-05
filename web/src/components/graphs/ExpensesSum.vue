@@ -2,15 +2,24 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { useQuery } from '@vue/apollo-composable';
 import ExpensesSum from '@/graphql/queries/ExpensesSum.gql';
+import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);
 
-const startDate = ref(dayjs((new Date()).getFullYear() + '-01-01T00:00:00Z').utc());
+const datePicker = ref(null);
+const initialDate = dayjs((new Date()).getFullYear() + '-01-01T00:00:00Z').utc()
+
+const startDate = computed(() => {
+  if (datePicker.value == null) return initialDate;
+
+  return datePicker.value.date;
+})
 const endDate = computed(() => startDate.value.add(1, 'year'));
+
 
 const {result: expensesSum, refetch: refetchSums, loading: loadingSums, onResult: onExpensesSumSucceed} = useQuery(ExpensesSum, {
   input: {startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString(), groupBy: 'MONTH'}
@@ -38,18 +47,25 @@ const cleanAndSort = function(s) {
   s.value = res;
 }
 
-//onExpensesSumSucceed(() => {listToDisplay.value = cleanAndSort(expensesSum.value)})
 onExpensesSumSucceed(() => cleanAndSort(expensesSum))
+
+watch(startDate, () => {
+  refetchSums({
+    input: {
+      startDate: startDate.value.toISOString(),
+      endDate: endDate.value.toISOString(),
+      groupBy: 'MONTH',
+    }
+  });
+})
 
 </script>
 
 <template>
   <div class="expenses-sum">
+    <DatePicker ref="datePicker" mode="YEAR" :initialDate="initialDate"/>
     <transition name="slide-fade" tag="div" mode="out-in">
-      <div v-if="loadingSums" class="expenses-list__loader" key="waiting">
-        <h1>A minute please, I'm gathering everything!</h1>
-      </div>
-      <div v-else class="expenses-sum__sum" key="loaded">
+      <div v-if="!loadingSums" class="expenses-sum__sum" key="loaded">
         <p>Expenses of the year:</p>
         <div v-for="expense in expensesSum" key="expense.startDate">
           {{ expense.startDate.format('MMMM') }} : {{ expense.amount }} 

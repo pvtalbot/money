@@ -14,17 +14,19 @@ import { useExpenseStore } from '@/stores/expense.js'
 // Vue
 import { computed, ref, watch } from 'vue'
 import ExpenseCard from '@/components/home/ExpenseCard.vue';
-import MonthPicker from '@/components/utils/MonthPicker.vue';
+import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc)
 
 const expenseStore = useExpenseStore();
-const monthPicker = ref(null)
+const datePicker = ref(null)
+
+const initialDate = dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
 
 const startDate = computed(() => {
-  if (monthPicker.value == null) return dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
+  if (datePicker.value == null) return initialDate;
 
-  return monthPicker.value.date;
+  return datePicker.value.date;
 })
 const endDate = computed(() => startDate.value.add(1, 'month'))
 
@@ -40,7 +42,7 @@ const sortedExpenses = computed(() => {
 
 const { result: expenses, onResult: onExpenseListSucceeded, refetch: refetchExpenses, loading: expensesLoading} = 
   useQuery(Expenses, 
-    { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}}
+    { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}},
   );
 
 onExpenseListSucceeded(() => { expenseStore.updateExpenses(expenses.value.expenses); })
@@ -64,13 +66,13 @@ watch(startDate, () => {
 
 <template>
   <div class="expenses-list">
-    <MonthPicker ref="monthPicker"/>
+    <DatePicker ref="datePicker" :initialDate="initialDate"/>
     <transition name="slide-fade" tag="div" mode="out-in">
       <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
-        <h1>A minute please, I'm gathering everything!</h1>
+        <h2>A minute please, I'm gathering everything!</h2>
       </div>
       <div v-else class="expenses_list__list" key="loaded">
-        <p>Expenses of the month:</p>
+        <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
         <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
           <ExpenseCard :expense="expense" @delete-expense="deleteExpense(expense)"/>
         </div>

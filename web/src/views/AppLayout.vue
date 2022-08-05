@@ -21,8 +21,7 @@ main {
   position: fixed;
   top: 0;
   padding-left: 111px;
-  padding-top: 20px;
   height: 100%;
-  width: calc(100% - 71px);
+  width: 100%;
 }
 </style>

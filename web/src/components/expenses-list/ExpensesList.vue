@@ -66,7 +66,6 @@ watch(startDate, () => {
 <template>
   <div class="expenses-list">
     <MonthPicker ref="monthPicker"/>
-    {{ startDate.format('DD MM YY') }}
     <transition name="slide-fade" tag="div" mode="out-in">
       <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
         <h1>A minute please, I'm gathering everything!</h1>

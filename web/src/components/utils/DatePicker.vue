@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 // Vue
-import { computed, ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 
 dayjs.extend(utc);
 
@@ -41,9 +41,13 @@ const config = (function() {
 
 <template>
   <div class="date_picker">
-    <div class="arrow left_arrow" @click="subtract">&lt;</div>
+    <div class="arrow left_arrow" @click="subtract">
+      <img src="@/assets/chevron-compact-left.svg" alt="left"/>
+    </div>
     <div class="current_date">{{ date.format(config.formatDate) }}</div>
-    <div class="arrow right_arrow" @click="add">&gt;</div>
+    <div class="arrow right_arrow" @click="add">
+      <img src="@/assets/chevron-compact-right.svg" alt="right"/>
+    </div>
   </div>
 </template>
 
@@ -61,5 +65,10 @@ const config = (function() {
 
 .arrow {
   cursor: pointer;
+  display: flex;
+}
+
+.arrow img {
+  margin: auto;
 }
 </style>

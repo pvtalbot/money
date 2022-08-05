@@ -76,3 +76,15 @@ const cleanAndSort = function(s) {
     </transition>
   </div>
 </template>
+
+<style scoped>
+.expenses-sum {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.expenses-sum__sum {
+  margin: auto;
+}
+
+</style>

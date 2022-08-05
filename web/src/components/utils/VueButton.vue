@@ -22,9 +22,9 @@ defineProps({
 
 <style scoped>
 button {
-  color: #002D4F;
+  color: var(--vt-c-indigo);
   background: #FFFFFF;
-  border: 1px solid #D01378;
+  border: 1px solid var(--em-c-pink-1);
   border-radius: 5px;
   padding: 5px 20px;
   cursor: pointer;

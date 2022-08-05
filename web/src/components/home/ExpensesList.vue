@@ -67,17 +67,33 @@ const deleteExpense = function(expense) {
 
 <template>
   <div class="expenses-list">
-    <DatePicker ref="datePicker" :initialDate="initialDate"/>
-    <transition name="slide-fade" tag="div" mode="out-in">
+    <DatePicker class="datepicker" ref="datePicker" :initialDate="initialDate"/>
       <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
         <h2>A minute please, I'm gathering everything!</h2>
       </div>
-      <div v-else class="expenses_list__list" key="loaded">
+      <div v-else class="expenses-list__list" key="loaded">
         <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
         <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
           <ExpenseCard :expense="expense" @delete-expense="deleteExpense(expense)"/>
         </div>
       </div>
-    </transition>
   </div>
 </template>
+
+<style scoped>
+.expenses-list {
+  display: flex;
+  flex-flow: column nowrap;
+}
+.expenses-list__list {
+  display: flex;
+  flex-flow: column nowrap;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.expenses-list__list .expenses-list__expense, .expenses-list__list p {
+  margin: auto;
+}
+
+</style>

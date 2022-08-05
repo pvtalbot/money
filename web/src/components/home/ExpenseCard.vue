@@ -23,7 +23,6 @@ const props = defineProps({
 .expense-card {
   border-radius: 5px;
   border: 1px solid black;
-  color: black;
   width: 200px;
   margin: 5px;
   background: white;

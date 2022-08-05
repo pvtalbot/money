@@ -22,22 +22,29 @@ const openCloseDrawer = () => {
 
 <template>
   <div class="home">
-    <Drawer>
-      <template #component>
-        <CreateExpenseForm />
-      </template>
-    </Drawer>
+    <Teleport to="body">
+      <Drawer>
+        <template #component>
+          <CreateExpenseForm />
+        </template>
+      </Drawer>
+    </Teleport>
     <h1>Hello {{firstName}}, this is Expenses manager!</h1>
     <div class="create-expense" @click="openCloseDrawer">
-      <VueButton message="Add an expense"/>
+      <VueButton message="Add an expense" />
     </div>
-    <ExpensesList/>
+    <ExpensesList />
   </div>
 </template>
 
 <style scoped>
+.home {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
 .create-expense {
-  margin: 0 15px;
+  margin: auto;
   width: fit-content;
 }
 </style>

@@ -68,10 +68,6 @@ form {
   flex-flow: column nowrap;
 }
 
-.create-expense-form {
-  color: black;
-}
-
 .create-expense-form__item-container {
   padding: 0 0 10px 0;
   display: flex;

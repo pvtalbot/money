@@ -1,0 +1,7 @@
+query ExpensesSum($input: GetExpensesSumInput!) {
+  expensesSum(input: $input) {
+    startDate
+    endDate
+    amount
+  }
+}

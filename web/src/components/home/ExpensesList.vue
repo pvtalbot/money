@@ -39,8 +39,7 @@ const sortedExpenses = computed(() => {
 })
 
 const { result: expenses, onResult: onExpenseListSucceeded, refetch: refetchExpenses, loading: expensesLoading} = 
-  useQuery(
-    Expenses, 
+  useQuery(Expenses, 
     { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}}
   );
 

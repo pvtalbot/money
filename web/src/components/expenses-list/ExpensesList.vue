@@ -60,7 +60,7 @@ const deleteExpense = function(expense) {
   <div class="expenses-list">
     <MonthPicker ref="monthPicker"/>
     <transition name="slide-fade" tag="div" mode="out-in">
-      <div v-if="expensesLoading" class="expenses-list__loader" key="waiting">
+      <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
         <h1>A minute please, I'm gathering everything!</h1>
       </div>
       <div v-else class="expenses_list__list" key="loaded">

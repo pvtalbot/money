@@ -9,7 +9,7 @@ const goTo = (route) => {router.push({name: route});};
 <template>
   <header>
     <div class="logo-container logo-container--head">
-      <img src="@/assets/euro-money-bag.svg" alt="logo"/>
+      <img src="@/assets/euro-money-bag.svg" alt="logo" @click.prevent="goTo('home')"/>
     </div>
 
     <div class="logo-container logo-container--el">

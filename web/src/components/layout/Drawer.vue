@@ -56,7 +56,7 @@ const drawerStore = useDrawerStore()
 }
 
 .drawer-leave-active, .drawer-enter-active {
-  transition: all 0.7s ease;
+  transition: all 0.8s ease;
 }
 
 .drawer-leave-to, .drawer-enter-from {

@@ -20,7 +20,9 @@ const COMPONENT_TO_DRAWER = "CreateExpenseForm"
 <template>
   <div class="expenses">
       <Teleport to="#teleport-component-to-drawer">
-        <CreateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"/>
+        <Transition name="component">
+          <CreateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"/>
+        </Transition>
       </Teleport>
     <h1>Hello {{firstName}}, this is Expenses manager!</h1>
     <div class="create-expense" @click="drawerStore.registerComponent(COMPONENT_TO_DRAWER)">
@@ -39,5 +41,13 @@ const COMPONENT_TO_DRAWER = "CreateExpenseForm"
 .create-expense {
   margin: auto;
   width: fit-content;
+}
+
+.component-leave-active, .component-enter-active {
+  transition: all 0.5s ease;
+}
+
+.component-leave-to, .component-enter-from {
+  transform: translateX(320px);
 }
 </style>

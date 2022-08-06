@@ -36,7 +36,7 @@ const createExpense = function() {
       date: formatedDate.value,
     }
   }).then((r) => {expenseStore.updateExpenses([r.data.createExpense]); })
-  .then(() => {drawerStore.setDrawerOpen(false);})
+  .then(() => {drawerStore.closeDrawer();})
   .catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})
 }

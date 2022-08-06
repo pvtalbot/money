@@ -45,7 +45,6 @@ func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) 
 	}
 
 	return m.r.Update(expense)
-
 }
 
 func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.Expense {

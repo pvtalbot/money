@@ -17,9 +17,14 @@ const router = createRouter({
       component: () => import('@/views/AppLayout.vue'),
       children: [
         {
-          path: 'home',
+          path: '',
           name: 'home',
           component: () => import('@/views/HomeView.vue'),
+        },
+        {
+          path: 'expenses',
+          name: 'expenses',
+          component: () => import('@/views/ExpensesView.vue'),
         },
         {
           path: 'graphs',

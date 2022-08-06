@@ -1,16 +1,31 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 export const useDrawerStore = defineStore('drawer', () => {
-  const drawerOpen = ref(false);
+  const isDrawerOpen = ref(false);
+  const currentComponent = ref("")
 
-  const setDrawerOpen = (newDrawerOpen) => {
-    drawerOpen.value = newDrawerOpen;
+  const openDrawer = () => {
+    isDrawerOpen.value = true;
   }
 
+  const registerComponent = (componentName) => {
+    currentComponent.value = componentName;
+    openDrawer();
+  }
+
+  const closeDrawer = () => {
+    currentComponent.value = "";
+    isDrawerOpen.value = false;
+  }
+
+  const isCurrentComponentDisplayed = computed(() => (componentName) => componentName === currentComponent.value);
+
   return {
-    drawerOpen,
-    setDrawerOpen,
+    isDrawerOpen,
+    registerComponent,
+    closeDrawer,
+    isCurrentComponentDisplayed,
   }
 })
 

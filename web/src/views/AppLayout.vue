@@ -1,13 +1,17 @@
 <script setup>
 import VueHeader from '@/components/layout/VueHeader.vue';
+import Drawer from '../components/layout/Drawer.vue';
 
+// Drawer self-teleports to body
 </script>
+
 <template>
   <div class="layout">
     <VueHeader/>
     <main>
       <RouterView/>
     </main>
+    <Drawer />
   </div>
 </template>
 

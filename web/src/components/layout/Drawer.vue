@@ -1,49 +1,31 @@
 <script setup>
 // Pinia
 import { useDrawerStore } from '@/stores/drawer.js'
-
-// Vue
-import { watch, ref } from 'vue';
-
 const drawerStore = useDrawerStore()
-
-const drawerOpen = ref(false)
-
-const closeDrawer = () => {
-  drawerStore.setDrawerOpen(false);
-}
-
-watch(() => drawerStore.drawerOpen, (newValue, _) => {
-  drawerOpen.value = newValue;
-});
 </script>
 
 <template>
   <div class="container">
     <Teleport to="body">
       <Transition name="mask-transition">
-        <div class="mask" @click="closeDrawer" v-if="drawerOpen">
+        <div class="mask" @click="drawerStore.closeDrawer" v-show="drawerStore.isDrawerOpen">
         </div>
       </Transition>
     </Teleport>
-    <Transition name="drawer">
-      <div class="drawer-container" v-if="drawerOpen">
-        <div class="icon-close" @click="closeDrawer">
-          <img id="icon-close__icon" alt="close" src="@/assets/cross_icon.svg" />
+    <Teleport to="body">
+      <Transition name="drawer">
+        <div class="drawer-container" v-show="drawerStore.isDrawerOpen">
+          <div class="icon-close" @click="drawerStore.closeDrawer">
+            <img id="icon-close__icon" alt="close" src="@/assets/cross_icon.svg" />
+          </div>
+          <div id="teleport-component-to-drawer"></div>
         </div>
-        <slot name="component"></slot>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <style scoped>
-.container {
-  position: absolute;
-  top: -1px;
-  right: 0;
-}
-
 .drawer-container {
   background: white;
   height: 100vh;
@@ -51,6 +33,9 @@ watch(() => drawerStore.drawerOpen, (newValue, _) => {
   padding: 30px 20px;
   z-index: 2000;
   box-shadow: -6px 0 16px -8px rgba(0,0,0,.08),-9px 0 28px 0 rgba(0,0,0,.05),-12px 0 48px 16px rgba(0,0,0,.03);
+  position: absolute;
+  top: -1px;
+  right: 0;
 }
 
 .mask {

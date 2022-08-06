@@ -4,18 +4,18 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 import { reactive, computed } from 'vue';
 
 export const useExpenseStore = defineStore('expenses', () => {
-  const expenses = reactive({})
+  const expenses = reactive({});
 
-  const updateExpenses = (newExpenses) => {
+  const cacheExpenses = newExpenses => {
     for (const expense of newExpenses) {
-      const date = dayjs(expense.date)
+      const date = dayjs(expense.date);
       const year = date.year();
       const month = date.month();
       if (!(year in expenses)) {
-        expenses[year] = {}
+        expenses[year] = {};
       }
       if (!(month in expenses[year])) {
-        expenses[year][month] = {}
+        expenses[year][month] = {};
       }
       if (expense.id in expenses[year][month]) {
         continue;
@@ -25,11 +25,11 @@ export const useExpenseStore = defineStore('expenses', () => {
         id: expense.id,
         amount: expense.amount,
         date: date,
-      }
+      };
     }
   }
 
-  const deleteExpense = (expense) => {
+  const deleteExpense = expense => {
     delete expenses[expense.date.year()][expense.date.month()][expense.id];
   }
 
@@ -44,7 +44,7 @@ export const useExpenseStore = defineStore('expenses', () => {
   return {
     expenses,
     getCurrentExpenses,
-    updateExpenses,
+    cacheExpenses,
     deleteExpense,
   };
 

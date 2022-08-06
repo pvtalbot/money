@@ -10,14 +10,17 @@ import utc from 'dayjs/plugin/utc';
 
 // Pinia
 import { useExpenseStore } from '@/stores/expense.js'
+import { useDrawerStore } from '@/stores/drawer.js';
 
 // Vue
 import { computed, ref, watch } from 'vue'
 import ExpenseCard from '@/components/expenses/ExpenseCard.vue';
+import UpdateExpenseForm from '@/components/expenses/UpdateExpenseForm.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc)
 const expenseStore = useExpenseStore();
+const drawerStore = useDrawerStore();
 
 // Ref to get the date from the datepicker
 const datePicker = ref(null)
@@ -26,6 +29,9 @@ const datePicker = ref(null)
 const initialDate = dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
 const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date);
 const endDate = computed(() => startDate.value.add(1, 'month'))
+
+const expenseToUpdate = ref(null);
+const COMPONENT_TO_DRAWER = 'UpdateExpenseForm'
 
 const displayedExpenses = computed(() => expenseStore.getCurrentExpenses(startDate.value));
 const sortedExpenses = computed(() => {
@@ -43,7 +49,7 @@ const { result: expenses, onResult: onExpenseListSucceeded, refetch: refetchExpe
     { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}},
   );
 
-onExpenseListSucceeded(() => { expenseStore.updateExpenses(expenses.value.expenses); })
+onExpenseListSucceeded(() => { expenseStore.cacheExpenses(expenses.value.expenses); })
 
 watch(startDate, () => {
   refetchExpenses({
@@ -63,20 +69,32 @@ const deleteExpense = function(expense) {
     .catch(e => { console.log(e); });
 }
 
+const updateExpense = (expense) => {
+  drawerStore.registerComponent(COMPONENT_TO_DRAWER);
+  expenseToUpdate.value = expense;
+}
+
 </script>
 
 <template>
   <div class="expenses-list">
-    <DatePicker class="datepicker" ref="datePicker" :initialDate="initialDate"/>
-      <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
-        <h2>A minute please, I'm gathering everything!</h2>
+    <DatePicker class="datepicker" ref="datePicker" :initialDate="initialDate" />
+    <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
+      <h2>A minute please, I'm gathering everything!</h2>
+    </div>
+    <div v-else class="expenses-list__list" key="loaded">
+      <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
+      <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
+        <ExpenseCard :expense="expense" 
+                      @delete-expense="deleteExpense(expense)"
+                      @click.self="updateExpense(expense)" />
       </div>
-      <div v-else class="expenses-list__list" key="loaded">
-        <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
-        <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
-          <ExpenseCard :expense="expense" @delete-expense="deleteExpense(expense)"/>
-        </div>
-      </div>
+    </div>
+    <Teleport to="#teleport-component-to-drawer">
+      <Transition name="component">
+        <UpdateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)" :expense="expenseToUpdate"/>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -96,4 +114,11 @@ const deleteExpense = function(expense) {
   margin: auto;
 }
 
+.component-leave-active, .component-enter-active {
+  transition: all 0.5s ease;
+}
+
+.component-leave-to, .component-enter-from {
+  transform: translateX(320px);
+}
 </style>

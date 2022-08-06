@@ -35,7 +35,7 @@ const createExpense = function() {
       amount: amount.value,
       date: formatedDate.value,
     }
-  }).then((r) => {expenseStore.updateExpenses([r.data.createExpense]); })
+  }).then(r => {expenseStore.cacheExpenses([r.data.createExpense]); })
   .then(() => {drawerStore.closeDrawer();})
   .catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})

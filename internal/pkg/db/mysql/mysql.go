@@ -50,7 +50,7 @@ func (c DbContainer) Migrate() {
 
 	driver, _ := mysql.WithInstance(c.Db, &mysql.Config{})
 	m, _ := migrate.NewWithDatabaseInstance(
-		"file://app/pkg/db/migrations/mysql",
+		"file://pkg/db/migrations/mysql",
 		"mysql",
 		driver,
 	)

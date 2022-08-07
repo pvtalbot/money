@@ -3,7 +3,7 @@ package commands
 import (
 	"time"
 
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/model"
 )
 
 type UpdateExpense struct {

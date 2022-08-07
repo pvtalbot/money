@@ -7,12 +7,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/pvtalbot/money/app/domain/commands"
-	"github.com/pvtalbot/money/app/domain/managers"
-	"github.com/pvtalbot/money/app/domain/queries"
-	"github.com/pvtalbot/money/app/middlewares"
+	"github.com/pvtalbot/money/app/commands"
+	"github.com/pvtalbot/money/app/queries"
+	"github.com/pvtalbot/money/domain/managers"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
+	"github.com/pvtalbot/money/middlewares"
 	"github.com/pvtalbot/money/pkg/utils"
 )
 

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/model"
 )
 
 type CreateUser struct {

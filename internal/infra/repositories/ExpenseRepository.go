@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/model"
 )
 
 type ExpenseMariaRepository struct {

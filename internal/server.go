@@ -1,13 +1,11 @@
 package main
 
 import (
-	"github.com/pvtalbot/money/app/domain"
-	"github.com/pvtalbot/money/app/middlewares"
-	"github.com/pvtalbot/money/app/service"
+	"github.com/pvtalbot/money/app"
 	"github.com/pvtalbot/money/graph"
 	"github.com/pvtalbot/money/graph/generated"
-
-	database "github.com/pvtalbot/money/app/pkg/db/mysql"
+	"github.com/pvtalbot/money/middlewares"
+	"github.com/pvtalbot/money/service"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -16,7 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func graphqlHandler(app domain.Application) gin.HandlerFunc {
+func graphqlHandler(app app.Application) gin.HandlerFunc {
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
 		Application: app,
 	}}))
@@ -35,11 +33,8 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 func main() {
-	dbContainer := database.NewDbContainer()
-	defer dbContainer.CloseDB()
-	dbContainer.Migrate()
-
-	app := service.NewApplication(dbContainer.Db)
+	app, cleanup := service.NewApplication()
+	defer cleanup()
 
 	r := gin.Default()
 

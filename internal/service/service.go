@@ -3,22 +3,30 @@ package service
 import (
 	"database/sql"
 
-	"github.com/pvtalbot/money/app/domain"
-	"github.com/pvtalbot/money/app/domain/commands"
-	"github.com/pvtalbot/money/app/domain/queries"
-	"github.com/pvtalbot/money/app/infra/repositories"
+	"github.com/pvtalbot/money/app"
+	"github.com/pvtalbot/money/app/commands"
+	"github.com/pvtalbot/money/app/queries"
+	"github.com/pvtalbot/money/infra/repositories"
+
+	database "github.com/pvtalbot/money/pkg/db/mysql"
 )
 
-func NewApplication(db *sql.DB) domain.Application {
-	return newApplication(db)
+func NewApplication() (app.Application, func()) {
+	dbContainer := database.NewDbContainer()
+	dbContainer.Migrate()
+
+	return newApplication(dbContainer.Db),
+		func() {
+			_ = dbContainer.CloseDB()
+		}
 }
 
-func newApplication(db *sql.DB) domain.Application {
+func newApplication(db *sql.DB) app.Application {
 	expenseRepository := repositories.NewExpenseMariaRepository(db)
 	userRepository := repositories.NewUserMariaRepository(db)
 
-	return domain.Application{
-		Commands: domain.Commands{
+	return app.Application{
+		Commands: app.Commands{
 			// Expenses
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
 			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
@@ -28,7 +36,7 @@ func newApplication(db *sql.DB) domain.Application {
 			CreateUser: commands.NewCreateUserHandler(userRepository),
 			Login:      commands.NewLoginHandler(userRepository),
 		},
-		Queries: domain.Queries{
+		Queries: app.Queries{
 			// Expenses
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
 			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),

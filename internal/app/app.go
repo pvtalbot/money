@@ -1,8 +1,8 @@
-package domain
+package app
 
 import (
-	"github.com/pvtalbot/money/app/domain/commands"
-	"github.com/pvtalbot/money/app/domain/queries"
+	"github.com/pvtalbot/money/app/commands"
+	"github.com/pvtalbot/money/app/queries"
 )
 
 type Application struct {

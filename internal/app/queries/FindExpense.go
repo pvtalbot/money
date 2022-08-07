@@ -1,6 +1,6 @@
 package queries
 
-import "github.com/pvtalbot/money/app/domain/model"
+import "github.com/pvtalbot/money/domain/model"
 
 type FindExpense struct {
 	Id string

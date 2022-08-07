@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/model"
 	"github.com/pvtalbot/money/pkg/jwt"
 
 	"github.com/gin-gonic/gin"

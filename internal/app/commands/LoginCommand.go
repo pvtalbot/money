@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/model"
 	"github.com/pvtalbot/money/pkg/jwt"
 	"github.com/pvtalbot/money/pkg/utils"
 )

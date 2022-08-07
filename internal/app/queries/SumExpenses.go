@@ -3,8 +3,8 @@ package queries
 import (
 	"time"
 
-	"github.com/pvtalbot/money/app/domain/managers"
-	"github.com/pvtalbot/money/app/domain/model"
+	"github.com/pvtalbot/money/domain/managers"
+	"github.com/pvtalbot/money/domain/model"
 	"github.com/pvtalbot/money/pkg/utils"
 )
 

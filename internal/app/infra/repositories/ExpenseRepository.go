@@ -59,7 +59,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *model.U
 	return expenses, nil
 }
 
-func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *model.User, startDate, endDate time.Time) []*model.ExpenseSum {
+func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *model.User, startDate, endDate time.Time) ([]*model.ExpenseSum, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT SUM(amount), MONTH(date), YEAR(date)
 		FROM expenses
@@ -78,6 +78,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	rows, err := stmt.Query(user.ID, startDate, endDate)
 	if err != nil {
 		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -98,7 +99,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 		expensesSum = append(expensesSum, &expenseSum)
 	}
 
-	return expensesSum
+	return expensesSum, nil
 }
 
 func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User) (*model.Expense, error) {

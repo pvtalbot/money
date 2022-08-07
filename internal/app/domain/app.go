@@ -19,4 +19,5 @@ type Commands struct {
 type Queries struct {
 	FindExpense queries.FindExpenseQueryHandler
 	GetExpenses queries.GetExpensesQueryHandler
+	SumExpenses queries.SumExpensesQueryHandler
 }

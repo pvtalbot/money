@@ -25,6 +25,7 @@ func newApplication(db *sql.DB) domain.Application {
 		Queries: domain.Queries{
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
 			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),
+			SumExpenses: queries.NewSumExpensesQueryHandler(expenseRepository),
 		},
 	}
 }

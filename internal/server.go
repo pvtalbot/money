@@ -19,11 +19,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func graphqlHandler(u model.UserServiceInterface, e model.ExpenseServiceInterface, a domain.Application) gin.HandlerFunc {
+func graphqlHandler(u model.UserServiceInterface, a domain.Application) gin.HandlerFunc {
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		UserService:    u,
-		ExpenseService: e,
-		Application:    a,
+		UserService: u,
+		Application: a,
 	}}))
 
 	return func(c *gin.Context) {
@@ -48,7 +47,6 @@ func main() {
 	userRepository := repositories.NewUserMariaRepository(dbContainer.Db)
 
 	u := managers.NewUserManager(userRepository, expenseRepository)
-	e := managers.NewExpenseManager(expenseRepository)
 
 	app := service.NewApplication(dbContainer.Db)
 
@@ -58,7 +56,7 @@ func main() {
 	r.Use(middlewares.GinContextToContextMiddleware())
 	r.Use(middlewares.AuthMiddleware(u))
 
-	r.POST("/query", graphqlHandler(u, e, app))
+	r.POST("/query", graphqlHandler(u, app))
 	r.GET("/", playgroundHandler())
 	r.Run()
 }

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"github.com/pvtalbot/money/pkg/utils"
 )
 
 type Expense struct {
@@ -38,9 +36,8 @@ type ExpenseRepository interface {
 	Find(ID string) (*Expense, error)
 	Update(expense *Expense) (*Expense, error)
 	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) ([]*Expense, error)
-	SumAllExpensesFromUserBetweenDatesByMonth(user *User, startDate, endDate time.Time) []*ExpenseSum
+	SumAllExpensesFromUserBetweenDatesByMonth(user *User, startDate, endDate time.Time) ([]*ExpenseSum, error)
 }
 
 type ExpenseServiceInterface interface {
-	SumAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time, groupBy utils.Duration) []*ExpenseSum
 }

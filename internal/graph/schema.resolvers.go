@@ -189,7 +189,18 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 	}
 
 	var expensesSum []*model.ExpenseSum
-	for _, e := range r.ExpenseService.SumAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate, groupBy) {
+	query := queries.NewSumExpensesQuery(
+		input.StartDate,
+		input.EndDate,
+		user,
+		groupBy,
+	)
+	result, err := r.Application.Queries.SumExpenses.Handle(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, e := range result {
 		expensesSum = append(expensesSum, &model.ExpenseSum{Amount: e.Amount, StartDate: e.StartDate, EndDate: e.EndDate})
 	}
 

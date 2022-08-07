@@ -12,7 +12,6 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	UserService    model.UserServiceInterface
-	ExpenseService model.ExpenseServiceInterface
-	Application    domain.Application
+	UserService model.UserServiceInterface
+	Application domain.Application
 }

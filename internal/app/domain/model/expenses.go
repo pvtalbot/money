@@ -42,7 +42,6 @@ type ExpenseRepository interface {
 }
 
 type ExpenseServiceInterface interface {
-	Delete(id string, userID string) (*Expense, error)
 	Update(id, userId string, amount *int, date *time.Time) (*Expense, error)
 	SumAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time, groupBy utils.Duration) []*ExpenseSum
 }

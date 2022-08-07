@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 
 	"github.com/pvtalbot/money/app/domain/commands"
 	"github.com/pvtalbot/money/app/domain/queries"
@@ -64,7 +65,20 @@ func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.Delete
 		return nil, err
 	}
 
-	expense, err := r.ExpenseService.Delete(input.ID, user.ID)
+	expense, err := r.Application.Queries.FindExpense.Handle(
+		queries.FindExpense{Id: input.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.ID != expense.User.ID {
+		return nil, errors.New("user cannot delete expense")
+	}
+
+	err = r.Application.Commands.DeleteExpense.Handle(
+		commands.DeleteExpense{Id: expense.ID},
+	)
 
 	if err != nil {
 		return nil, err

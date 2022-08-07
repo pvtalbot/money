@@ -38,20 +38,6 @@ func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) 
 	return m.r.Update(expense)
 }
 
-func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
-	expense, err := m.r.Find(id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if userID != expense.User.ID {
-		return nil, errors.New("user cannot delete expense")
-	}
-
-	return expense, m.r.Delete(id)
-}
-
 func (m ExpenseManager) SumAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time, groupBy utils.Duration) []*model.ExpenseSum {
 	switch groupBy {
 	case utils.MONTH:

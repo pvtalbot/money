@@ -19,6 +19,7 @@ func newApplication(db *sql.DB) domain.Application {
 	return domain.Application{
 		Commands: domain.Commands{
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
+			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
 		},
 		Queries: domain.Queries{
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),

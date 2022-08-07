@@ -36,7 +36,7 @@ onMounted(() => {
 })
 
 // Apollo Mutation to update an expense
-const { mutate: updateExpenseMutation } = useMutation(UpdateExpenseMutation)
+const { mutate: updateExpenseMutationd } = useMutation(UpdateExpenseMutation)
 //Wrapper function
 const updateExpense = () => {
   disabled.value = true;
@@ -46,8 +46,9 @@ const updateExpense = () => {
       amount: amount.value,
       date: formatedDate.value,
     }
-  }).then(r => {expenseStore.cacheExpenses([r.data.updateExpense])})
+  })
   .then(() => expenseStore.deleteExpense(props.expense))
+  .then(r => {expenseStore.cacheExpenses([r.data.updateExpense])})
   .then(() => {drawerStore.closeDrawer();})
   .catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})

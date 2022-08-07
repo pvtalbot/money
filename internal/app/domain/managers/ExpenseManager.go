@@ -1,7 +1,6 @@
 package managers
 
 import (
-	"errors"
 	"time"
 
 	"github.com/pvtalbot/money/app/domain/model"
@@ -16,26 +15,6 @@ func NewExpenseManager(r model.ExpenseRepository) ExpenseManager {
 	return ExpenseManager{
 		r: r,
 	}
-}
-
-func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) (*model.Expense, error) {
-	expense, err := m.r.Find(id)
-	if err != nil {
-		return nil, err
-	}
-
-	if userId != expense.User.ID {
-		return nil, errors.New("user cannot update expense")
-	}
-
-	if amount != nil {
-		expense.Amount = *amount
-	}
-	if date != nil {
-		expense.SetDate(*date)
-	}
-
-	return m.r.Update(expense)
 }
 
 func (m ExpenseManager) SumAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time, groupBy utils.Duration) []*model.ExpenseSum {

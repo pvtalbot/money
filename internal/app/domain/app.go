@@ -13,6 +13,7 @@ type Application struct {
 type Commands struct {
 	CreateExpense commands.CreateExpenseHandler
 	DeleteExpense commands.DeleteExpenseHandler
+	UpdateExpense commands.UpdateExpenseHandler
 }
 
 type Queries struct {

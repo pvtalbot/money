@@ -98,7 +98,18 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 		return nil, err
 	}
 
-	expense, err := r.ExpenseService.Update(input.ID, user.ID, input.Amount, input.Date)
+	expense, err := r.Application.Queries.FindExpense.Handle(
+		queries.FindExpense{Id: input.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if user.ID != expense.User.ID {
+		return nil, errors.New("user cannot update expense")
+	}
+
+	cmd := commands.NewUpdateExpenseCommand(*expense, input.Amount, input.Date)
+	expense, err = r.Application.Commands.UpdateExpense.Handle(cmd)
 
 	if err != nil {
 		return nil, err

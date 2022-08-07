@@ -135,7 +135,7 @@ func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, 
 		return nil, err
 	}
 
-	return expense, nil
+	return r.Find(expense.ID)
 }
 
 func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {

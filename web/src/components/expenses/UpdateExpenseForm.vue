@@ -36,7 +36,7 @@ onMounted(() => {
 })
 
 // Apollo Mutation to update an expense
-const { mutate: updateExpenseMutationd } = useMutation(UpdateExpenseMutation)
+const { mutate: updateExpenseMutation } = useMutation(UpdateExpenseMutation)
 //Wrapper function
 const updateExpense = () => {
   disabled.value = true;

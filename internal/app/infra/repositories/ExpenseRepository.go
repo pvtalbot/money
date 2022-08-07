@@ -100,7 +100,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	return expensesSum
 }
 
-func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User) *model.Expense {
+func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User) (*model.Expense, error) {
 	stmt, err := r.db.Prepare("insert into expenses(amount, date, user_id) values (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -114,11 +114,12 @@ func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User)
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal("Error:", err.Error())
+		return nil, err
 	}
 
 	expense.ID = strconv.FormatInt(id, 10)
 
-	return expense
+	return expense, nil
 }
 
 func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, error) {

@@ -33,7 +33,7 @@ func (e *Expense) SetDate(d time.Time) {
 }
 
 type ExpenseRepository interface {
-	Create(expense *Expense, user *User) *Expense
+	Create(expense *Expense, user *User) (*Expense, error)
 	Delete(ID string) error
 	Find(ID string) (*Expense, error)
 	Update(expense *Expense) (*Expense, error)
@@ -42,7 +42,6 @@ type ExpenseRepository interface {
 }
 
 type ExpenseServiceInterface interface {
-	Create(amount int, date time.Time, user *User) *Expense
 	Delete(id string, userID string) (*Expense, error)
 	Update(id, userId string, amount *int, date *time.Time) (*Expense, error)
 	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense

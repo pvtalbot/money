@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 
+	"github.com/pvtalbot/money/app/domain/commands"
 	"github.com/pvtalbot/money/app/middlewares"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
@@ -37,8 +38,16 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 		return nil, err
 	}
 
-	expenseService := r.ExpenseService
-	expense := expenseService.Create(input.Amount, input.Date, user)
+	cmd := commands.CreateExpense{
+		Amount: input.Amount,
+		Date:   input.Date,
+		User:   user,
+	}
+
+	expense, err := r.Application.Commands.CreateExpense.Handle(cmd)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.Expense{
 		ID:     expense.ID,

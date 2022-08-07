@@ -3,6 +3,7 @@ package graph
 //go:generate go run github.com/99designs/gqlgen generate
 
 import (
+	"github.com/pvtalbot/money/app/domain"
 	"github.com/pvtalbot/money/app/domain/model"
 )
 
@@ -13,4 +14,5 @@ import (
 type Resolver struct {
 	UserService    model.UserServiceInterface
 	ExpenseService model.ExpenseServiceInterface
+	Application    domain.Application
 }

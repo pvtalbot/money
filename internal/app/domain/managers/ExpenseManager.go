@@ -18,15 +18,6 @@ func NewExpenseManager(r model.ExpenseRepository) ExpenseManager {
 	}
 }
 
-func (m ExpenseManager) Create(amount int, date time.Time, user *model.User) *model.Expense {
-	exp := &model.Expense{
-		Amount: amount,
-	}
-	exp.SetDate(date)
-
-	return m.r.Create(exp, user)
-}
-
 func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) (*model.Expense, error) {
 	expense, err := m.r.Find(id)
 	if err != nil {

@@ -22,7 +22,6 @@ type ExpenseSum {
 }
 
 type Query {
-  users: [User]!
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!

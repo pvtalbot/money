@@ -122,18 +122,6 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 	}, nil
 }
 
-// Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	var resultUsers []*model.User
-	internalUsers := r.UserService.FindAll()
-
-	for _, user := range internalUsers {
-		resultUsers = append(resultUsers, &model.User{ID: user.ID, Name: user.Name, FirstName: user.FirstName, LastName: user.LastName})
-	}
-
-	return resultUsers, nil
-}
-
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)

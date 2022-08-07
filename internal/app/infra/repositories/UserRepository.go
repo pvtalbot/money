@@ -19,7 +19,7 @@ func NewUserMariaRepository(db *sql.DB) UserMariaRepository {
 	}
 }
 
-func (r UserMariaRepository) Create(user *model.User) *model.User {
+func (r UserMariaRepository) Create(user *model.User) (*model.User, error) {
 	stmt, err := r.db.Prepare("insert into users(name, password, first_name, last_name) values (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -33,11 +33,12 @@ func (r UserMariaRepository) Create(user *model.User) *model.User {
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal("Error:", err.Error())
+		return nil, err
 	}
 
 	user.ID = strconv.FormatInt(id, 10)
 
-	return user
+	return user, nil
 }
 
 func (r UserMariaRepository) FindAll() []*model.User {

@@ -18,21 +18,6 @@ func NewUserManager(r model.UserRepository, expenseRepository model.ExpenseRepos
 	}
 }
 
-func (m UserManager) Create(username, clearPassword, firstName, lastName string) *model.User {
-	u := &model.User{
-		Name:      username,
-		FirstName: firstName,
-		LastName:  lastName,
-	}
-	u.SetPassword(clearPassword)
-
-	return m.r.Create(u)
-}
-
-func (m UserManager) FindAll() []*model.User {
-	return m.r.FindAll()
-}
-
 func (m UserManager) FindByName(username string) (*model.User, error) {
 	return m.r.FindByName(username)
 }

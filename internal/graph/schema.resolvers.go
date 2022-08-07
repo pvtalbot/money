@@ -22,8 +22,17 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 
 // CreateUser is the resolver for the CreateUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	userService := r.UserService
-	user := userService.Create(input.Name, input.Password, input.FirstName, input.LastName)
+	cmd := commands.NewCreateUser(
+		input.Name,
+		input.Password,
+		input.FirstName,
+		input.LastName,
+	)
+
+	user, err := r.Application.Commands.CreateUser.Handle(cmd)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.User{
 		ID:        user.ID,

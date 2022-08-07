@@ -15,17 +15,25 @@ func NewApplication(db *sql.DB) domain.Application {
 
 func newApplication(db *sql.DB) domain.Application {
 	expenseRepository := repositories.NewExpenseMariaRepository(db)
+	userRepository := repositories.NewUserMariaRepository(db)
 
 	return domain.Application{
 		Commands: domain.Commands{
+			// Expenses
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
 			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
 			UpdateExpense: commands.NewUpdateExpenseHandler(expenseRepository),
+
+			// Users
+			CreateUser: commands.NewCreateUserHandler(userRepository),
 		},
 		Queries: domain.Queries{
+			// Expenses
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
 			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),
 			SumExpenses: queries.NewSumExpensesQueryHandler(expenseRepository),
+
+			// Users
 		},
 	}
 }

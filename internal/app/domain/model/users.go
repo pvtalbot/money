@@ -13,15 +13,10 @@ type User struct {
 	password  string
 }
 
-type UserServiceInterface interface {
-	FindByName(username string) (*User, error)
-	Login(username, claimedPassword string) (string, error)
-	ValidateToken(token string) bool
-}
-
 type UserRepository interface {
 	Create(user *User) (*User, error)
 	FindAll() []*User
+	Find(id string) (*User, error)
 	FindByName(username string) (*User, error)
 	FindPasswordByName(username string) (string, error)
 }

@@ -11,13 +11,14 @@ type Application struct {
 }
 
 type Commands struct {
-	//Expenses
+	// Expenses
 	CreateExpense commands.CreateExpenseHandler
 	DeleteExpense commands.DeleteExpenseHandler
 	UpdateExpense commands.UpdateExpenseHandler
 
-	//Users
+	// Users
 	CreateUser commands.CreateUserHandler
+	Login      commands.LoginHandler
 }
 
 type Queries struct {
@@ -25,4 +26,7 @@ type Queries struct {
 	FindExpense queries.FindExpenseQueryHandler
 	GetExpenses queries.GetExpensesQueryHandler
 	SumExpenses queries.SumExpensesQueryHandler
+
+	// Users
+	FindUser queries.FindUserQueryHandler
 }

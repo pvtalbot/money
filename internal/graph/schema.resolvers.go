@@ -8,6 +8,7 @@ import (
 	"errors"
 
 	"github.com/pvtalbot/money/app/domain/commands"
+	"github.com/pvtalbot/money/app/domain/managers"
 	"github.com/pvtalbot/money/app/domain/queries"
 	"github.com/pvtalbot/money/app/middlewares"
 	"github.com/pvtalbot/money/graph/generated"
@@ -17,7 +18,10 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	return r.UserService.Login(input.Username, input.Password)
+	return r.Application.Commands.Login.Handle(commands.Login{
+		Name:            input.Username,
+		ClaimedPassword: input.Password,
+	})
 }
 
 // CreateUser is the resolver for the CreateUser field.
@@ -138,6 +142,13 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, err
 	}
 
+	user, err = r.Application.Queries.FindUser.Handle(
+		queries.FindUser{Id: user.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &model.User{
 		ID:        user.ID,
 		FirstName: user.FirstName,
@@ -206,7 +217,7 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 
 // ValidateAccessToken is the resolver for the validateAccessToken field.
 func (r *queryResolver) ValidateAccessToken(ctx context.Context, accessToken string) (bool, error) {
-	return r.UserService.ValidateToken(accessToken), nil
+	return managers.ValidateToken(accessToken), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

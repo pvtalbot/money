@@ -5,14 +5,13 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/pvtalbot/money/app/domain/managers"
 	"github.com/pvtalbot/money/app/domain/model"
 	"github.com/pvtalbot/money/pkg/jwt"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware(um managers.UserManager) gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.Request.Header.Get("Authorization")
 
@@ -22,15 +21,10 @@ func AuthMiddleware(um managers.UserManager) gin.HandlerFunc {
 		}
 
 		tokenStr := header
-		username, err := jwt.ParseToken(tokenStr)
+		user, err := jwt.ParseToken(tokenStr)
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
-		}
-
-		user, err := um.FindByName(username)
-		if err != nil {
-			c.Next()
 		}
 
 		c.Set("user", user)

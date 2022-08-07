@@ -38,6 +38,3 @@ type ExpenseRepository interface {
 	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) ([]*Expense, error)
 	SumAllExpensesFromUserBetweenDatesByMonth(user *User, startDate, endDate time.Time) ([]*ExpenseSum, error)
 }
-
-type ExpenseServiceInterface interface {
-}

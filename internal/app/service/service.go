@@ -26,6 +26,7 @@ func newApplication(db *sql.DB) domain.Application {
 
 			// Users
 			CreateUser: commands.NewCreateUserHandler(userRepository),
+			Login:      commands.NewLoginHandler(userRepository),
 		},
 		Queries: domain.Queries{
 			// Expenses
@@ -34,6 +35,7 @@ func newApplication(db *sql.DB) domain.Application {
 			SumExpenses: queries.NewSumExpensesQueryHandler(expenseRepository),
 
 			// Users
+			FindUser: queries.NewFindUserHandler(userRepository),
 		},
 	}
 }

@@ -4,7 +4,6 @@ package graph
 
 import (
 	"github.com/pvtalbot/money/app/domain"
-	"github.com/pvtalbot/money/app/domain/model"
 )
 
 // This file will not be regenerated automatically.
@@ -12,6 +11,5 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	UserService model.UserServiceInterface
 	Application domain.Application
 }

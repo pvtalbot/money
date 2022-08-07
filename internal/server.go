@@ -2,9 +2,6 @@ package main
 
 import (
 	"github.com/pvtalbot/money/app/domain"
-	"github.com/pvtalbot/money/app/domain/managers"
-	"github.com/pvtalbot/money/app/domain/model"
-	"github.com/pvtalbot/money/app/infra/repositories"
 	"github.com/pvtalbot/money/app/middlewares"
 	"github.com/pvtalbot/money/app/service"
 	"github.com/pvtalbot/money/graph"
@@ -19,10 +16,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func graphqlHandler(u model.UserServiceInterface, a domain.Application) gin.HandlerFunc {
+func graphqlHandler(app domain.Application) gin.HandlerFunc {
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		UserService: u,
-		Application: a,
+		Application: app,
 	}}))
 
 	return func(c *gin.Context) {
@@ -43,20 +39,15 @@ func main() {
 	defer dbContainer.CloseDB()
 	dbContainer.Migrate()
 
-	expenseRepository := repositories.NewExpenseMariaRepository(dbContainer.Db)
-	userRepository := repositories.NewUserMariaRepository(dbContainer.Db)
-
-	u := managers.NewUserManager(userRepository, expenseRepository)
-
 	app := service.NewApplication(dbContainer.Db)
 
 	r := gin.Default()
 
 	r.Use(middlewares.CORSMiddleware())
 	r.Use(middlewares.GinContextToContextMiddleware())
-	r.Use(middlewares.AuthMiddleware(u))
+	r.Use(middlewares.AuthMiddleware())
 
-	r.POST("/query", graphqlHandler(u, app))
+	r.POST("/query", graphqlHandler(app))
 	r.GET("/", playgroundHandler())
 	r.Run()
 }

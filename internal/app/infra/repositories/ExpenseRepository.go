@@ -140,7 +140,7 @@ func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, 
 }
 
 func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
-	stmt, err := r.db.Prepare("SELECT id, amount, date, user_id FROM expenses WHERE id = ?")
+	stmt, err := r.db.Prepare("SELECT amount, date, user_id FROM expenses WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -149,7 +149,7 @@ func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
 	var expense model.Expense
 	var expenseDate time.Time
 	var userId string
-	err = row.Scan(&expense.ID, &expense.Amount, &expenseDate, &userId)
+	err = row.Scan(&expense.Amount, &expenseDate, &userId)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Print(err)
@@ -158,6 +158,7 @@ func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
 	}
 
 	expense.SetDate(expenseDate)
+	expense.ID = id
 	expense.User = model.User{ID: userId}
 
 	return &expense, nil

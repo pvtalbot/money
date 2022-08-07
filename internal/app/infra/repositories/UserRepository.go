@@ -110,3 +110,25 @@ func (r UserMariaRepository) FindPasswordByName(username string) (string, error)
 
 	return hashedPassword, nil
 }
+
+func (r UserMariaRepository) Find(id string) (*model.User, error) {
+	stmt, err := r.db.Prepare("SELECT name, first_name, last_name from users where id = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	row := stmt.QueryRow(id)
+
+	var user model.User
+	err = row.Scan(&user.Name, &user.FirstName, &user.LastName)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return nil, err
+	}
+
+	user.ID = id
+
+	return &user, nil
+}

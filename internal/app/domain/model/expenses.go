@@ -37,13 +37,12 @@ type ExpenseRepository interface {
 	Delete(ID string) error
 	Find(ID string) (*Expense, error)
 	Update(expense *Expense) (*Expense, error)
-	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense
+	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) ([]*Expense, error)
 	SumAllExpensesFromUserBetweenDatesByMonth(user *User, startDate, endDate time.Time) []*ExpenseSum
 }
 
 type ExpenseServiceInterface interface {
 	Delete(id string, userID string) (*Expense, error)
 	Update(id, userId string, amount *int, date *time.Time) (*Expense, error)
-	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) []*Expense
 	SumAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time, groupBy utils.Duration) []*ExpenseSum
 }

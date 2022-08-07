@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/pvtalbot/money/app/domain/commands"
+	"github.com/pvtalbot/money/app/domain/queries"
 )
 
 type Application struct {
@@ -14,4 +15,6 @@ type Commands struct {
 }
 
 type Queries struct {
+	FindExpense queries.FindExpenseQueryHandler
+	GetExpenses queries.GetExpensesQueryHandler
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/pvtalbot/money/app/domain"
 	"github.com/pvtalbot/money/app/domain/commands"
+	"github.com/pvtalbot/money/app/domain/queries"
 	"github.com/pvtalbot/money/app/infra/repositories"
 )
 
@@ -18,6 +19,10 @@ func newApplication(db *sql.DB) domain.Application {
 	return domain.Application{
 		Commands: domain.Commands{
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
+		},
+		Queries: domain.Queries{
+			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
+			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),
 		},
 	}
 }

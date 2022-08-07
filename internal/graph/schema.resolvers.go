@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/pvtalbot/money/app/domain/commands"
+	"github.com/pvtalbot/money/app/domain/queries"
 	"github.com/pvtalbot/money/app/middlewares"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
@@ -130,9 +131,20 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 		return nil, err
 	}
 
+	query := queries.NewGetExpensesQuery(user, input.StartDate, input.EndDate)
+	exp, err := r.Application.Queries.GetExpenses.Handle(query)
+
+	if err != nil {
+		return nil, err
+	}
+
 	var expenses []*model.Expense
-	for _, e := range r.ExpenseService.GetAllExpensesFromUserBetweenDates(user, input.StartDate, input.EndDate) {
-		expenses = append(expenses, &model.Expense{ID: e.ID, Amount: e.Amount, Date: e.GetDate()})
+	for _, e := range exp {
+		expenses = append(expenses, &model.Expense{
+			ID:     e.ID,
+			Amount: e.Amount,
+			Date:   e.GetDate(),
+		})
 	}
 
 	return expenses, nil

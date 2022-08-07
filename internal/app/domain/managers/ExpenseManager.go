@@ -38,13 +38,6 @@ func (m ExpenseManager) Update(id, userId string, amount *int, date *time.Time) 
 	return m.r.Update(expense)
 }
 
-func (m ExpenseManager) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) []*model.Expense {
-	roundedStartDate := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
-	roundedEndDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, endDate.Location())
-
-	return m.r.GetAllExpensesFromUserBetweenDates(user, roundedStartDate, roundedEndDate)
-}
-
 func (m ExpenseManager) Delete(id, userID string) (*model.Expense, error) {
 	expense, err := m.r.Find(id)
 

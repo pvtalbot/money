@@ -1,25 +1,25 @@
 package commands
 
 import (
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type CreateUser struct {
-	user *model.User
+	user *models.User
 }
 
 type CreateUserHandler struct {
-	r model.UserRepository
+	r models.UserRepository
 }
 
-func NewCreateUserHandler(r model.UserRepository) CreateUserHandler {
+func NewCreateUserHandler(r models.UserRepository) CreateUserHandler {
 	return CreateUserHandler{
 		r: r,
 	}
 }
 
 func NewCreateUser(name, password, firstName, lastName string) CreateUser {
-	u := &model.User{
+	u := &models.User{
 		Name:      name,
 		FirstName: firstName,
 		LastName:  lastName,
@@ -29,6 +29,6 @@ func NewCreateUser(name, password, firstName, lastName string) CreateUser {
 	return CreateUser{user: u}
 }
 
-func (h CreateUserHandler) Handle(cmd CreateUser) (*model.User, error) {
+func (h CreateUserHandler) Handle(cmd CreateUser) (*models.User, error) {
 	return h.r.Create(cmd.user)
 }

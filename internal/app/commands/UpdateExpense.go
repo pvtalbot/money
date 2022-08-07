@@ -3,7 +3,7 @@ package commands
 import (
 	"time"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type UpdateExpense struct {
@@ -13,16 +13,16 @@ type UpdateExpense struct {
 }
 
 type UpdateExpenseHandler struct {
-	r model.ExpenseRepository
+	r models.ExpenseRepository
 }
 
-func NewUpdateExpenseHandler(r model.ExpenseRepository) UpdateExpenseHandler {
+func NewUpdateExpenseHandler(r models.ExpenseRepository) UpdateExpenseHandler {
 	return UpdateExpenseHandler{
 		r: r,
 	}
 }
 
-func NewUpdateExpenseCommand(expense model.Expense, amount *int, date *time.Time) UpdateExpense {
+func NewUpdateExpenseCommand(expense models.Expense, amount *int, date *time.Time) UpdateExpense {
 	cmd := UpdateExpense{id: expense.ID}
 
 	if amount == nil {
@@ -40,8 +40,8 @@ func NewUpdateExpenseCommand(expense model.Expense, amount *int, date *time.Time
 	return cmd
 }
 
-func (h UpdateExpenseHandler) Handle(cmd UpdateExpense) (*model.Expense, error) {
-	exp := &model.Expense{Amount: cmd.amount, ID: cmd.id}
+func (h UpdateExpenseHandler) Handle(cmd UpdateExpense) (*models.Expense, error) {
+	exp := &models.Expense{Amount: cmd.amount, ID: cmd.id}
 	exp.SetDate(cmd.date)
 
 	return h.r.Update(exp)

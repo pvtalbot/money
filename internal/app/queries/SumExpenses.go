@@ -4,28 +4,28 @@ import (
 	"time"
 
 	"github.com/pvtalbot/money/domain/managers"
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 	"github.com/pvtalbot/money/pkg/utils"
 )
 
 type SumExpenses struct {
 	startDate time.Time
 	endDate   time.Time
-	user      *model.User
+	user      *models.User
 	groupBy   utils.Duration
 }
 
 type SumExpensesQueryHandler struct {
-	r model.ExpenseRepository
+	r models.ExpenseRepository
 }
 
-func NewSumExpensesQueryHandler(r model.ExpenseRepository) SumExpensesQueryHandler {
+func NewSumExpensesQueryHandler(r models.ExpenseRepository) SumExpensesQueryHandler {
 	return SumExpensesQueryHandler{
 		r: r,
 	}
 }
 
-func NewSumExpensesQuery(startDate, endDate time.Time, user *model.User, groupBy utils.Duration) SumExpenses {
+func NewSumExpensesQuery(startDate, endDate time.Time, user *models.User, groupBy utils.Duration) SumExpenses {
 	var roundedStartDate, roundedEndDate time.Time
 	switch groupBy {
 	case utils.MONTH:
@@ -41,8 +41,8 @@ func NewSumExpensesQuery(startDate, endDate time.Time, user *model.User, groupBy
 	}
 }
 
-func (h SumExpensesQueryHandler) Handle(q SumExpenses) ([]*model.ExpenseSum, error) {
-	var result []*model.ExpenseSum
+func (h SumExpensesQueryHandler) Handle(q SumExpenses) ([]*models.ExpenseSum, error) {
+	var result []*models.ExpenseSum
 	var err error
 	switch q.groupBy {
 	case utils.MONTH:

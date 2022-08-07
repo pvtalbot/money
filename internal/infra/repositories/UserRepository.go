@@ -3,7 +3,7 @@ package repositories
 import (
 	"strconv"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 
 	"database/sql"
 	"log"
@@ -19,7 +19,7 @@ func NewUserMariaRepository(db *sql.DB) UserMariaRepository {
 	}
 }
 
-func (r UserMariaRepository) Create(user *model.User) (*model.User, error) {
+func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
 	stmt, err := r.db.Prepare("insert into users(name, password, first_name, last_name) values (?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +41,7 @@ func (r UserMariaRepository) Create(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (r UserMariaRepository) FindAll() []*model.User {
+func (r UserMariaRepository) FindAll() []*models.User {
 	stmt, err := r.db.Prepare("select id, name, first_name, last_name from users")
 	if err != nil {
 		log.Fatal(err)
@@ -54,9 +54,9 @@ func (r UserMariaRepository) FindAll() []*model.User {
 	}
 	defer rows.Close()
 
-	var users []*model.User
+	var users []*models.User
 	for rows.Next() {
-		var user model.User
+		var user models.User
 		err := rows.Scan(&user.ID, &user.Name, &user.FirstName, &user.LastName)
 		if err != nil {
 			log.Fatal(err)
@@ -71,14 +71,14 @@ func (r UserMariaRepository) FindAll() []*model.User {
 	return users
 }
 
-func (r UserMariaRepository) FindByName(username string) (*model.User, error) {
+func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
 	stmt, err := r.db.Prepare("select id, first_name, last_name from users where Name = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 	row := stmt.QueryRow(username)
 
-	var user model.User
+	var user models.User
 	err = row.Scan(&user.ID, &user.FirstName, &user.LastName)
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -111,7 +111,7 @@ func (r UserMariaRepository) FindPasswordByName(username string) (string, error)
 	return hashedPassword, nil
 }
 
-func (r UserMariaRepository) Find(id string) (*model.User, error) {
+func (r UserMariaRepository) Find(id string) (*models.User, error) {
 	stmt, err := r.db.Prepare("SELECT name, first_name, last_name from users where id = ?")
 	if err != nil {
 		log.Fatal(err)
@@ -119,7 +119,7 @@ func (r UserMariaRepository) Find(id string) (*model.User, error) {
 
 	row := stmt.QueryRow(id)
 
-	var user model.User
+	var user models.User
 	err = row.Scan(&user.Name, &user.FirstName, &user.LastName)
 	if err != nil {
 		if err != sql.ErrNoRows {

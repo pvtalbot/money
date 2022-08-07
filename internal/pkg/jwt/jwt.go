@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 var (
@@ -26,14 +26,14 @@ func GenerateToken(username, id string) (string, error) {
 	return tokenString, nil
 }
 
-func ParseToken(tokenString string) (*model.User, error) {
+func ParseToken(tokenString string) (*models.User, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return SecretKey, nil
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		username := claims["username"].(string)
 		id := claims["id"].(string)
-		user := model.User{Name: username, ID: id}
+		user := models.User{Name: username, ID: id}
 		return &user, nil
 	} else {
 		return nil, err

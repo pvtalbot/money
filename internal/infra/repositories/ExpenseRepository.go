@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type ExpenseMariaRepository struct {
@@ -19,7 +19,7 @@ func NewExpenseMariaRepository(db *sql.DB) ExpenseMariaRepository {
 	}
 }
 
-func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *model.User, startDate, endDate time.Time) ([]*model.Expense, error) {
+func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *models.User, startDate, endDate time.Time) ([]*models.Expense, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, amount, date
 		FROM expenses
@@ -39,9 +39,9 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *model.U
 	}
 	defer rows.Close()
 
-	var expenses []*model.Expense
+	var expenses []*models.Expense
 	for rows.Next() {
-		var expense model.Expense
+		var expense models.Expense
 		var expenseDate time.Time
 		err := rows.Scan(&expense.ID, &expense.Amount, &expenseDate)
 		if err != nil {
@@ -59,7 +59,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *model.U
 	return expenses, nil
 }
 
-func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *model.User, startDate, endDate time.Time) ([]*model.ExpenseSum, error) {
+func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *models.User, startDate, endDate time.Time) ([]*models.ExpenseSum, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT SUM(amount), MONTH(date), YEAR(date)
 		FROM expenses
@@ -82,7 +82,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	}
 	defer rows.Close()
 
-	var expensesSum []*model.ExpenseSum
+	var expensesSum []*models.ExpenseSum
 	for rows.Next() {
 		var amount, month, year int
 		err := rows.Scan(&amount, &month, &year)
@@ -90,7 +90,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 			log.Fatal(err)
 		}
 
-		expenseSum := model.ExpenseSum{
+		expenseSum := models.ExpenseSum{
 			Amount:    amount,
 			StartDate: time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Now().Location()),
 			EndDate:   time.Date(year, time.Month(month+1), 1, 0, 0, 0, 0, time.Now().Location()),
@@ -102,7 +102,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	return expensesSum, nil
 }
 
-func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User) (*model.Expense, error) {
+func (r ExpenseMariaRepository) Create(expense *models.Expense, user *models.User) (*models.Expense, error) {
 	stmt, err := r.db.Prepare("insert into expenses(amount, date, user_id) values (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
@@ -124,7 +124,7 @@ func (r ExpenseMariaRepository) Create(expense *model.Expense, user *model.User)
 	return expense, nil
 }
 
-func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, error) {
+func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense, error) {
 	stmt, err := r.db.Prepare("UPDATE expenses SET amount = ?, date = ? WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
@@ -139,14 +139,14 @@ func (r ExpenseMariaRepository) Update(expense *model.Expense) (*model.Expense, 
 	return r.Find(expense.ID)
 }
 
-func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
+func (r ExpenseMariaRepository) Find(id string) (*models.Expense, error) {
 	stmt, err := r.db.Prepare("SELECT amount, date, user_id FROM expenses WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 	row := stmt.QueryRow(id)
 
-	var expense model.Expense
+	var expense models.Expense
 	var expenseDate time.Time
 	var userId string
 	err = row.Scan(&expense.Amount, &expenseDate, &userId)
@@ -159,7 +159,7 @@ func (r ExpenseMariaRepository) Find(id string) (*model.Expense, error) {
 
 	expense.SetDate(expenseDate)
 	expense.ID = id
-	expense.User = model.User{ID: userId}
+	expense.User = models.User{ID: userId}
 
 	return &expense, nil
 }

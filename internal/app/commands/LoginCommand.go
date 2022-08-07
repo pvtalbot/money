@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 	"github.com/pvtalbot/money/pkg/jwt"
 	"github.com/pvtalbot/money/pkg/utils"
 )
@@ -12,10 +12,10 @@ type Login struct {
 }
 
 type LoginHandler struct {
-	r model.UserRepository
+	r models.UserRepository
 }
 
-func NewLoginHandler(r model.UserRepository) LoginHandler {
+func NewLoginHandler(r models.UserRepository) LoginHandler {
 	return LoginHandler{
 		r: r,
 	}

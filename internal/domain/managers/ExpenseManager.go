@@ -3,7 +3,7 @@ package managers
 import (
 	"time"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 /*
@@ -12,7 +12,7 @@ import (
 	we then go through all values from result and for each, sets the map to false. Every value in the map still at true is then
 	not in result. We iterate through the map and add an ExpenseSum{Amount: -1, ...} for each key whose value is still true
 */
-func PopulateResult(startDate, endDate time.Time, result []*model.ExpenseSum) []*model.ExpenseSum {
+func PopulateResult(startDate, endDate time.Time, result []*models.ExpenseSum) []*models.ExpenseSum {
 	emptyDateMap := createEmptyDateMap(startDate, endDate)
 	for _, v := range result {
 		emptyDateMap[v.StartDate.Year()][int(v.StartDate.Month())] = false
@@ -20,7 +20,7 @@ func PopulateResult(startDate, endDate time.Time, result []*model.ExpenseSum) []
 	for i, v := range emptyDateMap {
 		for j, w := range v {
 			if w {
-				result = append(result, &model.ExpenseSum{
+				result = append(result, &models.ExpenseSum{
 					Amount:    0,
 					StartDate: time.Date(i, time.Month(j), 1, 0, 0, 0, 0, startDate.Location()),
 					EndDate:   time.Date(i, time.Month(j+1), 1, 0, 0, 0, 0, endDate.Location()),

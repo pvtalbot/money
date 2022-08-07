@@ -3,26 +3,26 @@ package queries
 import (
 	"time"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type GetExpenses struct {
-	user      *model.User
+	user      *models.User
 	startDate time.Time
 	endDate   time.Time
 }
 
 type GetExpensesQueryHandler struct {
-	r model.ExpenseRepository
+	r models.ExpenseRepository
 }
 
-func NewGetExpensesHandler(r model.ExpenseRepository) GetExpensesQueryHandler {
+func NewGetExpensesHandler(r models.ExpenseRepository) GetExpensesQueryHandler {
 	return GetExpensesQueryHandler{
 		r: r,
 	}
 }
 
-func NewGetExpensesQuery(user *model.User, startDate, endDate time.Time) GetExpenses {
+func NewGetExpensesQuery(user *models.User, startDate, endDate time.Time) GetExpenses {
 	roundedStartDate := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location())
 	roundedEndDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day()+1, 0, 0, 0, 0, endDate.Location())
 
@@ -33,6 +33,6 @@ func NewGetExpensesQuery(user *model.User, startDate, endDate time.Time) GetExpe
 	}
 }
 
-func (h GetExpensesQueryHandler) Handle(q GetExpenses) ([]*model.Expense, error) {
+func (h GetExpensesQueryHandler) Handle(q GetExpenses) ([]*models.Expense, error) {
 	return h.r.GetAllExpensesFromUserBetweenDates(q.user, q.startDate, q.endDate)
 }

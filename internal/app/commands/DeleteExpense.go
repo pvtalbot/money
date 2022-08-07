@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type DeleteExpense struct {
@@ -9,10 +9,10 @@ type DeleteExpense struct {
 }
 
 type DeleteExpenseHandler struct {
-	r model.ExpenseRepository
+	r models.ExpenseRepository
 }
 
-func NewDeleteExpenseHandler(r model.ExpenseRepository) DeleteExpenseHandler {
+func NewDeleteExpenseHandler(r models.ExpenseRepository) DeleteExpenseHandler {
 	return DeleteExpenseHandler{
 		r: r,
 	}

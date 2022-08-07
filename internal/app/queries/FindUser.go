@@ -1,21 +1,21 @@
 package queries
 
-import "github.com/pvtalbot/money/domain/model"
+import "github.com/pvtalbot/money/domain/models"
 
 type FindUser struct {
 	Id string
 }
 
 type FindUserQueryHandler struct {
-	r model.UserRepository
+	r models.UserRepository
 }
 
-func NewFindUserHandler(r model.UserRepository) FindUserQueryHandler {
+func NewFindUserHandler(r models.UserRepository) FindUserQueryHandler {
 	return FindUserQueryHandler{
 		r: r,
 	}
 }
 
-func (h FindUserQueryHandler) Handle(q FindUser) (*model.User, error) {
+func (h FindUserQueryHandler) Handle(q FindUser) (*models.User, error) {
 	return h.r.Find(q.Id)
 }

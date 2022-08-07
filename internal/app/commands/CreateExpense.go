@@ -3,27 +3,27 @@ package commands
 import (
 	"time"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 )
 
 type CreateExpense struct {
 	Amount int
 	Date   time.Time
-	User   *model.User
+	User   *models.User
 }
 
 type CreateExpenseHandler struct {
-	r model.ExpenseRepository
+	r models.ExpenseRepository
 }
 
-func NewCreateExpenseHandler(r model.ExpenseRepository) CreateExpenseHandler {
+func NewCreateExpenseHandler(r models.ExpenseRepository) CreateExpenseHandler {
 	return CreateExpenseHandler{
 		r: r,
 	}
 }
 
-func (h CreateExpenseHandler) Handle(cmd CreateExpense) (*model.Expense, error) {
-	exp := &model.Expense{Amount: cmd.Amount}
+func (h CreateExpenseHandler) Handle(cmd CreateExpense) (*models.Expense, error) {
+	exp := &models.Expense{Amount: cmd.Amount}
 	exp.SetDate(cmd.Date)
 
 	return h.r.Create(exp, cmd.User)

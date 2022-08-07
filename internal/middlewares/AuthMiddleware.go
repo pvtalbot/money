@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/pvtalbot/money/domain/model"
+	"github.com/pvtalbot/money/domain/models"
 	"github.com/pvtalbot/money/pkg/jwt"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +32,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func ExtractUserFromContext(ctx context.Context) (*model.User, error) {
+func ExtractUserFromContext(ctx context.Context) (*models.User, error) {
 	ginContext, err := GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func ExtractUserFromContext(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("not found")
 	}
 
-	user, ok := u.(*model.User)
+	user, ok := u.(*models.User)
 	if !ok {
 		return nil, errors.New("user has wrong type")
 	}

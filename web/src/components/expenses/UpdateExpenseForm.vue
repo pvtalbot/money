@@ -13,8 +13,7 @@ import { useDrawerStore } from '@/stores/drawer.js';
 
 // Vue
 import VueButton from '@/components/utils/VueButton.vue';
-import { ref, onMounted } from 'vue';
-import { computed } from '@vue/reactivity';
+import { ref, onMounted, computed } from 'vue';
 
 dayjs.extend(utc);
 const expenseStore = useExpenseStore();

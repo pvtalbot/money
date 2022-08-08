@@ -1,0 +1,7 @@
+mutation UpdateRevenue($input: UpdateRevenueInput!) {
+  updateRevenue(input: $input) {
+    id
+    date
+    amount
+  }
+}

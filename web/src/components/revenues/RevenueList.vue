@@ -14,8 +14,9 @@ import { useRevenueStore } from '@/stores/revenue.js'
 import { useDrawerStore } from '@/stores/drawer.js'
 
 // Vue
-import { computed, watch } from 'vue';
-import RevenueCard from '@/components/revenues/RevenueCard.vue'
+import { computed, watch, ref } from 'vue';
+import RevenueCard from '@/components/revenues/RevenueCard.vue';
+import UpdateRevenueForm from '@/components/revenues/UpdateRevenueForm.vue';
 
 dayjs.extend(utc);
 const revenueStore = useRevenueStore();
@@ -29,6 +30,9 @@ const props = defineProps({
 
 const startDate = computed(() => props.initialDate);
 const endDate = computed(() => startDate.value.add(1, 'month'));
+
+const revenueToUpdate = ref(null)
+const COMPONENT_TO_DRAWER = 'UpdateRevenueForm';
 
 const displayedRevenues = computed(() => revenueStore.getCurrentRevenues(startDate.value))
 const sortedRevenues = computed(() => {
@@ -65,6 +69,11 @@ const deleteRevenue = function(revenue) {
     .then(() => revenueStore.deleteRevenue(revenue))
     .catch(e => { console.log(e); });
 }
+
+const updateRevenue = revenue => {
+  drawerStore.registerComponent(COMPONENT_TO_DRAWER);
+  revenueToUpdate.value = revenue;
+}
 </script>
 
 <template>
@@ -76,9 +85,17 @@ const deleteRevenue = function(revenue) {
       <p v-if="sortedRevenues.length > 0">Revenues of the month:</p>
       <div v-for="revenue in sortedRevenues" :key="revenue.id" class="revenue">
         <RevenueCard :revenue="revenue"
-                      @delete-revenue="deleteRevenue(revenue)"/>
+                      @delete-revenue="deleteRevenue(revenue)"
+                      @click.self="updateRevenue(revenue)"/>
       </div>
     </div>
+    <Teleport to="#teleport-component-to-drawer">
+      <Transition name="component">
+        <UpdateRevenueForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"
+        :updatedObject="revenueToUpdate"
+        :mode="'revenue'"/>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

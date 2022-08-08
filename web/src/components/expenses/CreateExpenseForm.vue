@@ -21,8 +21,13 @@ const drawerStore = useDrawerStore();
 
 const amount = ref(0);
 const date = ref(dayjs().format('YYYY-MM-DD'));
+const categoryId = ref(null)
 const formatedDate = computed(() => date.value + 'T00:00:00Z')
 const disabled = ref(false);
+
+const getCategories = computed(() => {
+  return expenseStore.expensesCategories
+})
 
 // Apollo Mutation to create an expense
 const { mutate: createExpenseMutation } = useMutation(CreateExpenseMutation)
@@ -34,9 +39,12 @@ const createExpense = function() {
     input: {
       amount: amount.value,
       date: formatedDate.value,
+      categoryId: categoryId.value,
     }
-  }).then(r => {expenseStore.cacheExpenses([r.data.createExpense]); })
-  .then(() => {drawerStore.closeDrawer();})
+  }).then(r => {
+    expenseStore.cacheExpenses([r.data.createExpense]); 
+    drawerStore.closeDrawer();
+    })
   .catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})
 }
@@ -55,8 +63,17 @@ const createExpense = function() {
         id="create-expense-form__amount"
         v-model.number="amount"/>
       </div>
-      <input class="create-expense-form__datepicker" type="date" v-model="date" />
-      <VueButton button-type="submit" message="Submit" :disabled="disabled" />
+      <div class="create-expense-form__item-container">
+        <label for="create-expense-form__date">Date</label>
+        <input class="create-expense-form__datepicker" type="date" v-model="date" id="create-expense-form__date" />
+      </div>
+      <div class="create-expense-form__item-container">
+        <label for="create-expense-form__category">Category</label>
+        <select class="create-expense-form__select-category" id="create-expense-form__category" v-model="categoryId" required>
+          <option v-for="c in getCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-button"/>
     </form>
   </div>
 
@@ -74,11 +91,15 @@ form {
   flex-flow: column nowrap;
 }
 
-.create-expense-form__datepicker {
-  margin-bottom: 10px;
+.create-expense-form__select-category {
+  background-color: var(--vt-c-white);
 }
 
 label {
   align-self: start;
+}
+
+.submit-button {
+  margin-top: 10px;
 }
 </style>

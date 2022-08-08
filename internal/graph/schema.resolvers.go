@@ -78,7 +78,7 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 		ID:       expense.ID,
 		Amount:   expense.Amount,
 		Date:     expense.GetDate(),
-		Category: &model.ExpenseCategory{ID: expense.Category.ID},
+		Category: &model.ExpenseCategory{ID: input.CategoryID},
 	}, nil
 }
 

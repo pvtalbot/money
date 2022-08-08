@@ -11,7 +11,7 @@ import (
 type SumExpenses struct {
 	startDate time.Time
 	endDate   time.Time
-	user      *models.User
+	userId    string
 	groupBy   utils.Duration
 }
 
@@ -25,7 +25,7 @@ func NewSumExpensesQueryHandler(r models.ExpenseRepository) SumExpensesQueryHand
 	}
 }
 
-func NewSumExpensesQuery(startDate, endDate time.Time, user *models.User, groupBy utils.Duration) SumExpenses {
+func NewSumExpensesQuery(startDate, endDate time.Time, userId string, groupBy utils.Duration) SumExpenses {
 	var roundedStartDate, roundedEndDate time.Time
 	switch groupBy {
 	case utils.MONTH:
@@ -36,7 +36,7 @@ func NewSumExpensesQuery(startDate, endDate time.Time, user *models.User, groupB
 	return SumExpenses{
 		startDate: roundedStartDate,
 		endDate:   roundedEndDate,
-		user:      user,
+		userId:    userId,
 		groupBy:   groupBy,
 	}
 }
@@ -50,7 +50,7 @@ func (h SumExpensesQueryHandler) Handle(q SumExpenses) ([]*models.ExpenseSum, er
 			return result, nil
 		}
 
-		result, err = h.r.SumAllExpensesFromUserBetweenDatesByMonth(q.user, q.startDate, q.endDate)
+		result, err = h.r.SumAllExpensesFromUserBetweenDatesByMonth(q.userId, q.startDate, q.endDate)
 		if err != nil {
 			return nil, err
 		}

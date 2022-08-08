@@ -20,7 +20,10 @@ func NewUserMariaRepository(db *sql.DB) UserMariaRepository {
 }
 
 func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
-	stmt, err := r.db.Prepare("insert into users(name, password, first_name, last_name) values (?, ?, ?, ?)")
+	stmt, err := r.db.Prepare(`
+		INSERT INTO users(name, password, first_name, last_name) 
+		VALUES (?, ?, ?, ?)
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +45,10 @@ func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
 }
 
 func (r UserMariaRepository) FindAll() []*models.User {
-	stmt, err := r.db.Prepare("select id, name, first_name, last_name from users")
+	stmt, err := r.db.Prepare(`
+		SELECT id, name, first_name, last_name
+		FROM users
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,7 +78,11 @@ func (r UserMariaRepository) FindAll() []*models.User {
 }
 
 func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
-	stmt, err := r.db.Prepare("select id, first_name, last_name from users where Name = ?")
+	stmt, err := r.db.Prepare(`
+		SELECT id, first_name, last_name 
+		FROM users 
+		WHERE name = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +103,11 @@ func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
 }
 
 func (r UserMariaRepository) FindPasswordByName(username string) (string, error) {
-	stmt, err := r.db.Prepare("select password from users where Name = ?")
+	stmt, err := r.db.Prepare(`
+		SELECT password
+		FROM users 
+		WHERE name = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,7 +126,11 @@ func (r UserMariaRepository) FindPasswordByName(username string) (string, error)
 }
 
 func (r UserMariaRepository) Find(id string) (*models.User, error) {
-	stmt, err := r.db.Prepare("SELECT name, first_name, last_name from users where id = ?")
+	stmt, err := r.db.Prepare(`
+		SELECT name, first_name, last_name 
+		FROM users 
+		WHERE id = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}

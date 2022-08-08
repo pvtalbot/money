@@ -19,7 +19,10 @@ func NewExpenseCategoryMariaRepository(db *sql.DB) ExpenseCategoryMariaRepositor
 }
 
 func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*models.ExpenseCategory, error) {
-	stmt, err := r.db.Prepare("INSERT INTO expenses_categories(name, user_id) values (?, ?)")
+	stmt, err := r.db.Prepare(`
+		INSERT INTO expenses_categories(name, user_id) 
+		values (?, ?)
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +43,7 @@ func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*mod
 	return ec, nil
 }
 
-func (r ExpenseCategoryMariaRepository) FindAll(user *models.User) ([]*models.ExpenseCategory, error) {
+func (r ExpenseCategoryMariaRepository) FindAll(userId string) ([]*models.ExpenseCategory, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, name
 		FROM expenses_categories
@@ -51,7 +54,7 @@ func (r ExpenseCategoryMariaRepository) FindAll(user *models.User) ([]*models.Ex
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user.ID)
+	rows, err := stmt.Query(userId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +63,7 @@ func (r ExpenseCategoryMariaRepository) FindAll(user *models.User) ([]*models.Ex
 	var result []*models.ExpenseCategory
 	for rows.Next() {
 		var ec models.ExpenseCategory
+		ec.User = &models.User{ID: userId}
 		err := rows.Scan(&ec.ID, &ec.Name)
 
 		if err != nil {

@@ -19,9 +19,9 @@ func (r *Revenue) SetDate(d time.Time) {
 }
 
 type RevenueRepository interface {
-	Create(revenue *Revenue, user *User) (*Revenue, error)
+	Create(revenue *Revenue, userId string) (*Revenue, error)
 	Delete(ID string) error
 	Find(ID string) (*Revenue, error)
 	Update(revenue *Revenue) (*Revenue, error)
-	GetAllRevenuesOfUserBetweenDates(user *User, startDate, endDate time.Time) ([]*Revenue, error)
+	GetAllRevenuesOfUserBetweenDates(userId string, startDate, endDate time.Time) ([]*Revenue, error)
 }

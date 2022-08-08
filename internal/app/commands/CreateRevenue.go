@@ -9,7 +9,7 @@ import (
 type CreateRevenue struct {
 	Amount int
 	Date   time.Time
-	User   *models.User
+	UserId string
 }
 
 type CreateRevenueHandler struct {
@@ -26,5 +26,5 @@ func (h CreateRevenueHandler) Handle(cmd CreateRevenue) (*models.Revenue, error)
 	r := &models.Revenue{Amount: cmd.Amount}
 	r.SetDate(cmd.Date)
 
-	return h.r.Create(r, cmd.User)
+	return h.r.Create(r, cmd.UserId)
 }

@@ -32,10 +32,10 @@ func (e *Expense) SetDate(d time.Time) {
 }
 
 type ExpenseRepository interface {
-	Create(expense *Expense, user *User, categoryId string) (*Expense, error)
+	Create(expense *Expense, userId, categoryId string) (*Expense, error)
 	Delete(ID string) error
 	Find(ID string) (*Expense, error)
 	Update(expense *Expense) (*Expense, error)
-	GetAllExpensesFromUserBetweenDates(user *User, startDate, endDate time.Time) ([]*Expense, error)
-	SumAllExpensesFromUserBetweenDatesByMonth(user *User, startDate, endDate time.Time) ([]*ExpenseSum, error)
+	GetAllExpensesFromUserBetweenDates(userId string, startDate, endDate time.Time) ([]*Expense, error)
+	SumAllExpensesFromUserBetweenDatesByMonth(userId string, startDate, endDate time.Time) ([]*ExpenseSum, error)
 }

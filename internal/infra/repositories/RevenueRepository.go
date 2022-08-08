@@ -19,7 +19,7 @@ func NewRevenueMariaRepository(db *sql.DB) RevenueMariaRepository {
 	}
 }
 
-func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(user *models.User, startDate, endDate time.Time) ([]*models.Revenue, error) {
+func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(userId string, startDate, endDate time.Time) ([]*models.Revenue, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, amount, date
 		FROM revenues
@@ -32,7 +32,7 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(user *models.Us
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user.ID, startDate, endDate)
+	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,6 +47,7 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(user *models.Us
 			log.Fatal(err)
 		}
 		revenue.SetDate(revenueDate)
+		revenue.User = models.User{ID: userId}
 		revenues = append(revenues, &revenue)
 	}
 
@@ -58,7 +59,7 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(user *models.Us
 	return revenues, nil
 }
 
-func (r RevenueMariaRepository) Create(revenue *models.Revenue, user *models.User) (*models.Revenue, error) {
+func (r RevenueMariaRepository) Create(revenue *models.Revenue, userId string) (*models.Revenue, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO revenues(amount, date, user_id)
 		VALUES (?, ?, ?)
@@ -67,7 +68,7 @@ func (r RevenueMariaRepository) Create(revenue *models.Revenue, user *models.Use
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(revenue.Amount, revenue.GetDate(), user.ID)
+	res, err := stmt.Exec(revenue.Amount, revenue.GetDate(), userId)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,7 +5,7 @@ import (
 )
 
 type GetExpensesCategories struct {
-	User *models.User
+	UserId string
 }
 
 type GetExpensesCategoriesQueryHandler struct {
@@ -19,5 +19,5 @@ func NewGetExpensesCategoriesHandler(r models.ExpenseCategoryRepository) GetExpe
 }
 
 func (h GetExpensesCategoriesQueryHandler) Handle(q GetExpensesCategories) ([]*models.ExpenseCategory, error) {
-	return h.r.FindAll(q.User)
+	return h.r.FindAll(q.UserId)
 }

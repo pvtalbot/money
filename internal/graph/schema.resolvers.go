@@ -11,7 +11,6 @@ import (
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
 	"github.com/pvtalbot/money/domain/managers"
-	"github.com/pvtalbot/money/domain/models"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
 	"github.com/pvtalbot/money/middlewares"
@@ -66,7 +65,7 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 	cmd := commands.CreateExpense{
 		Amount:     input.Amount,
 		Date:       input.Date,
-		User:       user,
+		UserId:     user.ID,
 		CategoryId: input.CategoryID,
 	}
 
@@ -169,7 +168,7 @@ func (r *mutationResolver) CreateRevenue(ctx context.Context, input model.Create
 	cmd := commands.CreateRevenue{
 		Amount: input.Amount,
 		Date:   input.Date,
-		User:   user,
+		UserId: user.ID,
 	}
 
 	revenue, err := r.Application.Commands.CreateRevenue.Handle(cmd)
@@ -280,7 +279,7 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 		return nil, err
 	}
 
-	query := queries.NewGetExpensesQuery(user, input.StartDate, input.EndDate)
+	query := queries.NewGetExpensesQuery(user.ID, input.StartDate, input.EndDate)
 	exp, err := r.Application.Queries.GetExpenses.Handle(query)
 
 	if err != nil {
@@ -307,7 +306,7 @@ func (r *queryResolver) Revenues(ctx context.Context, input model.GetRevenuesInp
 		return nil, err
 	}
 
-	query := queries.NewGetRevenuesQuery(user, input.StartDate, input.EndDate)
+	query := queries.NewGetRevenuesQuery(user.ID, input.StartDate, input.EndDate)
 	rev, err := r.Application.Queries.GetRevenues.Handle(query)
 
 	if err != nil {
@@ -343,7 +342,7 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 	query := queries.NewSumExpensesQuery(
 		input.StartDate,
 		input.EndDate,
-		user,
+		user.ID,
 		groupBy,
 	)
 	result, err := r.Application.Queries.SumExpenses.Handle(query)
@@ -368,7 +367,7 @@ func (r *userResolver) ExpensesCategories(ctx context.Context, obj *model.User) 
 	var expensesCategories []*model.ExpenseCategory
 
 	result, err := r.Application.Queries.GetExpensesCategories.Handle(queries.GetExpensesCategories{
-		User: &models.User{ID: obj.ID},
+		UserId: obj.ID,
 	})
 	if err != nil {
 		return nil, err

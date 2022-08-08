@@ -19,7 +19,7 @@ func NewExpenseMariaRepository(db *sql.DB) ExpenseMariaRepository {
 	}
 }
 
-func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *models.User, startDate, endDate time.Time) ([]*models.Expense, error) {
+func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(userId string, startDate, endDate time.Time) ([]*models.Expense, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT id, amount, date, expense_category_id
 		FROM expenses
@@ -33,7 +33,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *models.
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user.ID, startDate, endDate)
+	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,6 +50,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *models.
 		}
 		expense.SetDate(expenseDate)
 		expense.Category = models.ExpenseCategory{ID: expenseCategoryId}
+		expense.User = models.User{ID: userId}
 		expenses = append(expenses, &expense)
 	}
 
@@ -61,7 +62,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(user *models.
 	return expenses, nil
 }
 
-func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *models.User, startDate, endDate time.Time) ([]*models.ExpenseSum, error) {
+func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(userId string, startDate, endDate time.Time) ([]*models.ExpenseSum, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT SUM(amount), MONTH(date), YEAR(date)
 		FROM expenses
@@ -77,7 +78,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(user.ID, startDate, endDate)
+	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -104,13 +105,16 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(user *
 	return expensesSum, nil
 }
 
-func (r ExpenseMariaRepository) Create(expense *models.Expense, user *models.User, categoryId string) (*models.Expense, error) {
-	stmt, err := r.db.Prepare("insert into expenses(amount, date, user_id, expense_category_id) values (?, ?, ?, ?)")
+func (r ExpenseMariaRepository) Create(expense *models.Expense, userId, categoryId string) (*models.Expense, error) {
+	stmt, err := r.db.Prepare(`
+		INSERT INTO expenses(amount, date, user_id, expense_category_id) 
+		VALUES (?, ?, ?, ?)
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(expense.Amount, expense.GetDate(), user.ID, categoryId)
+	res, err := stmt.Exec(expense.Amount, expense.GetDate(), userId, categoryId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +131,11 @@ func (r ExpenseMariaRepository) Create(expense *models.Expense, user *models.Use
 }
 
 func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense, error) {
-	stmt, err := r.db.Prepare("UPDATE expenses SET amount = ?, date = ?, expense_category_id = ? WHERE id = ?")
+	stmt, err := r.db.Prepare(`
+		UPDATE expenses 
+		SET amount = ?, date = ?, expense_category_id = ? 
+		WHERE id = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,7 +150,11 @@ func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense
 }
 
 func (r ExpenseMariaRepository) Find(id string) (*models.Expense, error) {
-	stmt, err := r.db.Prepare("SELECT amount, date, user_id, expense_category_id FROM expenses WHERE id = ?")
+	stmt, err := r.db.Prepare(`
+		SELECT amount, date, user_id, expense_category_id 
+		FROM expenses 
+		WHERE id = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -169,7 +181,10 @@ func (r ExpenseMariaRepository) Find(id string) (*models.Expense, error) {
 }
 
 func (r ExpenseMariaRepository) Delete(id string) error {
-	stmt, err := r.db.Prepare("DELETE FROM expenses WHERE id = ?")
+	stmt, err := r.db.Prepare(`
+		DELETE FROM expenses 
+		WHERE id = ?
+	`)
 	if err != nil {
 		log.Fatal(err)
 	}

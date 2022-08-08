@@ -12,7 +12,8 @@ import { useRevenueStore } from '@/stores/revenue.js'
 import { useDrawerStore } from '@/stores/drawer.js'
 
 // Vue
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
+import RevenueCard from '@/components/revenues/RevenueCard.vue'
 
 dayjs.extend(utc);
 const revenueStore = useRevenueStore();
@@ -63,7 +64,7 @@ watch(startDate, () => {
     <div v-else class="list" key="loaded">
       <p v-if="sortedRevenues.length > 0">Revenues of the month:</p>
       <div v-for="revenue in sortedRevenues" :key="revenue.id" class="revenue">
-        {{revenue.id}} - {{revenue.amount}}
+        <RevenueCard :revenue="revenue"/>
       </div>
     </div>
   </div>

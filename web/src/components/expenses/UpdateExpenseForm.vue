@@ -47,9 +47,11 @@ const updateExpense = () => {
       date: formatedDate.value,
     }
   })
-  .then(() => expenseStore.deleteExpense(props.expense))
-  .then(r => {expenseStore.cacheExpenses([r.data.updateExpense])})
-  .then(() => {drawerStore.closeDrawer();})
+  .then(r => {
+    expenseStore.deleteExpense(props.expense);
+    expenseStore.cacheExpenses([r.data.updateExpense]);
+    drawerStore.closeDrawer();
+    })
   .catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})
 }

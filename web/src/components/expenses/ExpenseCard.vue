@@ -29,6 +29,7 @@ const props = defineProps({
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .expense-card__expense-details {
@@ -41,7 +42,6 @@ const props = defineProps({
 
 .expense-card__delete-expense {
   margin: 10px 10px 0 0;
-  cursor: pointer;
 }
 
 .expense-card__delete-expense img {

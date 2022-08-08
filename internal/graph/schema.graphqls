@@ -17,6 +17,12 @@ type Expense {
   category: ExpenseCategory!
 }
 
+type Revenue {
+  id: ID!
+  amount: Int!
+  date: Time!
+}
+
 type ExpenseSum {
   amount: Int!
   startDate: Time!
@@ -52,6 +58,7 @@ type Mutation {
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!
+  createRevenue(input: CreateRevenueInput!): Revenue!
 }
 
 input DeleteExpenseInput {
@@ -76,6 +83,11 @@ input CreateExpenseInput {
   amount: Int!
   date: Time!
   categoryId: ID!
+}
+
+input CreateRevenueInput {
+  amount: Int!
+  date: Time!
 }
 
 input Login  {

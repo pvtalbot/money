@@ -21,6 +21,9 @@ type Commands struct {
 	DeleteExpense commands.DeleteExpenseHandler
 	UpdateExpense commands.UpdateExpenseHandler
 
+	// Revenues
+	CreateRevenue commands.CreateRevenueHandler
+
 	// Users
 	CreateUser commands.CreateUserHandler
 	Login      commands.LoginHandler
@@ -53,6 +56,7 @@ func NewApplication() (Application, func()) {
 func newApplication(db *sql.DB) Application {
 	expenseRepository := repositories.NewExpenseMariaRepository(db)
 	expenseCategoryRepository := repositories.NewExpenseCategoryMariaRepository(db)
+	revenueRepository := repositories.NewRevenueMariaRepository(db)
 	userRepository := repositories.NewUserMariaRepository(db)
 
 	return Application{
@@ -61,6 +65,9 @@ func newApplication(db *sql.DB) Application {
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
 			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
 			UpdateExpense: commands.NewUpdateExpenseHandler(expenseRepository),
+
+			// Revenues
+			CreateRevenue: commands.NewCreateRevenueHandler(revenueRepository),
 
 			// Users
 			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),

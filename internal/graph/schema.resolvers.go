@@ -158,6 +158,31 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 	}, nil
 }
 
+// CreateRevenue is the resolver for the createRevenue field.
+func (r *mutationResolver) CreateRevenue(ctx context.Context, input model.CreateRevenueInput) (*model.Revenue, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := commands.CreateRevenue{
+		Amount: input.Amount,
+		Date:   input.Date,
+		User:   user,
+	}
+
+	revenue, err := r.Application.Commands.CreateRevenue.Handle(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Revenue{
+		ID:     revenue.ID,
+		Amount: revenue.Amount,
+		Date:   revenue.GetDate(),
+	}, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)

@@ -15,6 +15,11 @@ type CreateExpenseInput struct {
 	CategoryID string    `json:"categoryId"`
 }
 
+type CreateRevenueInput struct {
+	Amount int       `json:"amount"`
+	Date   time.Time `json:"date"`
+}
+
 type CreateUserInput struct {
 	Name      string `json:"name"`
 	Password  string `json:"password"`
@@ -53,6 +58,12 @@ type GetExpensesSumInput struct {
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type Revenue struct {
+	ID     string    `json:"id"`
+	Amount int       `json:"amount"`
+	Date   time.Time `json:"date"`
 }
 
 type UpdateExpenseInput struct {

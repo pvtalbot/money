@@ -412,7 +412,7 @@ type Expense {
   id: ID!
   amount: Int!
   date: Time!
-  category: ExpenseCategory
+  category: ExpenseCategory!
 }
 
 type ExpenseSum {
@@ -460,6 +460,7 @@ input UpdateExpenseInput {
   id: ID!
   amount: Int
   date: Time
+  categoryId: ID
 }
 
 input CreateUserInput {
@@ -472,7 +473,7 @@ input CreateUserInput {
 input CreateExpenseInput {
   amount: Int!
   date: Time!
-  categoryId: String!
+  categoryId: ID!
 }
 
 input Login  {
@@ -819,11 +820,14 @@ func (ec *executionContext) _Expense_category(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.ExpenseCategory)
 	fc.Result = res
-	return ec.marshalOExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, field.Selections, res)
+	return ec.marshalNExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Expense_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3777,7 +3781,7 @@ func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
-			it.CategoryID, err = ec.unmarshalNString2string(ctx, v)
+			it.CategoryID, err = ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3990,7 +3994,7 @@ func (ec *executionContext) unmarshalInputUpdateExpenseInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "amount", "date"}
+	fieldsInOrder := [...]string{"id", "amount", "date", "categoryId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4018,6 +4022,14 @@ func (ec *executionContext) unmarshalInputUpdateExpenseInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
 			it.Date, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "categoryId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
+			it.CategoryID, err = ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4070,6 +4082,9 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Expense_category(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4840,6 +4855,16 @@ func (ec *executionContext) marshalNExpense2ᚖgithubᚗcomᚋpvtalbotᚋmoney�
 	return ec._Expense(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ExpenseCategory(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNExpenseSum2ᚕᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseSum(ctx context.Context, sel ast.SelectionSet, v []*model.ExpenseSum) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -5311,6 +5336,22 @@ func (ec *executionContext) marshalOExpenseSum2ᚖgithubᚗcomᚋpvtalbotᚋmone
 		return graphql.Null
 	}
 	return ec._ExpenseSum(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

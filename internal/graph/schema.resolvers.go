@@ -54,7 +54,7 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 		return nil, err
 	}
 
-	category, err := r.Application.Queries.FindExpenseCategory.Handle(queries.FindExpense{Id: input.CategoryID})
+	category, err := r.Application.Queries.FindExpenseCategory.Handle(queries.FindExpenseCategory{Id: input.CategoryID})
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,17 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 		return nil, errors.New("user cannot update expense")
 	}
 
-	cmd := commands.NewUpdateExpenseCommand(*expense, input.Amount, input.Date)
+	if input.CategoryID != nil {
+		category, err := r.Application.Queries.FindExpenseCategory.Handle(queries.FindExpenseCategory{Id: *input.CategoryID})
+		if err != nil {
+			return nil, err
+		}
+		if category.User.ID != user.ID {
+			return nil, errors.New("this category does not belong to the current user")
+		}
+	}
+
+	cmd := commands.NewUpdateExpenseCommand(*expense, input.Amount, input.Date, input.CategoryID)
 	expense, err = r.Application.Commands.UpdateExpense.Handle(cmd)
 
 	if err != nil {

@@ -7,9 +7,10 @@ import (
 )
 
 type UpdateExpense struct {
-	amount int
-	date   time.Time
-	id     string
+	amount     int
+	date       time.Time
+	categoryId string
+	id         string
 }
 
 type UpdateExpenseHandler struct {
@@ -22,7 +23,7 @@ func NewUpdateExpenseHandler(r models.ExpenseRepository) UpdateExpenseHandler {
 	}
 }
 
-func NewUpdateExpenseCommand(expense models.Expense, amount *int, date *time.Time) UpdateExpense {
+func NewUpdateExpenseCommand(expense models.Expense, amount *int, date *time.Time, categoryId *string) UpdateExpense {
 	cmd := UpdateExpense{id: expense.ID}
 
 	if amount == nil {
@@ -37,11 +38,17 @@ func NewUpdateExpenseCommand(expense models.Expense, amount *int, date *time.Tim
 		cmd.date = *date
 	}
 
+	if categoryId == nil {
+		cmd.categoryId = expense.Category.ID
+	} else {
+		cmd.categoryId = *categoryId
+	}
+
 	return cmd
 }
 
 func (h UpdateExpenseHandler) Handle(cmd UpdateExpense) (*models.Expense, error) {
-	exp := &models.Expense{Amount: cmd.amount, ID: cmd.id}
+	exp := &models.Expense{Amount: cmd.amount, ID: cmd.id, Category: models.ExpenseCategory{ID: cmd.categoryId}}
 	exp.SetDate(cmd.date)
 
 	return h.r.Update(exp)

@@ -56,9 +56,10 @@ type Login struct {
 }
 
 type UpdateExpenseInput struct {
-	ID     string     `json:"id"`
-	Amount *int       `json:"amount"`
-	Date   *time.Time `json:"date"`
+	ID         string     `json:"id"`
+	Amount     *int       `json:"amount"`
+	Date       *time.Time `json:"date"`
+	CategoryID *string    `json:"categoryId"`
 }
 
 type Duration string

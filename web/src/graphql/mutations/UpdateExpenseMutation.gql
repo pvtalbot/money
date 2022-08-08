@@ -3,5 +3,8 @@ mutation UpdateExpense($input: UpdateExpenseInput!) {
     id
     date
     amount
+    category {
+      id
+    }
   }
 }

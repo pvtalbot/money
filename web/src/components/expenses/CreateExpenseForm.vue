@@ -25,9 +25,7 @@ const categoryId = ref(null)
 const formatedDate = computed(() => date.value + 'T00:00:00Z')
 const disabled = ref(false);
 
-const getCategories = computed(() => {
-  return expenseStore.expensesCategories
-})
+const getCategories = computed(() => expenseStore.expensesCategories)
 
 // Apollo Mutation to create an expense
 const { mutate: createExpenseMutation } = useMutation(CreateExpenseMutation)
@@ -55,21 +53,21 @@ const createExpense = function() {
   <div class="create-expense-form">
     <h2>Create a new expense</h2>
     <form @submit.prevent="createExpense">
-      <div class="create-expense-form__item-container">
-        <label for="create-expense-form__amount">Amount</label>
+      <div class="item-container">
+        <label for="amount">Amount</label>
         <input type="number"
         min=0
         step="1"
         id="create-expense-form__amount"
         v-model.number="amount"/>
       </div>
-      <div class="create-expense-form__item-container">
+      <div class="item-container">
         <label for="create-expense-form__date">Date</label>
         <input class="create-expense-form__datepicker" type="date" v-model="date" id="create-expense-form__date" />
       </div>
-      <div class="create-expense-form__item-container">
+      <div class="item-container">
         <label for="create-expense-form__category">Category</label>
-        <select class="create-expense-form__select-category" id="create-expense-form__category" v-model="categoryId" required>
+        <select class="select-category" id="create-expense-form__category" v-model="categoryId" required>
           <option v-for="c in getCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>

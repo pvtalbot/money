@@ -29,14 +29,18 @@ const props = defineProps({
 const amount = ref(0)
 const date = ref(null)
 const formatedDate = computed(() => date.value + 'T00:00:00Z')
+const categoryId = ref(null)
 const disabled = ref(false)
 onMounted(() => {
   amount.value = props.expense.amount;
   date.value = props.expense.date.format('YYYY-MM-DD');
+  categoryId.value = props.expense.categoryId
 })
 
+const getCategories = computed(() => expenseStore.expensesCategories);
+
 // Apollo Mutation to update an expense
-const { mutate: updateExpenseMutation } = useMutation(UpdateExpenseMutation)
+const { mutate: updateExpenseMutation } = useMutation(UpdateExpenseMutation);
 //Wrapper function
 const updateExpense = () => {
   disabled.value = true;
@@ -45,6 +49,7 @@ const updateExpense = () => {
       id: props.expense.id,
       amount: amount.value,
       date: formatedDate.value,
+      categoryId: categoryId.value,
     }
   })
   .then(r => {
@@ -53,7 +58,7 @@ const updateExpense = () => {
     drawerStore.closeDrawer();
     })
   .catch(e => {console.log(e);})
-  .finally(() => {disabled.value = false;})
+  .finally(() => {disabled.value = false;});
 }
 
 </script>
@@ -70,8 +75,17 @@ const updateExpense = () => {
         id="update-expense-form__amount"
         v-model="amount"/>
       </div>
-      <input class="datepicker" type="date" v-model="date"/>
-      <VueButton button-type="submit" message="Submit" :disabled="disabled"/>
+      <div class="item-container">
+        <label for="update-expense-form__date">Date</label>
+        <input class="datepicker" type="date" v-model="date" id="update-expense-form__date"/>
+      </div>
+      <div class="item-container">
+        <label for="update-expense-form__category">Category</label>
+        <select class="select-category" id="update-expense-form__category" v-model="categoryId">
+          <option v-for="c in getCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-button"/>
     </form>
   </div>
 </template>
@@ -88,11 +102,15 @@ form {
   flex-flow: column nowrap;
 }
 
-.datepicker {
-  margin-bottom: 10px;
+.select-category {
+  background-color: var(--vt-c-white);
 }
 
 label {
   align-self: start;
+}
+
+.submit-button {
+  margin-top: 10px;
 }
 </style>

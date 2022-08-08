@@ -16,6 +16,6 @@ func NewFindExpenseCategoryHandler(r models.ExpenseCategoryRepository) FindExpen
 	}
 }
 
-func (h FindExpenseCategoryQueryHandler) Handle(q FindExpense) (*models.ExpenseCategory, error) {
+func (h FindExpenseCategoryQueryHandler) Handle(q FindExpenseCategory) (*models.ExpenseCategory, error) {
 	return h.r.Find(q.Id)
 }

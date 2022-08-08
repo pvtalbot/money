@@ -127,12 +127,12 @@ func (r ExpenseMariaRepository) Create(expense *models.Expense, user *models.Use
 }
 
 func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense, error) {
-	stmt, err := r.db.Prepare("UPDATE expenses SET amount = ?, date = ? WHERE id = ?")
+	stmt, err := r.db.Prepare("UPDATE expenses SET amount = ?, date = ?, expense_category_id = ? WHERE id = ?")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = stmt.Exec(expense.Amount, expense.GetDate(), expense.ID)
+	_, err = stmt.Exec(expense.Amount, expense.GetDate(), expense.Category.ID, expense.ID)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

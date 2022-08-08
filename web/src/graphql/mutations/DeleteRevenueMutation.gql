@@ -1,0 +1,5 @@
+mutation DeleteRevenue($input: DeleteRevenueInput!) {
+  deleteRevenue(input: $input) {
+    id
+  }
+}

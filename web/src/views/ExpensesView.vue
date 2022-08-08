@@ -3,42 +3,60 @@
 import { useUserStore } from '@/stores/user.js';
 import { useDrawerStore } from '@/stores/drawer.js';
 
+// External libraries
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
 // Vue
 import { computed } from 'vue';
 import ExpensesList from '@/components/expenses/ExpensesList.vue';
+import RevenueList from '@/components/revenues/RevenueList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
 import CreateExpenseForm from '@/components/expenses/CreateExpenseForm.vue';
 
+dayjs.extend(utc);
 const userStore = useUserStore();
 const drawerStore = useDrawerStore();
 
 const firstName = computed(() => userStore.user.firstName)
 const COMPONENT_TO_DRAWER = "CreateExpenseForm"
-
 </script>
 
 <template>
-  <div class="expenses">
-      <Teleport to="#teleport-component-to-drawer">
-        <Transition name="component">
-          <CreateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"/>
-        </Transition>
-      </Teleport>
-    <h1>Hello {{firstName}}, this is Expenses manager!</h1>
-    <div class="create-expense" @click="drawerStore.registerComponent(COMPONENT_TO_DRAWER)">
-      <VueButton message="Add an expense" />
+  <h1>Hello {{firstName}}, this is Expenses manager!</h1>
+  <div class="transfers">
+    <Teleport to="#teleport-component-to-drawer">
+      <Transition name="component">
+        <CreateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"/>
+      </Transition>
+    </Teleport>
+    <div class="revenues">
+      <div class="create-revenue">
+        <VueButton message="Add a revenue" />
+      </div>
+      <RevenueList />
     </div>
-    <ExpensesList />
+    <div class="expenses">
+      <div class="create-expense" @click="drawerStore.registerComponent(COMPONENT_TO_DRAWER)">
+        <VueButton message="Add an expense" />
+      </div>
+      <ExpensesList />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.expenses {
+.transfers {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row;
 }
 
-.create-expense {
+.revenues, .expenses {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-expense, .create-revenue {
   margin: auto;
   width: fit-content;
 }

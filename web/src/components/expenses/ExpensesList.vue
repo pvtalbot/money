@@ -18,20 +18,20 @@ import ExpenseCard from '@/components/expenses/ExpenseCard.vue';
 import UpdateExpenseForm from '@/components/expenses/UpdateExpenseForm.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
-dayjs.extend(utc)
+dayjs.extend(utc);
 const expenseStore = useExpenseStore();
 const drawerStore = useDrawerStore();
 
 // Ref to get the date from the datepicker
-const datePicker = ref(null)
+const datePicker2 = ref(null);
 
 // initial date, start date, end date
 const initialDate = dayjs().utc().date(1).hour(0).minute(0).second(0).millisecond(0);
-const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date);
+const startDate = computed(() => datePicker2.value == null ? initialDate : datePicker2.value.date);
 const endDate = computed(() => startDate.value.add(1, 'month'))
 
 const expenseToUpdate = ref(null);
-const COMPONENT_TO_DRAWER = 'UpdateExpenseForm'
+const COMPONENT_TO_DRAWER = 'UpdateExpenseForm';
 
 const displayedExpenses = computed(() => expenseStore.getCurrentExpenses(startDate.value));
 const sortedExpenses = computed(() => {
@@ -78,7 +78,7 @@ const updateExpense = (expense) => {
 
 <template>
   <div class="expenses-list">
-    <DatePicker class="datepicker" ref="datePicker" :initialDate="initialDate" />
+    <DatePicker class="datepicker" ref="datePicker2" :initialDate="initialDate" />
     <div v-if="expensesLoading.value" class="expenses-list__loader" key="waiting">
       <h2>A minute please, I'm gathering everything!</h2>
     </div>

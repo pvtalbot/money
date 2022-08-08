@@ -1,0 +1,7 @@
+query Revenues($input: GetRevenuesInput!) {
+  revenues(input: $input) {
+    id
+    amount
+    date
+  }
+}

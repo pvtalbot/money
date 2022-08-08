@@ -83,13 +83,13 @@ form {
   flex-flow: column nowrap;
 }
 
-.create-expense-form__item-container {
+.item-container {
   padding: 0 0 10px 0;
   display: flex;
   flex-flow: column nowrap;
 }
 
-.create-expense-form__select-category {
+.select-category {
   background-color: var(--vt-c-white);
 }
 

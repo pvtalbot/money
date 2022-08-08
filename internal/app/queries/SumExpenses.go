@@ -55,7 +55,7 @@ func (h SumExpensesQueryHandler) Handle(q SumExpenses) ([]*models.ExpenseSum, er
 			return nil, err
 		}
 
-		result = managers.PopulateResult(q.startDate, q.endDate, result)
+		result = managers.PopulateExpensesSum(q.startDate, q.endDate, result)
 	}
 
 	return result, nil

@@ -31,6 +31,10 @@ type DeleteExpenseInput struct {
 	ID string `json:"id"`
 }
 
+type DeleteRevenueInput struct {
+	ID string `json:"id"`
+}
+
 type Expense struct {
 	ID       string           `json:"id"`
 	Amount   int              `json:"amount"`
@@ -55,6 +59,11 @@ type GetExpensesSumInput struct {
 	GroupBy   Duration  `json:"groupBy"`
 }
 
+type GetRevenuesInput struct {
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+}
+
 type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -71,6 +80,12 @@ type UpdateExpenseInput struct {
 	Amount     *int       `json:"amount"`
 	Date       *time.Time `json:"date"`
 	CategoryID *string    `json:"categoryId"`
+}
+
+type UpdateRevenueInput struct {
+	ID     string     `json:"id"`
+	Amount *int       `json:"amount"`
+	Date   *time.Time `json:"date"`
 }
 
 type Duration string

@@ -23,6 +23,8 @@ type Commands struct {
 
 	// Revenues
 	CreateRevenue commands.CreateRevenueHandler
+	DeleteRevenue commands.DeleteRevenueHandler
+	UpdateRevenue commands.UpdateRevenueHandler
 
 	// Users
 	CreateUser commands.CreateUserHandler
@@ -38,6 +40,10 @@ type Queries struct {
 	// Expenses Categories
 	GetExpensesCategories queries.GetExpensesCategoriesQueryHandler
 	FindExpenseCategory   queries.FindExpenseCategoryQueryHandler
+
+	// Revenues
+	FindRevenue queries.FindRevenueQueryHandler
+	GetRevenues queries.GetRevenuesQueryHandler
 
 	// Users
 	FindUser queries.FindUserQueryHandler
@@ -68,6 +74,8 @@ func newApplication(db *sql.DB) Application {
 
 			// Revenues
 			CreateRevenue: commands.NewCreateRevenueHandler(revenueRepository),
+			DeleteRevenue: commands.NewDeleteRevenueHandler(revenueRepository),
+			UpdateRevenue: commands.NewUpdateRevenueHandler(revenueRepository),
 
 			// Users
 			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),
@@ -82,6 +90,10 @@ func newApplication(db *sql.DB) Application {
 			// Expenses Categories
 			FindExpenseCategory:   queries.NewFindExpenseCategoryHandler(expenseCategoryRepository),
 			GetExpensesCategories: queries.NewGetExpensesCategoriesHandler(expenseCategoryRepository),
+
+			// Revenues
+			FindRevenue: queries.NewFindRevenueHandler(revenueRepository),
+			GetRevenues: queries.NewGetRevenuesHandler(revenueRepository),
 
 			// Users
 			FindUser: queries.NewFindUserHandler(userRepository),

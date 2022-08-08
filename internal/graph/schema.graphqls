@@ -37,6 +37,7 @@ type ExpenseCategory {
 type Query {
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
+  revenues(input: GetRevenuesInput!): [Revenue]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
   validateAccessToken(accessToken: String!): Boolean!
 }
@@ -52,6 +53,11 @@ input GetExpensesSumInput {
   groupBy: Duration!
 }
 
+input GetRevenuesInput {
+  startDate: Time!
+  endDate: Time!
+}
+
 type Mutation {
   login(input: Login!): String!
   createUser(input: CreateUserInput!): User!
@@ -59,9 +65,15 @@ type Mutation {
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!
   createRevenue(input: CreateRevenueInput!): Revenue!
+  deleteRevenue(input: DeleteRevenueInput!): Revenue!
+  updateRevenue(input: UpdateRevenueInput!): Revenue!
 }
 
 input DeleteExpenseInput {
+  id: ID!
+}
+
+input DeleteRevenueInput {
   id: ID!
 }
 
@@ -70,6 +82,12 @@ input UpdateExpenseInput {
   amount: Int
   date: Time
   categoryId: ID
+}
+
+input UpdateRevenueInput {
+  id: ID!
+  amount: Int
+  date: Time
 }
 
 input CreateUserInput {

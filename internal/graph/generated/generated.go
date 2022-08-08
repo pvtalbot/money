@@ -69,14 +69,17 @@ type ComplexityRoot struct {
 		CreateRevenue func(childComplexity int, input model.CreateRevenueInput) int
 		CreateUser    func(childComplexity int, input model.CreateUserInput) int
 		DeleteExpense func(childComplexity int, input model.DeleteExpenseInput) int
+		DeleteRevenue func(childComplexity int, input model.DeleteRevenueInput) int
 		Login         func(childComplexity int, input model.Login) int
 		UpdateExpense func(childComplexity int, input model.UpdateExpenseInput) int
+		UpdateRevenue func(childComplexity int, input model.UpdateRevenueInput) int
 	}
 
 	Query struct {
 		Expenses            func(childComplexity int, input model.GetExpensesInput) int
 		ExpensesSum         func(childComplexity int, input model.GetExpensesSumInput) int
 		Me                  func(childComplexity int) int
+		Revenues            func(childComplexity int, input model.GetRevenuesInput) int
 		ValidateAccessToken func(childComplexity int, accessToken string) int
 	}
 
@@ -102,10 +105,13 @@ type MutationResolver interface {
 	DeleteExpense(ctx context.Context, input model.DeleteExpenseInput) (*model.Expense, error)
 	UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error)
 	CreateRevenue(ctx context.Context, input model.CreateRevenueInput) (*model.Revenue, error)
+	DeleteRevenue(ctx context.Context, input model.DeleteRevenueInput) (*model.Revenue, error)
+	UpdateRevenue(ctx context.Context, input model.UpdateRevenueInput) (*model.Revenue, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
+	Revenues(ctx context.Context, input model.GetRevenuesInput) ([]*model.Revenue, error)
 	ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error)
 	ValidateAccessToken(ctx context.Context, accessToken string) (bool, error)
 }
@@ -239,6 +245,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteExpense(childComplexity, args["input"].(model.DeleteExpenseInput)), true
 
+	case "Mutation.deleteRevenue":
+		if e.complexity.Mutation.DeleteRevenue == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteRevenue_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteRevenue(childComplexity, args["input"].(model.DeleteRevenueInput)), true
+
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
 			break
@@ -262,6 +280,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateExpense(childComplexity, args["input"].(model.UpdateExpenseInput)), true
+
+	case "Mutation.updateRevenue":
+		if e.complexity.Mutation.UpdateRevenue == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRevenue_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRevenue(childComplexity, args["input"].(model.UpdateRevenueInput)), true
 
 	case "Query.expenses":
 		if e.complexity.Query.Expenses == nil {
@@ -293,6 +323,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Me(childComplexity), true
+
+	case "Query.revenues":
+		if e.complexity.Query.Revenues == nil {
+			break
+		}
+
+		args, err := ec.field_Query_revenues_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Revenues(childComplexity, args["input"].(model.GetRevenuesInput)), true
 
 	case "Query.validateAccessToken":
 		if e.complexity.Query.ValidateAccessToken == nil {
@@ -374,10 +416,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateRevenueInput,
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputDeleteExpenseInput,
+		ec.unmarshalInputDeleteRevenueInput,
 		ec.unmarshalInputGetExpensesInput,
 		ec.unmarshalInputGetExpensesSumInput,
+		ec.unmarshalInputGetRevenuesInput,
 		ec.unmarshalInputLogin,
 		ec.unmarshalInputUpdateExpenseInput,
+		ec.unmarshalInputUpdateRevenueInput,
 	)
 	first := true
 
@@ -477,6 +522,7 @@ type ExpenseCategory {
 type Query {
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
+  revenues(input: GetRevenuesInput!): [Revenue]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
   validateAccessToken(accessToken: String!): Boolean!
 }
@@ -492,6 +538,11 @@ input GetExpensesSumInput {
   groupBy: Duration!
 }
 
+input GetRevenuesInput {
+  startDate: Time!
+  endDate: Time!
+}
+
 type Mutation {
   login(input: Login!): String!
   createUser(input: CreateUserInput!): User!
@@ -499,9 +550,15 @@ type Mutation {
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!
   createRevenue(input: CreateRevenueInput!): Revenue!
+  deleteRevenue(input: DeleteRevenueInput!): Revenue!
+  updateRevenue(input: UpdateRevenueInput!): Revenue!
 }
 
 input DeleteExpenseInput {
+  id: ID!
+}
+
+input DeleteRevenueInput {
   id: ID!
 }
 
@@ -510,6 +567,12 @@ input UpdateExpenseInput {
   amount: Int
   date: Time
   categoryId: ID
+}
+
+input UpdateRevenueInput {
+  id: ID!
+  amount: Int
+  date: Time
 }
 
 input CreateUserInput {
@@ -608,6 +671,21 @@ func (ec *executionContext) field_Mutation_deleteExpense_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteRevenue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DeleteRevenueInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDeleteRevenueInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐDeleteRevenueInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -630,6 +708,21 @@ func (ec *executionContext) field_Mutation_updateExpense_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateExpenseInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐUpdateExpenseInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRevenue_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateRevenueInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateRevenueInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐUpdateRevenueInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -675,6 +768,21 @@ func (ec *executionContext) field_Query_expenses_args(ctx context.Context, rawAr
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNGetExpensesInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐGetExpensesInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_revenues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.GetRevenuesInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNGetRevenuesInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐGetRevenuesInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1515,6 +1623,132 @@ func (ec *executionContext) fieldContext_Mutation_createRevenue(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteRevenue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteRevenue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteRevenue(rctx, fc.Args["input"].(model.DeleteRevenueInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Revenue)
+	fc.Result = res
+	return ec.marshalNRevenue2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteRevenue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Revenue_id(ctx, field)
+			case "amount":
+				return ec.fieldContext_Revenue_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Revenue_date(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Revenue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteRevenue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateRevenue(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateRevenue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateRevenue(rctx, fc.Args["input"].(model.UpdateRevenueInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Revenue)
+	fc.Result = res
+	return ec.marshalNRevenue2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateRevenue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Revenue_id(ctx, field)
+			case "amount":
+				return ec.fieldContext_Revenue_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Revenue_date(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Revenue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateRevenue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_me(ctx, field)
 	if err != nil {
@@ -1630,6 +1864,69 @@ func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_expenses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_revenues(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_revenues(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Revenues(rctx, fc.Args["input"].(model.GetRevenuesInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Revenue)
+	fc.Result = res
+	return ec.marshalNRevenue2ᚕᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_revenues(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Revenue_id(ctx, field)
+			case "amount":
+				return ec.fieldContext_Revenue_amount(ctx, field)
+			case "date":
+				return ec.fieldContext_Revenue_date(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Revenue", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_revenues_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4171,6 +4468,34 @@ func (ec *executionContext) unmarshalInputDeleteExpenseInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteRevenueInput(ctx context.Context, obj interface{}) (model.DeleteRevenueInput, error) {
+	var it model.DeleteRevenueInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGetExpensesInput(ctx context.Context, obj interface{}) (model.GetExpensesInput, error) {
 	var it model.GetExpensesInput
 	asMap := map[string]interface{}{}
@@ -4242,6 +4567,42 @@ func (ec *executionContext) unmarshalInputGetExpensesSumInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupBy"))
 			it.GroupBy, err = ec.unmarshalNDuration2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetRevenuesInput(ctx context.Context, obj interface{}) (model.GetRevenuesInput, error) {
+	var it model.GetRevenuesInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"startDate", "endDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "startDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			it.StartDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			it.EndDate, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4330,6 +4691,50 @@ func (ec *executionContext) unmarshalInputUpdateExpenseInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
 			it.CategoryID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateRevenueInput(ctx context.Context, obj interface{}) (model.UpdateRevenueInput, error) {
+	var it model.UpdateRevenueInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "amount", "date"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "amount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			it.Amount, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4543,6 +4948,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteRevenue":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteRevenue(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateRevenue":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateRevenue(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4606,6 +5029,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_expenses(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "revenues":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_revenues(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5149,6 +5595,11 @@ func (ec *executionContext) unmarshalNDeleteExpenseInput2githubᚗcomᚋpvtalbot
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNDeleteRevenueInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐDeleteRevenueInput(ctx context.Context, v interface{}) (model.DeleteRevenueInput, error) {
+	res, err := ec.unmarshalInputDeleteRevenueInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNDuration2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐDuration(ctx context.Context, v interface{}) (model.Duration, error) {
 	var res model.Duration
 	err := res.UnmarshalGQL(v)
@@ -5269,6 +5720,11 @@ func (ec *executionContext) unmarshalNGetExpensesSumInput2githubᚗcomᚋpvtalbo
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNGetRevenuesInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐGetRevenuesInput(ctx context.Context, v interface{}) (model.GetRevenuesInput, error) {
+	res, err := ec.unmarshalInputGetRevenuesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5306,6 +5762,44 @@ func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋpvtalbotᚋmoneyᚋgr
 
 func (ec *executionContext) marshalNRevenue2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx context.Context, sel ast.SelectionSet, v model.Revenue) graphql.Marshaler {
 	return ec._Revenue(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRevenue2ᚕᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx context.Context, sel ast.SelectionSet, v []*model.Revenue) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalORevenue2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
 }
 
 func (ec *executionContext) marshalNRevenue2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx context.Context, sel ast.SelectionSet, v *model.Revenue) graphql.Marshaler {
@@ -5350,6 +5844,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 
 func (ec *executionContext) unmarshalNUpdateExpenseInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐUpdateExpenseInput(ctx context.Context, v interface{}) (model.UpdateExpenseInput, error) {
 	res, err := ec.unmarshalInputUpdateExpenseInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateRevenueInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐUpdateRevenueInput(ctx context.Context, v interface{}) (model.UpdateRevenueInput, error) {
+	res, err := ec.unmarshalInputUpdateRevenueInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5738,6 +6237,13 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) marshalORevenue2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐRevenue(ctx context.Context, sel ast.SelectionSet, v *model.Revenue) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Revenue(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

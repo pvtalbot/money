@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
@@ -183,6 +184,73 @@ func (r *mutationResolver) CreateRevenue(ctx context.Context, input model.Create
 	}, nil
 }
 
+// DeleteRevenue is the resolver for the deleteRevenue field.
+func (r *mutationResolver) DeleteRevenue(ctx context.Context, input model.DeleteRevenueInput) (*model.Revenue, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	revenue, err := r.Application.Queries.FindRevenue.Handle(
+		queries.FindRevenue{Id: input.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.ID != revenue.User.ID {
+		return nil, errors.New("user cannot delete revenue")
+	}
+
+	err = r.Application.Commands.DeleteRevenue.Handle(
+		commands.DeleteRevenue{Id: revenue.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Revenue{
+		ID:     revenue.ID,
+		Amount: revenue.Amount,
+		Date:   revenue.GetDate(),
+	}, nil
+}
+
+// UpdateRevenue is the resolver for the updateRevenue field.
+func (r *mutationResolver) UpdateRevenue(ctx context.Context, input model.UpdateRevenueInput) (*model.Revenue, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	revenue, err := r.Application.Queries.FindRevenue.Handle(
+		queries.FindRevenue{Id: input.ID},
+	)
+	if err != nil {
+		return nil, err
+	}
+	if user.ID != revenue.User.ID {
+		return nil, errors.New("user cannot update revenue")
+	}
+
+	log.Println("kikoo")
+
+	cmd := commands.NewUpdateRevenueCommand(*revenue, input.Amount, input.Date)
+	revenue, err = r.Application.Commands.UpdateRevenue.Handle(cmd)
+
+	log.Println("kikoo 2")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Revenue{
+		ID:     revenue.ID,
+		Amount: revenue.Amount,
+		Date:   revenue.GetDate(),
+	}, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)
@@ -230,6 +298,32 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 	}
 
 	return expenses, nil
+}
+
+// Revenues is the resolver for the revenues field.
+func (r *queryResolver) Revenues(ctx context.Context, input model.GetRevenuesInput) ([]*model.Revenue, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	query := queries.NewGetRevenuesQuery(user, input.StartDate, input.EndDate)
+	rev, err := r.Application.Queries.GetRevenues.Handle(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var revenues []*model.Revenue
+	for _, r := range rev {
+		revenues = append(revenues, &model.Revenue{
+			ID:     r.ID,
+			Amount: r.Amount,
+			Date:   r.GetDate(),
+		})
+	}
+
+	return revenues, nil
 }
 
 // ExpensesSum is the resolver for the expensesSum field.

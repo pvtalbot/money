@@ -83,6 +83,7 @@ func (r RevenueMariaRepository) Create(revenue *models.Revenue, user *models.Use
 }
 
 func (r RevenueMariaRepository) Update(revenue *models.Revenue) (*models.Revenue, error) {
+	log.Println("revenue repository", revenue.ID, revenue.Amount, revenue.GetDate())
 	stmt, err := r.db.Prepare(`
 		UPDATE revenues
 		SET amount = ?, date = ?
@@ -104,7 +105,7 @@ func (r RevenueMariaRepository) Update(revenue *models.Revenue) (*models.Revenue
 func (r RevenueMariaRepository) Find(id string) (*models.Revenue, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT amount, date, user_id
-		FROM expenses
+		FROM revenues
 		WHERE id = ?
 	`)
 
@@ -123,6 +124,7 @@ func (r RevenueMariaRepository) Find(id string) (*models.Revenue, error) {
 		}
 		return nil, err
 	}
+	revenue.ID = id
 	revenue.SetDate(revenueDate)
 	revenue.User = models.User{ID: userId}
 
@@ -131,7 +133,7 @@ func (r RevenueMariaRepository) Find(id string) (*models.Revenue, error) {
 
 func (r RevenueMariaRepository) Delete(id string) error {
 	stmt, err := r.db.Prepare(`
-		DELETE FROM expenses
+		DELETE FROM revenues
 		WHERE id = ?
 	`)
 	if err != nil {

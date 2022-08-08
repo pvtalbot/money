@@ -8,22 +8,29 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 // Vue
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import ExpensesList from '@/components/expenses/ExpensesList.vue';
 import RevenueList from '@/components/revenues/RevenueList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
 import CreateExpenseForm from '@/components/expenses/CreateExpenseForm.vue';
+import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);
 const userStore = useUserStore();
 const drawerStore = useDrawerStore();
 
+const mainDatePicker = ref(null)
+
 const firstName = computed(() => userStore.user.firstName)
 const COMPONENT_TO_DRAWER = "CreateExpenseForm"
+
+const initialDate = dayjs().utc().date(1).hour(0).minute(0).second(0).millisecond(0);
+const dateToProp = computed(() => mainDatePicker == null || mainDatePicker.value == null ? initialDate : mainDatePicker.value.date);
 </script>
 
 <template>
   <h1>Hello {{firstName}}, this is Expenses manager!</h1>
+  <DatePicker :initialDate="initialDate" ref="mainDatePicker"/>
   <div class="transfers">
     <Teleport to="#teleport-component-to-drawer">
       <Transition name="component">
@@ -34,13 +41,13 @@ const COMPONENT_TO_DRAWER = "CreateExpenseForm"
       <div class="create-revenue">
         <VueButton message="Add a revenue" />
       </div>
-      <RevenueList />
+      <RevenueList :initialDate="dateToProp"/>
     </div>
     <div class="expenses">
       <div class="create-expense" @click="drawerStore.registerComponent(COMPONENT_TO_DRAWER)">
         <VueButton message="Add an expense" />
       </div>
-      <ExpensesList />
+      <ExpensesList :initialDate="dateToProp"/>
     </div>
   </div>
 </template>

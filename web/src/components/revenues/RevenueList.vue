@@ -13,22 +13,19 @@ import { useDrawerStore } from '@/stores/drawer.js'
 
 // Vue
 import { computed, ref, watch } from 'vue';
-import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);
 const revenueStore = useRevenueStore();
 const drawerStore = useDrawerStore();
 
-// Ref to get the date from the datepicker
-const datePicker = ref(null);
+const props = defineProps({
+  initialDate: {
+    required: true,
+  },
+})
 
-// initial date, start date, end date
-const initialDate = dayjs().utc().date(1).hour(0).minute(0).second(0).millisecond(0);
-const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date);
+const startDate = computed(() => props.initialDate);
 const endDate = computed(() => startDate.value.add(1, 'month'));
-
-const revenueToUpdate = ref(null);
-const COMPONENT_TO_DRAWER = 'UpdateRevenueForm';
 
 const displayedRevenues = computed(() => revenueStore.getCurrentRevenues(startDate.value))
 const sortedRevenues = computed(() => {
@@ -60,7 +57,6 @@ watch(startDate, () => {
 
 <template>
   <div class="revenues-list">
-    <DatePicker class="datepicker" ref="datePicker" :initialDate="initialDate" />
     <div v-if="revenuesLoading.value" class="loader" key="waiting">
       <h2>A minute please, I'm gathering everything!</h2>
     </div>

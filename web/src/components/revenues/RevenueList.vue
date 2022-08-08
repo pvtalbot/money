@@ -1,8 +1,7 @@
 <script setup>
 // Apollo
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import Revenues from '@/graphql/queries/RevenueList.gql';
-import DeleteRevenue from '@/graphql/mutations/DeleteRevenueMutation.gql';
 
 
 // External libraries
@@ -61,15 +60,6 @@ watch(startDate, () => {
   })
 })
 
-// Apollo Mutation to delete a revenue
-const { mutate: DeleteRevenueMutation} = useMutation(DeleteRevenue)
-// Wrapper function for the mutation
-const deleteRevenue = function(revenue) {
-  DeleteRevenueMutation({input: {id: revenue.id}})
-    .then(() => revenueStore.deleteRevenue(revenue))
-    .catch(e => { console.log(e); });
-}
-
 const updateRevenue = revenue => {
   drawerStore.registerComponent(COMPONENT_TO_DRAWER);
   revenueToUpdate.value = revenue;
@@ -85,7 +75,6 @@ const updateRevenue = revenue => {
       <p v-if="sortedRevenues.length > 0">Revenues of the month:</p>
       <div v-for="revenue in sortedRevenues" :key="revenue.id" class="revenue">
         <RevenueCard :revenue="revenue"
-                      @delete-revenue="deleteRevenue(revenue)"
                       @click.self="updateRevenue(revenue)"/>
       </div>
     </div>

@@ -19,9 +19,6 @@ const props = defineProps({
       <p>{{ expense.amount}}</p>
       <p>{{ expenseStore.getCategory(expense).name }}</p>
     </div>
-    <div class="expense-card__delete-expense" @click="$emit('delete-expense')">
-      <img alt="delete expense" src="@/assets/bin_icon.svg"/>
-    </div>
   </div>
 </template>
 
@@ -44,14 +41,6 @@ const props = defineProps({
 
 .expense-card__expense-details p {
   margin: 5px;
-}
-
-.expense-card__delete-expense {
-  margin: 10px 10px 0 0;
-}
-
-.expense-card__delete-expense img {
-  width: 18px;
 }
 
 .expense-card:hover {

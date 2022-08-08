@@ -14,9 +14,6 @@ const props = defineProps({
       <p>{{ revenue.date.format('D MMM YYYY')}}</p>
       <p>{{ revenue.amount }}</p>
     </div>
-    <div class="delete-revenue" @click="$emit('delete-revenue')">
-      <img alt="delete revenue" src="@/assets/bin_icon.svg"/> 
-    </div>
   </div>
 </template>
 
@@ -39,13 +36,5 @@ const props = defineProps({
 
 .revenue-details p {
   margin: 5px;
-}
-
-.delete-revenue {
-  margin: 10px 10px 0 0;
-}
-
-.delete-revenue img {
-  width: 18px;
 }
 </style>

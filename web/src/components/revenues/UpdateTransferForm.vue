@@ -3,6 +3,8 @@
 import { useMutation } from '@vue/apollo-composable';
 import UpdateExpenseMutation from '@/graphql/mutations/UpdateExpenseMutation.gql';
 import UpdateRevenueMutation from '@/graphql/mutations/UpdateRevenueMutation.gql';
+import DeleteExpenseMutation from '@/graphql/mutations/DeleteExpenseMutation.gql';
+import DeleteRevenueMutation from '@/graphql/mutations/DeleteRevenueMutation.gql';
 
 // External libraries
 import dayjs from 'dayjs';
@@ -64,6 +66,7 @@ const config = (function() {
       store: store,
       getCategories: computed(() => store.expensesCategories),
       mutation: UpdateExpenseMutation,
+      deleteMutation: DeleteExpenseMutation,
       deleteObject: store.deleteExpense,
       cacheObject: store.cacheExpenses,
       resultName: 'updateExpense',
@@ -74,6 +77,7 @@ const config = (function() {
       store: store,
       getCategories: null,
       mutation: UpdateRevenueMutation,
+      deleteMutation: DeleteRevenueMutation,
       deleteObject: store.deleteRevenue,
       cacheObject: store.cacheRevenues,
       resultName: 'updateRevenue',
@@ -96,6 +100,18 @@ const update = () => {
     .finally(() => {disabled.value = false;})
   ;
 }
+
+// Apollo mutation to delete the object
+const { mutate: deleteObjectMutation } = useMutation(config.deleteMutation);
+// Wrapper function for the mutation
+const deleteObject = () => {
+  deleteObjectMutation({input: {id: props.updatedObject.id}})
+    .then(() => {
+      config.deleteObject(props.updatedObject);
+      drawerStore.closeDrawer();
+    })
+    .catch(e => { console.log(e); })
+}
 </script> 
 
 <template>
@@ -104,15 +120,11 @@ const update = () => {
     <form @submit.prevent="update">
       <div class="item-container">
         <label for="update-object-form__amount">Amount</label>
-        <input type="number" 
-        min="0" 
-        step="1" 
-        id="update-object-form__amount" 
-        v-model="amount" />
+        <input type="number" min="0" step="1" id="update-object-form__amount" v-model="amount" />
       </div>
       <div class="item-container">
         <label for="update-object-form__date">Date</label>
-        <input class="datepicker" type="date" v-model="date" id="update-object-form__date"/>
+        <input class="datepicker" type="date" v-model="date" id="update-object-form__date" />
       </div>
       <div class="item-container" v-if="props.mode =='expense'">
         <label for="update-object-form__category">Category</label>
@@ -120,7 +132,10 @@ const update = () => {
           <option v-for="c in config.getCategories.value" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
-      <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-button"/>
+      <div class="buttons-container">
+        <VueButton class="button-delete" button-type="button" message="Delete" @click.stop="deleteObject" />
+        <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-button" />
+      </div>
     </form>
   </div>
 </template>
@@ -145,7 +160,17 @@ label {
   align-self: start;
 }
 
-.submit-button {
+.buttons-container {
   margin-top: 10px;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.buttons-container button {
+  margin: auto;
+}
+
+.button-delete {
+  border: 0;
 }
 </style>

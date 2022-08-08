@@ -1,8 +1,7 @@
 <script setup>
 // Apollo
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import Expenses from '@/graphql/queries/ExpenseList.gql';
-import DeleteExpense from '@/graphql/mutations/DeleteExpenseMutation.gql';
 
 // External libraries
 import dayjs from 'dayjs';
@@ -61,15 +60,6 @@ watch(startDate, () => {
   });
 })
 
-// Apollo Mutation to delete an expense
-const {mutate: deleteExpenseMutation} = useMutation(DeleteExpense)
-// Wrapper function for the mutation
-const deleteExpense = function(expense) {
-  deleteExpenseMutation({input: {id: expense.id}})
-    .then(() => expenseStore.deleteExpense(expense))
-    .catch(e => { console.log(e); });
-}
-
 const updateExpense = (expense) => {
   drawerStore.registerComponent(COMPONENT_TO_DRAWER);
   expenseToUpdate.value = expense;
@@ -86,7 +76,6 @@ const updateExpense = (expense) => {
       <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
       <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
         <ExpenseCard :expense="expense" 
-                      @delete-expense="deleteExpense(expense)"
                       @click.self="updateExpense(expense)" />
       </div>
     </div>

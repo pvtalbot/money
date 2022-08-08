@@ -5,10 +5,11 @@ import (
 )
 
 type Expense struct {
-	ID     string `json:"id"`
-	Amount int    `json:"amount"`
-	User   User   `json:"user"`
-	date   time.Time
+	ID       string          `json:"id"`
+	Amount   int             `json:"amount"`
+	User     User            `json:"user"`
+	Category ExpenseCategory `json:"category"`
+	date     time.Time
 }
 
 type ExpenseSum struct {
@@ -31,7 +32,7 @@ func (e *Expense) SetDate(d time.Time) {
 }
 
 type ExpenseRepository interface {
-	Create(expense *Expense, user *User) (*Expense, error)
+	Create(expense *Expense, user *User, categoryId string) (*Expense, error)
 	Delete(ID string) error
 	Find(ID string) (*Expense, error)
 	Update(expense *Expense) (*Expense, error)

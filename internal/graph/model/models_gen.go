@@ -10,8 +10,9 @@ import (
 )
 
 type CreateExpenseInput struct {
-	Amount int       `json:"amount"`
-	Date   time.Time `json:"date"`
+	Amount     int       `json:"amount"`
+	Date       time.Time `json:"date"`
+	CategoryID string    `json:"categoryId"`
 }
 
 type CreateUserInput struct {
@@ -26,9 +27,10 @@ type DeleteExpenseInput struct {
 }
 
 type Expense struct {
-	ID     string    `json:"id"`
-	Amount int       `json:"amount"`
-	Date   time.Time `json:"date"`
+	ID       string           `json:"id"`
+	Amount   int              `json:"amount"`
+	Date     time.Time        `json:"date"`
+	Category *ExpenseCategory `json:"category"`
 }
 
 type ExpenseSum struct {

@@ -5,6 +5,16 @@ import { reactive, computed } from 'vue';
 
 export const useExpenseStore = defineStore('expenses', () => {
   const expenses = reactive({});
+  const expensesCategories = reactive({})
+
+  const cacheExpensesCategories = categories => {
+    for (const c of categories) {
+      expensesCategories[c.id] = {
+        id: c.id,
+        name: c.name
+      }
+    }
+  }
 
   const cacheExpenses = newExpenses => {
     for (const expense of newExpenses) {
@@ -25,6 +35,7 @@ export const useExpenseStore = defineStore('expenses', () => {
         id: expense.id,
         amount: expense.amount,
         date: date,
+        categoryId: expense.category.id,
       };
     }
   }
@@ -41,10 +52,15 @@ export const useExpenseStore = defineStore('expenses', () => {
     }
   });
 
+  const getCategory = computed(() => (expense) => expensesCategories[expense.categoryId]);
+
   return {
     expenses,
+    expensesCategories,
     getCurrentExpenses,
+    getCategory,
     cacheExpenses,
+    cacheExpensesCategories,
     deleteExpense,
   };
 

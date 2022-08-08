@@ -54,10 +54,19 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 		return nil, err
 	}
 
+	category, err := r.Application.Queries.FindExpenseCategory.Handle(queries.FindExpense{Id: input.CategoryID})
+	if err != nil {
+		return nil, err
+	}
+	if category.User.ID != user.ID {
+		return nil, errors.New("this category does not belong to the current user")
+	}
+
 	cmd := commands.CreateExpense{
-		Amount: input.Amount,
-		Date:   input.Date,
-		User:   user,
+		Amount:     input.Amount,
+		Date:       input.Date,
+		User:       user,
+		CategoryId: input.CategoryID,
 	}
 
 	expense, err := r.Application.Commands.CreateExpense.Handle(cmd)
@@ -66,9 +75,10 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.Create
 	}
 
 	return &model.Expense{
-		ID:     expense.ID,
-		Amount: expense.Amount,
-		Date:   expense.GetDate(),
+		ID:       expense.ID,
+		Amount:   expense.Amount,
+		Date:     expense.GetDate(),
+		Category: &model.ExpenseCategory{ID: expense.Category.ID},
 	}, nil
 }
 
@@ -99,9 +109,10 @@ func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.Delete
 	}
 
 	return &model.Expense{
-		ID:     expense.ID,
-		Amount: expense.Amount,
-		Date:   expense.GetDate(),
+		ID:       expense.ID,
+		Amount:   expense.Amount,
+		Date:     expense.GetDate(),
+		Category: &model.ExpenseCategory{ID: expense.Category.ID},
 	}, nil
 }
 
@@ -130,9 +141,10 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 	}
 
 	return &model.Expense{
-		ID:     expense.ID,
-		Amount: expense.Amount,
-		Date:   expense.GetDate(),
+		ID:       expense.ID,
+		Amount:   expense.Amount,
+		Date:     expense.GetDate(),
+		Category: &model.ExpenseCategory{ID: expense.Category.ID},
 	}, nil
 }
 
@@ -175,9 +187,10 @@ func (r *queryResolver) Expenses(ctx context.Context, input model.GetExpensesInp
 	var expenses []*model.Expense
 	for _, e := range exp {
 		expenses = append(expenses, &model.Expense{
-			ID:     e.ID,
-			Amount: e.Amount,
-			Date:   e.GetDate(),
+			ID:       e.ID,
+			Amount:   e.Amount,
+			Date:     e.GetDate(),
+			Category: &model.ExpenseCategory{ID: e.Category.ID},
 		})
 	}
 
@@ -225,7 +238,7 @@ func (r *queryResolver) ValidateAccessToken(ctx context.Context, accessToken str
 func (r *userResolver) ExpensesCategories(ctx context.Context, obj *model.User) ([]*model.ExpenseCategory, error) {
 	var expensesCategories []*model.ExpenseCategory
 
-	result, err := r.Application.Queries.FindExpensesCategories.Handle(queries.GetExpensesCategories{
+	result, err := r.Application.Queries.GetExpensesCategories.Handle(queries.GetExpensesCategories{
 		User: &models.User{ID: obj.ID},
 	})
 	if err != nil {

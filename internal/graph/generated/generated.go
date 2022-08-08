@@ -47,9 +47,10 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Expense struct {
-		Amount func(childComplexity int) int
-		Date   func(childComplexity int) int
-		ID     func(childComplexity int) int
+		Amount   func(childComplexity int) int
+		Category func(childComplexity int) int
+		Date     func(childComplexity int) int
+		ID       func(childComplexity int) int
 	}
 
 	ExpenseCategory struct {
@@ -125,6 +126,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expense.Amount(childComplexity), true
+
+	case "Expense.category":
+		if e.complexity.Expense.Category == nil {
+			break
+		}
+
+		return e.complexity.Expense.Category(childComplexity), true
 
 	case "Expense.date":
 		if e.complexity.Expense.Date == nil {
@@ -404,6 +412,7 @@ type Expense {
   id: ID!
   amount: Int!
   date: Time!
+  category: ExpenseCategory
 }
 
 type ExpenseSum {
@@ -414,7 +423,7 @@ type ExpenseSum {
 
 type ExpenseCategory {
   id: ID!
-  name: String!
+  name: String
 }
 
 type Query {
@@ -463,6 +472,7 @@ input CreateUserInput {
 input CreateExpenseInput {
   amount: Int!
   date: Time!
+  categoryId: String!
 }
 
 input Login  {
@@ -788,6 +798,53 @@ func (ec *executionContext) fieldContext_Expense_date(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Expense_category(ctx context.Context, field graphql.CollectedField, obj *model.Expense) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Expense_category(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ExpenseCategory)
+	fc.Result = res
+	return ec.marshalOExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Expense_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Expense",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ExpenseCategory_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ExpenseCategory_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExpenseCategory", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ExpenseCategory_id(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseCategory) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ExpenseCategory_id(ctx, field)
 	if err != nil {
@@ -853,14 +910,11 @@ func (ec *executionContext) _ExpenseCategory_name(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ExpenseCategory_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1175,6 +1229,8 @@ func (ec *executionContext) fieldContext_Mutation_createExpense(ctx context.Cont
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "date":
 				return ec.fieldContext_Expense_date(ctx, field)
+			case "category":
+				return ec.fieldContext_Expense_category(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -1238,6 +1294,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteExpense(ctx context.Cont
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "date":
 				return ec.fieldContext_Expense_date(ctx, field)
+			case "category":
+				return ec.fieldContext_Expense_category(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -1301,6 +1359,8 @@ func (ec *executionContext) fieldContext_Mutation_updateExpense(ctx context.Cont
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "date":
 				return ec.fieldContext_Expense_date(ctx, field)
+			case "category":
+				return ec.fieldContext_Expense_category(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -1420,6 +1480,8 @@ func (ec *executionContext) fieldContext_Query_expenses(ctx context.Context, fie
 				return ec.fieldContext_Expense_amount(ctx, field)
 			case "date":
 				return ec.fieldContext_Expense_date(ctx, field)
+			case "category":
+				return ec.fieldContext_Expense_category(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Expense", field.Name)
 		},
@@ -3688,7 +3750,7 @@ func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"amount", "date"}
+	fieldsInOrder := [...]string{"amount", "date", "categoryId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3708,6 +3770,14 @@ func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
 			it.Date, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "categoryId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
+			it.CategoryID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3996,6 +4066,10 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "category":
+
+			out.Values[i] = ec._Expense_category(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4028,9 +4102,6 @@ func (ec *executionContext) _ExpenseCategory(ctx context.Context, sel ast.Select
 
 			out.Values[i] = ec._ExpenseCategory_name(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5255,6 +5326,16 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	res := graphql.MarshalInt(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
 	return res
 }
 

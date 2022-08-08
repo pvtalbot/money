@@ -8,10 +8,12 @@ import Me from '@/graphql/queries/CurrentUser.gql';
 // Vue
 import { ref, watch, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { useExpenseStore } from '@/stores/expense'
 import { useRouter } from 'vue-router';
 import VueButton from '@/components/utils/VueButton.vue';
 
 const userStore = useUserStore();
+const expenseStore = useExpenseStore();
 const router = useRouter();
 
 const username = ref("");
@@ -45,6 +47,8 @@ onCurrentUserSucceeded(() => {
     store.user.firstName = currentUser.value.me.firstName;
     store.user.lastName = currentUser.value.me.lastName;
   })
+
+  expenseStore.cacheExpensesCategories(currentUser.value.me.expensesCategories);
 })
 
 // If loadCurrentUser is called and succeed, will then call onCurrentUserSucceeded

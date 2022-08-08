@@ -33,7 +33,8 @@ type Queries struct {
 	SumExpenses queries.SumExpensesQueryHandler
 
 	// Expenses Categories
-	FindExpensesCategories queries.GetExpensesCategoriesQueryHandler
+	GetExpensesCategories queries.GetExpensesCategoriesQueryHandler
+	FindExpenseCategory   queries.FindExpenseCategoryQueryHandler
 
 	// Users
 	FindUser queries.FindUserQueryHandler
@@ -72,7 +73,8 @@ func newApplication(db *sql.DB) Application {
 			SumExpenses: queries.NewSumExpensesQueryHandler(expenseRepository),
 
 			// Expenses Categories
-			FindExpensesCategories: queries.NewGetExpensesCategoriesHandler(expenseCategoryRepository),
+			FindExpenseCategory:   queries.NewFindExpenseCategoryHandler(expenseCategoryRepository),
+			GetExpensesCategories: queries.NewGetExpensesCategoriesHandler(expenseCategoryRepository),
 
 			// Users
 			FindUser: queries.NewFindUserHandler(userRepository),

@@ -75,3 +75,30 @@ func (r ExpenseCategoryMariaRepository) FindAll(user *models.User) ([]*models.Ex
 
 	return result, nil
 }
+
+func (r ExpenseCategoryMariaRepository) Find(id string) (*models.ExpenseCategory, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT name, user_id
+		FROM expenses_categories
+		WHERE id = ?	
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	row := stmt.QueryRow(id)
+
+	var userId string
+	var expenseCategory models.ExpenseCategory
+	err = row.Scan(&expenseCategory.Name, &userId)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Print(err)
+		}
+		return nil, err
+	}
+
+	expenseCategory.User = &models.User{ID: userId}
+	expenseCategory.ID = id
+
+	return &expenseCategory, nil
+}

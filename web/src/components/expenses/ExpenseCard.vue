@@ -1,4 +1,9 @@
 <script setup>
+// Pinia
+import { useExpenseStore } from '@/stores/expense';
+
+const expenseStore = useExpenseStore()
+
 const props = defineProps({
   expense: {
     type: Object,
@@ -12,6 +17,7 @@ const props = defineProps({
     <div class="expense-card__expense-details">
       <p>{{ expense.date.format('D MMM YYYY')}}</p>
       <p>{{ expense.amount}}</p>
+      <p>{{ expenseStore.getCategory(expense).name }}</p>
     </div>
     <div class="expense-card__delete-expense" @click="$emit('delete-expense')">
       <img alt="delete expense" src="@/assets/bin_icon.svg"/>

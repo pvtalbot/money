@@ -7,9 +7,10 @@ import (
 )
 
 type CreateExpense struct {
-	Amount int
-	Date   time.Time
-	User   *models.User
+	Amount     int
+	Date       time.Time
+	User       *models.User
+	CategoryId string
 }
 
 type CreateExpenseHandler struct {
@@ -26,5 +27,5 @@ func (h CreateExpenseHandler) Handle(cmd CreateExpense) (*models.Expense, error)
 	exp := &models.Expense{Amount: cmd.Amount}
 	exp.SetDate(cmd.Date)
 
-	return h.r.Create(exp, cmd.User)
+	return h.r.Create(exp, cmd.User, cmd.CategoryId)
 }

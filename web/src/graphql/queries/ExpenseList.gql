@@ -3,5 +3,8 @@ query Expenses($input: GetExpensesInput!) {
     id
     amount
     date
+    category {
+      id
+    }
   }
 }

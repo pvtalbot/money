@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	SecretKey = []byte("secret")
+	secretKey = []byte("secret")
 )
 
 func GenerateToken(username, id string) (string, error) {
@@ -18,7 +18,7 @@ func GenerateToken(username, id string) (string, error) {
 		"id":       id,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
-	tokenString, err := token.SignedString(SecretKey)
+	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
 		log.Fatal("Error in generating key")
 		return "", err
@@ -28,7 +28,7 @@ func GenerateToken(username, id string) (string, error) {
 
 func ParseToken(tokenString string) (*models.User, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return SecretKey, nil
+		return secretKey, nil
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		username := claims["username"].(string)

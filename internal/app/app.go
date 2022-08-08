@@ -27,10 +27,13 @@ type Commands struct {
 }
 
 type Queries struct {
-	//Expenses
+	// Expenses
 	FindExpense queries.FindExpenseQueryHandler
 	GetExpenses queries.GetExpensesQueryHandler
 	SumExpenses queries.SumExpensesQueryHandler
+
+	// Expenses Categories
+	FindExpensesCategories queries.GetExpensesCategoriesQueryHandler
 
 	// Users
 	FindUser queries.FindUserQueryHandler
@@ -53,22 +56,25 @@ func newApplication(db *sql.DB) Application {
 
 	return Application{
 		Commands: Commands{
-			//Expenses
+			// Expenses
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
 			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
 			UpdateExpense: commands.NewUpdateExpenseHandler(expenseRepository),
 
-			//Users
+			// Users
 			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),
 			Login:      commands.NewLoginHandler(userRepository),
 		},
 		Queries: Queries{
-			//Expenses
+			// Expenses
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
 			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),
 			SumExpenses: queries.NewSumExpensesQueryHandler(expenseRepository),
 
-			//Users
+			// Expenses Categories
+			FindExpensesCategories: queries.NewGetExpensesCategoriesHandler(expenseCategoryRepository),
+
+			// Users
 			FindUser: queries.NewFindUserHandler(userRepository),
 		},
 	}

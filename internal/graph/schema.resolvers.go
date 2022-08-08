@@ -10,6 +10,7 @@ import (
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
 	"github.com/pvtalbot/money/domain/managers"
+	"github.com/pvtalbot/money/domain/models"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
 	"github.com/pvtalbot/money/middlewares"
@@ -220,11 +221,36 @@ func (r *queryResolver) ValidateAccessToken(ctx context.Context, accessToken str
 	return managers.ValidateToken(accessToken), nil
 }
 
+// ExpensesCategories is the resolver for the expensesCategories field.
+func (r *userResolver) ExpensesCategories(ctx context.Context, obj *model.User) ([]*model.ExpenseCategory, error) {
+	var expensesCategories []*model.ExpenseCategory
+
+	result, err := r.Application.Queries.FindExpensesCategories.Handle(queries.GetExpensesCategories{
+		User: &models.User{ID: obj.ID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range result {
+		expensesCategories = append(expensesCategories, &model.ExpenseCategory{
+			ID:   v.ID,
+			Name: v.Name,
+		})
+	}
+
+	return expensesCategories, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

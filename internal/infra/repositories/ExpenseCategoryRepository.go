@@ -39,3 +39,39 @@ func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*mod
 
 	return ec, nil
 }
+
+func (r ExpenseCategoryMariaRepository) FindAll(user *models.User) ([]*models.ExpenseCategory, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT id, name
+		FROM expenses_categories
+		WHERE user_id = ?
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(user.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var result []*models.ExpenseCategory
+	for rows.Next() {
+		var ec models.ExpenseCategory
+		err := rows.Scan(&ec.ID, &ec.Name)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		result = append(result, &ec)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return result, nil
+}

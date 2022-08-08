@@ -39,6 +39,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -49,6 +50,11 @@ type ComplexityRoot struct {
 		Amount func(childComplexity int) int
 		Date   func(childComplexity int) int
 		ID     func(childComplexity int) int
+	}
+
+	ExpenseCategory struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
 	}
 
 	ExpenseSum struct {
@@ -73,10 +79,11 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		FirstName func(childComplexity int) int
-		ID        func(childComplexity int) int
-		LastName  func(childComplexity int) int
-		Name      func(childComplexity int) int
+		ExpensesCategories func(childComplexity int) int
+		FirstName          func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		LastName           func(childComplexity int) int
+		Name               func(childComplexity int) int
 	}
 }
 
@@ -92,6 +99,9 @@ type QueryResolver interface {
 	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
 	ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error)
 	ValidateAccessToken(ctx context.Context, accessToken string) (bool, error)
+}
+type UserResolver interface {
+	ExpensesCategories(ctx context.Context, obj *model.User) ([]*model.ExpenseCategory, error)
 }
 
 type executableSchema struct {
@@ -129,6 +139,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Expense.ID(childComplexity), true
+
+	case "ExpenseCategory.id":
+		if e.complexity.ExpenseCategory.ID == nil {
+			break
+		}
+
+		return e.complexity.ExpenseCategory.ID(childComplexity), true
+
+	case "ExpenseCategory.name":
+		if e.complexity.ExpenseCategory.Name == nil {
+			break
+		}
+
+		return e.complexity.ExpenseCategory.Name(childComplexity), true
 
 	case "ExpenseSum.amount":
 		if e.complexity.ExpenseSum.Amount == nil {
@@ -254,6 +278,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ValidateAccessToken(childComplexity, args["accessToken"].(string)), true
 
+	case "User.expensesCategories":
+		if e.complexity.User.ExpensesCategories == nil {
+			break
+		}
+
+		return e.complexity.User.ExpensesCategories(childComplexity), true
+
 	case "User.firstName":
 		if e.complexity.User.FirstName == nil {
 			break
@@ -366,6 +397,7 @@ type User {
   name: String!
   firstName: String!
   lastName: String!
+  expensesCategories: [ExpenseCategory]
 }
 
 type Expense {
@@ -378,6 +410,11 @@ type ExpenseSum {
   amount: Int!
   startDate: Time!
   endDate: Time!
+}
+
+type ExpenseCategory {
+  id: ID!
+  name: String!
 }
 
 type Query {
@@ -751,6 +788,94 @@ func (ec *executionContext) fieldContext_Expense_date(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _ExpenseCategory_id(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseCategory) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseCategory_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseCategory_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseCategory",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExpenseCategory_name(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseCategory) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExpenseCategory_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExpenseCategory_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExpenseCategory",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ExpenseSum_amount(ctx context.Context, field graphql.CollectedField, obj *model.ExpenseSum) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ExpenseSum_amount(ctx, field)
 	if err != nil {
@@ -985,6 +1110,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_User_lastName(ctx, field)
+			case "expensesCategories":
+				return ec.fieldContext_User_expensesCategories(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1239,6 +1366,8 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 				return ec.fieldContext_User_firstName(ctx, field)
 			case "lastName":
 				return ec.fieldContext_User_lastName(ctx, field)
+			case "expensesCategories":
+				return ec.fieldContext_User_expensesCategories(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1727,6 +1856,53 @@ func (ec *executionContext) fieldContext_User_lastName(ctx context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_expensesCategories(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_expensesCategories(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().ExpensesCategories(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ExpenseCategory)
+	fc.Result = res
+	return ec.marshalOExpenseCategory2ᚕᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_expensesCategories(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ExpenseCategory_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ExpenseCategory_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExpenseCategory", field.Name)
 		},
 	}
 	return fc, nil
@@ -3831,6 +4007,41 @@ func (ec *executionContext) _Expense(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var expenseCategoryImplementors = []string{"ExpenseCategory"}
+
+func (ec *executionContext) _ExpenseCategory(ctx context.Context, sel ast.SelectionSet, obj *model.ExpenseCategory) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, expenseCategoryImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExpenseCategory")
+		case "id":
+
+			out.Values[i] = ec._ExpenseCategory_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+
+			out.Values[i] = ec._ExpenseCategory_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var expenseSumImplementors = []string{"ExpenseSum"}
 
 func (ec *executionContext) _ExpenseSum(ctx context.Context, sel ast.SelectionSet, obj *model.ExpenseSum) graphql.Marshaler {
@@ -4097,29 +4308,46 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._User_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "firstName":
 
 			out.Values[i] = ec._User_firstName(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "lastName":
 
 			out.Values[i] = ec._User_lastName(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "expensesCategories":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_expensesCategories(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4957,6 +5185,54 @@ func (ec *executionContext) marshalOExpense2ᚖgithubᚗcomᚋpvtalbotᚋmoney�
 		return graphql.Null
 	}
 	return ec._Expense(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOExpenseCategory2ᚕᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx context.Context, sel ast.SelectionSet, v []*model.ExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ExpenseCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOExpenseSum2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseSum(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseSum) graphql.Marshaler {

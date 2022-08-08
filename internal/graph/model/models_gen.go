@@ -59,13 +59,6 @@ type UpdateExpenseInput struct {
 	Date   *time.Time `json:"date"`
 }
 
-type User struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-}
-
 type Duration string
 
 const (

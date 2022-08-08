@@ -16,7 +16,7 @@ import { useDrawerStore } from '@/stores/drawer.js'
 // Vue
 import { computed, watch, ref } from 'vue';
 import RevenueCard from '@/components/revenues/RevenueCard.vue';
-import UpdateRevenueForm from '@/components/revenues/UpdateRevenueForm.vue';
+import UpdateTransferForm from '@/components/revenues/UpdateTransferForm.vue';
 
 dayjs.extend(utc);
 const revenueStore = useRevenueStore();
@@ -91,7 +91,7 @@ const updateRevenue = revenue => {
     </div>
     <Teleport to="#teleport-component-to-drawer">
       <Transition name="component">
-        <UpdateRevenueForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"
+        <UpdateTransferForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"
         :updatedObject="revenueToUpdate"
         :mode="'revenue'"/>
       </Transition>

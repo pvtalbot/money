@@ -30,8 +30,6 @@ const props = defineProps({
   }
 });
 
-let getCategories;
-const store = props.mode == 'expense' ? useExpenseStore() : useRevenueStore();
 const drawerStore = useDrawerStore();
 
 const amount = ref(0);
@@ -40,42 +38,58 @@ const formatedDate = computed(() => date.value + 'T00:00:00Z');
 const categoryId = ref(null);
 const disabled = ref(false);
 
+// Link refs to props
 onMounted(() => {
   amount.value = props.updatedObject.amount;
   date.value = props.updatedObject.date.format('YYYY-MM-DD');
 
   if (props.mode == 'expense') {
     categoryId.value = props.updatedObject.categoryId;
-    getCategories = computed(() => store.expensesCategories);
   }
 });
 
 const getInput = computed(() => {
-  const input = {
-    id: props.updatedObject.id,
-    amount: amount.value,
-    date: formatedDate.value,
-  };
+  const input = { id: props.updatedObject.id, amount: amount.value, date: formatedDate.value };
 
   if (props.mode == 'expense') {
-    input['categoryId'] == categoryId.value;
+    input['categoryId'] = categoryId.value;
   }
-
   return input;
 })
-const mutation = props.mode == 'expense' ? UpdateExpenseMutation : UpdateRevenueMutation;
-const deleteObject = props.mode == 'expense' ? store.deleteExpense : store.deleteRevenue;
-const cacheObject = props.mode == 'expense' ? store.cacheExpenses : store.cacheRevenues;
-const resultName = props.mode == 'expense' ? 'updateExpense' : 'updateRevenue';
 
-const { mutate: updateObjectMutation } = useMutation(mutation);
+const config = (function() {
+  if (props.mode == 'expense') {
+    const store = useExpenseStore();
+    return {
+      store: store,
+      getCategories: computed(() => store.expensesCategories),
+      mutation: UpdateExpenseMutation,
+      deleteObject: store.deleteExpense,
+      cacheObject: store.cacheExpenses,
+      resultName: 'updateExpense',
+    };
+  } else {
+    const store = useRevenueStore();
+    return {
+      store: store,
+      getCategories: null,
+      mutation: UpdateRevenueMutation,
+      deleteObject: store.deleteRevenue,
+      cacheObject: store.cacheRevenues,
+      resultName: 'updateRevenue',
+    };
+  }
+})();
+
+// Apollo mutation to update the object
+const { mutate: updateObjectMutation } = useMutation(config.mutation);
 // Wrapper function
 const update = () => {
   disabled.value = true;
   updateObjectMutation({ input: getInput.value })
     .then(r => {
-      deleteObject(props.updatedObject);
-      cacheObject([r.data[resultName]]);
+      config.deleteObject(props.updatedObject);
+      config.cacheObject([r.data[config.resultName]]);
       drawerStore.closeDrawer();
     })
     .catch(e => { console.log(e); })
@@ -86,7 +100,7 @@ const update = () => {
 
 <template>
   <div class="update-object-form">
-    <h2>Update</h2>
+    <h2>Update {{ props.mode }}</h2>
     <form @submit.prevent="update">
       <div class="item-container">
         <label for="update-object-form__amount">Amount</label>
@@ -103,10 +117,10 @@ const update = () => {
       <div class="item-container" v-if="props.mode =='expense'">
         <label for="update-object-form__category">Category</label>
         <select class="select-category" id="update-object-form__category" v-model="categoryId">
-          <option v-for="c in getCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
+          <option v-for="c in config.getCategories.value" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
-      <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-butotn"/>
+      <VueButton button-type="submit" message="Submit" :disabled="disabled" class="submit-button"/>
     </form>
   </div>
 </template>

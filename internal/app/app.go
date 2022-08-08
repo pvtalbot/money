@@ -48,6 +48,7 @@ func NewApplication() (Application, func()) {
 
 func newApplication(db *sql.DB) Application {
 	expenseRepository := repositories.NewExpenseMariaRepository(db)
+	expenseCategoryRepository := repositories.NewExpenseCategoryMariaRepository(db)
 	userRepository := repositories.NewUserMariaRepository(db)
 
 	return Application{
@@ -58,7 +59,7 @@ func newApplication(db *sql.DB) Application {
 			UpdateExpense: commands.NewUpdateExpenseHandler(expenseRepository),
 
 			//Users
-			CreateUser: commands.NewCreateUserHandler(userRepository),
+			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),
 			Login:      commands.NewLoginHandler(userRepository),
 		},
 		Queries: Queries{

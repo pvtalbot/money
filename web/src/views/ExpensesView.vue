@@ -13,6 +13,7 @@ import ExpensesList from '@/components/expenses/ExpensesList.vue';
 import RevenueList from '@/components/revenues/RevenueList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
 import CreateExpenseForm from '@/components/expenses/CreateExpenseForm.vue';
+import CreateRevenueForm from '@/components/revenues/CreateRevenueForm.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);
@@ -22,7 +23,8 @@ const drawerStore = useDrawerStore();
 const mainDatePicker = ref(null)
 
 const firstName = computed(() => userStore.user.firstName)
-const COMPONENT_TO_DRAWER = "CreateExpenseForm"
+const COMPONENT_TO_DRAWER = "CreateExpenseForm";
+const COMPONENT_TWO_TO_DRAWER = "CreateRevenueForm";
 
 const initialDate = dayjs().utc().date(1).hour(0).minute(0).second(0).millisecond(0);
 const dateToProp = computed(() => mainDatePicker == null || mainDatePicker.value == null ? initialDate : mainDatePicker.value.date);
@@ -37,9 +39,14 @@ const dateToProp = computed(() => mainDatePicker == null || mainDatePicker.value
         <CreateExpenseForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"/>
       </Transition>
     </Teleport>
+    <Teleport to="#teleport-component-to-drawer">
+      <Transition name="component">
+        <CreateRevenueForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TWO_TO_DRAWER)"/>
+      </Transition>
+    </Teleport>
     <div class="revenues">
       <div class="create-revenue">
-        <VueButton message="Add a revenue" />
+        <VueButton message="Add a revenue" @click="drawerStore.registerComponent(COMPONENT_TWO_TO_DRAWER)"/>
       </div>
       <RevenueList :initialDate="dateToProp"/>
     </div>

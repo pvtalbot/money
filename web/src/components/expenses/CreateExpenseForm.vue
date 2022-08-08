@@ -13,7 +13,7 @@ import { useDrawerStore } from '@/stores/drawer';
 
 // Vue
 import { ref, computed } from 'vue';
-import VueButton from '../utils/VueButton.vue';
+import VueButton from '@/components/utils/VueButton.vue';
 
 dayjs.extend(utc);
 const expenseStore = useExpenseStore();
@@ -54,7 +54,7 @@ const createExpense = function() {
     <h2>Create a new expense</h2>
     <form @submit.prevent="createExpense">
       <div class="item-container">
-        <label for="amount">Amount</label>
+        <label for="create-expense-form__amount">Amount</label>
         <input type="number"
         min=0
         step="1"
@@ -63,7 +63,7 @@ const createExpense = function() {
       </div>
       <div class="item-container">
         <label for="create-expense-form__date">Date</label>
-        <input class="create-expense-form__datepicker" type="date" v-model="date" id="create-expense-form__date" />
+        <input class="datepicker" type="date" v-model="date" id="create-expense-form__date" />
       </div>
       <div class="item-container">
         <label for="create-expense-form__category">Category</label>

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS expenses_categories(
 );
 
 ALTER TABLE expenses
-ADD expense_category_id INT,
+ADD expense_category_id INT NOT NULL,
 ADD CONSTRAINT `fk_expense_expense_category`
   FOREIGN KEY (expense_category_id) REFERENCES expenses_categories(id);
 

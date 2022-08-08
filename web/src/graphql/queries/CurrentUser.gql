@@ -3,5 +3,9 @@ query CurrentUser {
     id
     firstName
     lastName
+    expensesCategories {
+      id
+      name
+    }
   }
 }

@@ -1,9 +1,7 @@
 BEGIN;
 
 ALTER TABLE users
-DROP COLUMN first_name IF EXISTS;
-
-ALTER TABLE users
+DROP COLUMN first_name IF EXISTS,
 DROP COLUMN last_name IF EXISTS;
 
 COMMIT;

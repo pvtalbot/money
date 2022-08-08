@@ -26,7 +26,7 @@ const drawerStore = useDrawerStore();
 const datePicker = ref(null)
 
 // initial date, start date, end date
-const initialDate = dayjs().utc().day(1).hour(0).minute(0).second(0).millisecond(0);
+const initialDate = dayjs().utc().date(1).hour(0).minute(0).second(0).millisecond(0);
 const startDate = computed(() => datePicker.value == null ? initialDate : datePicker.value.date);
 const endDate = computed(() => startDate.value.add(1, 'month'))
 

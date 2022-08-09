@@ -14,8 +14,8 @@ import { useDrawerStore } from '@/stores/drawer.js'
 
 // Vue
 import { computed, watch, ref } from 'vue';
-import TransferCard from '@/components/revenues/TransferCard.vue';
-import UpdateTransferForm from '@/components/revenues/UpdateTransferForm.vue';
+import TransferCard from '@/components/transfers/TransferCard.vue';
+import UpdateTransferForm from '@/components/transfers/UpdateTransferForm.vue';
 
 dayjs.extend(utc);
 const revenueStore = useRevenueStore();

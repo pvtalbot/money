@@ -10,9 +10,9 @@ import utc from 'dayjs/plugin/utc';
 // Vue
 import { computed, ref } from 'vue';
 import ExpensesList from '@/components/expenses/ExpensesList.vue';
-import RevenueList from '@/components/revenues/RevenueList.vue';
+import RevenueList from '@/components/transfers/RevenueList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
-import CreateTransferForm from '@/components/revenues/CreateTransferForm.vue';
+import CreateTransferForm from '@/components/transfers/CreateTransferForm.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
 
 dayjs.extend(utc);

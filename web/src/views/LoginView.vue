@@ -1,21 +1,38 @@
 <script setup>
+// Vue
+import { ref, computed } from 'vue';
 import LoginForm from "@/components/login/LoginForm.vue"
+import SignupForm from '../components/login/SignupForm.vue';
+
+const signup = ref(false)
+
+const switchForm = () => {signup.value = !signup.value};
+const message = computed(() => signup.value ? 'Go to login' : 'Go to signup')
 </script>
 
 <template>
   <div class="main-wrapper">
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125"/>
+    <header>
+      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
-    <div class="wrapper">
-      <div class="greetings">
-        <h1 class="green">Welcome to expenses manager!</h1>
+      <div class="wrapper">
+        <div class="greetings">
+          <h1 class="green">Welcome to expenses manager!</h1>
+        </div>
       </div>
-    </div>
-  </header>
-  <main>
-    <LoginForm />
-  </main>
+    </header>
+    <main>
+      <div class="switch" @click="switchForm">
+        <p>{{ message }}</p>
+        <div class="arrow right_arrow">
+          <img src="@/assets/chevron-compact-right.svg" alt="right" />
+        </div>
+      </div>
+      <div class="forms">
+        <SignupForm v-if="signup" />
+        <LoginForm v-else />
+      </div>
+    </main>
   </div>
 </template>
 
@@ -34,6 +51,7 @@ main {
     height: 100%;
     width: 100%;
     display: flex;
+    flex-flow: column;
 }
 
 header {
@@ -44,6 +62,25 @@ header {
 .logo {
   display: block;
   margin: 0 auto 2rem;
+}
+
+.switch {
+  margin: auto;
+  display: flex;
+  cursor: pointer;
+}
+
+.switch p, .switch .arrow {
+  margin: auto;
+  display: flex;
+}
+
+.arrow img {
+  margin: auto;
+}
+
+.forms {
+  margin: auto;
 }
 
 @media (min-width: 1024px) {

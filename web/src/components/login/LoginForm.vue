@@ -30,7 +30,7 @@ const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidate
 
 // Wrapper function for login mutation
 const login = () => {
-  disabled.value = false;
+  disabled.value = true;
   let response = loginMutation({login: {username: username.value, password: password.value}});
   response.then(({data: {login}}) => {
     if (typeof localStorage !== 'undefined' && login) {
@@ -38,17 +38,16 @@ const login = () => {
     }
   })
   .then(() => loadCurrentUser())
+  .finally(() => {disabled.value = false;});
 
 }
 
-onCurrentUserSucceeded(() => {
-  if (!currentUser.value) return;
-  userStore.$patch((store) => {
-    store.user.firstName = currentUser.value.me.firstName;
-    store.user.lastName = currentUser.value.me.lastName;
-  })
-
-  expenseStore.cacheExpensesCategories(currentUser.value.me.expensesCategories);
+// Check if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in.
+onMounted(() => {
+  if (!localStorage) return;
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken == null) return;
+  loadTokenValidity(undefined, {accessToken: accessToken});
 })
 
 // If loadCurrentUser is called and succeed, will then call onCurrentUserSucceeded
@@ -58,13 +57,15 @@ onTokenValidated(() => {
   loadCurrentUser();
 })
 
-watch(() => userStore.userLoggedIn, () => {router.push({name: 'home'})});
+onCurrentUserSucceeded(() => {
+  if (!currentUser.value) return;
+  userStore.$patch((store) => {
+    store.user.firstName = currentUser.value.me.firstName;
+    store.user.lastName = currentUser.value.me.lastName;
+  })
 
-// Check if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in.
-onMounted(() => {
-  const accessToken = localStorage.getItem('accessToken');
-  if (accessToken == null) return;
-  loadTokenValidity(undefined, {accessToken: accessToken});
+  expenseStore.cacheExpensesCategories(currentUser.value.me.expensesCategories);
+  router.push({name: 'home'});
 })
 </script>
 

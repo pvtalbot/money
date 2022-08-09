@@ -13,7 +13,7 @@ import { useDrawerStore } from '@/stores/drawer.js';
 
 // Vue
 import { computed, ref, watch } from 'vue'
-import ExpenseCard from '@/components/expenses/ExpenseCard.vue';
+import TransferCard from '@/components/revenues/TransferCard.vue';
 import UpdateTransferForm from '@/components/revenues/UpdateTransferForm.vue';
 
 dayjs.extend(utc);
@@ -75,7 +75,8 @@ const updateExpense = (expense) => {
     <div v-else class="expenses-list__list" key="loaded">
       <p v-if="sortedExpenses.length > 0">Expenses of the month:</p>
       <div v-for="expense in sortedExpenses" :key="expense.id" class="expenses-list__expense">
-        <ExpenseCard :expense="expense" 
+        <TransferCard :displayedObject="expense" 
+                      :mode="'expense'"
                       @click.self="updateExpense(expense)" />
       </div>
     </div>

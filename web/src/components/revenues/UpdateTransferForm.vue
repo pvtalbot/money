@@ -25,7 +25,7 @@ const props = defineProps({
   mode: {
     type: String,
     required: true,
-    validator: (value) => ['expense', 'revenue'].includes(value),
+    validator: value => ['expense', 'revenue'].includes(value),
   },
   updatedObject : {
     required: true,

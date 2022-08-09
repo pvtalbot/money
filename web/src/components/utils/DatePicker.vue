@@ -12,7 +12,7 @@ const props = defineProps({
   mode: {
     type: String,
     default: "MONTH",
-    validator: (value) => ['MONTH', 'YEAR'].includes(value),
+    validator: value => ['MONTH', 'YEAR'].includes(value),
   },
   initialDate: {
     required: true,

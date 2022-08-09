@@ -1,4 +1,7 @@
 <script setup>
+// Gasp
+import { gsap } from "gsap";
+
 // Vue
 import { ref, computed } from 'vue';
 import LoginForm from "@/components/login/LoginForm.vue"
@@ -8,6 +11,24 @@ const signup = ref(false)
 
 const switchForm = () => {signup.value = !signup.value};
 const message = computed(() => signup.value ? 'Go to login' : 'Go to signup')
+
+const onEnter = (el, done) => {
+  gsap.from(el, {
+    transform: 'translateX(-100px)',
+    opacity: 0,
+    onComplete: done,
+    duration: 0.3,
+  })
+}
+
+const onLeave = (el, done) => {
+  gsap.to(el, {
+    transform: 'translateX(100px)',
+    opacity: 0,
+    onComplete: done,
+    duration: 0.3,
+  })
+}
 </script>
 
 <template>
@@ -29,8 +50,10 @@ const message = computed(() => signup.value ? 'Go to login' : 'Go to signup')
         </div>
       </div>
       <div class="forms">
-        <SignupForm v-if="signup" />
-        <LoginForm v-else />
+        <Transition mode="out-in" @enter="onEnter" @leave="onLeave" :css="false">
+          <SignupForm v-if="signup" />
+          <LoginForm v-else />
+        </Transition>
       </div>
     </main>
   </div>

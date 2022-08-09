@@ -26,7 +26,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string
 }
 
 // CreateUser is the resolver for the CreateUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (string, error) {
 	cmd := commands.NewCreateUser(
 		input.Name,
 		input.Password,
@@ -34,17 +34,12 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 		input.LastName,
 	)
 
-	user, err := r.Application.Commands.CreateUser.Handle(cmd)
+	token, err := r.Application.Commands.CreateUser.Handle(cmd)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &model.User{
-		ID:        user.ID,
-		Name:      user.Name,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-	}, nil
+	return token, nil
 }
 
 // CreateExpense is the resolver for the createExpense field.

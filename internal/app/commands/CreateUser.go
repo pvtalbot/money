@@ -3,6 +3,7 @@ package commands
 import (
 	"github.com/pvtalbot/money/domain/managers"
 	"github.com/pvtalbot/money/domain/models"
+	"github.com/pvtalbot/money/pkg/jwt"
 )
 
 type CreateUser struct {
@@ -32,19 +33,19 @@ func NewCreateUser(name, password, firstName, lastName string) CreateUser {
 	return CreateUser{user: u}
 }
 
-func (h CreateUserHandler) Handle(cmd CreateUser) (*models.User, error) {
+func (h CreateUserHandler) Handle(cmd CreateUser) (string, error) {
 	user, err := h.r.Create(cmd.user)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	categories := managers.GetDefaultCategories(user)
 	for _, c := range categories {
 		_, err = h.ec.Create(&c)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 	}
 
-	return user, nil
+	return jwt.GenerateToken(user.Name, user.ID)
 }

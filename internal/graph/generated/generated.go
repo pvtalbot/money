@@ -100,7 +100,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Login(ctx context.Context, input model.Login) (string, error)
-	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
+	CreateUser(ctx context.Context, input model.CreateUserInput) (string, error)
 	CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error)
 	DeleteExpense(ctx context.Context, input model.DeleteExpenseInput) (*model.Expense, error)
 	UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error)
@@ -545,7 +545,7 @@ input GetRevenuesInput {
 
 type Mutation {
   login(input: Login!): String!
-  createUser(input: CreateUserInput!): User!
+  createUser(input: CreateUserInput!): String!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!
@@ -1324,9 +1324,9 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1336,19 +1336,7 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
-			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
-			case "expensesCategories":
-				return ec.fieldContext_User_expensesCategories(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {

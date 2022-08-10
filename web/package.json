@@ -11,6 +11,7 @@
     "@apollo/client": "^3.6.9",
     "@rollup/plugin-graphql": "^1.1.0",
     "@vue/apollo-composable": "^4.0.0-alpha.19",
+    "@vue/apollo-util": "^4.0.0-alpha.18",
     "dayjs": "^1.11.4",
     "graphql": "^16.5.0",
     "graphql-tag": "^2.12.6",

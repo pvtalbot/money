@@ -1,5 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
+import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
+import { logErrorMessages } from '@vue/apollo-util';
 import openEndpoints from './openEndpoints';
 
 const AUTH_TOKEN = 'accessToken';
@@ -14,7 +16,7 @@ const httpLink = createHttpLink({
 // To ensure we don't get any errors, we never include the Auth header for those
 const needAuth = (operation) => !!operation && !openEndpoints.includes(operation)
 
-const authLink = setContext(({operationName}, { headers }) => {
+const authLink = setContext(({operationName}, {headers}) => {
   const token = localStorage.getItem(AUTH_TOKEN);
 
   if (needAuth(operationName) && !!token) {
@@ -29,9 +31,16 @@ const authLink = setContext(({operationName}, { headers }) => {
   return headers;
 })
 
+const errorLink = onError(error => {
+  if (import.meta.env.MODE !== 'production') {
+    logErrorMessages(error);
+  }
+})
+
+
 export const createApolloClient = () => {
   return new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: errorLink.concat(authLink.concat(httpLink)),
     cache,
     defaultOptions: {
       watchQuery: {

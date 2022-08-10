@@ -100,11 +100,6 @@ const createTransfer = () => {
 </template>
 
 <style scoped>
-form {
-  display: flex;
-  flex-flow: column nowrap;
-}
-
 .item-container {
   padding: 0 0 10px 0;
   display: flex;
@@ -115,11 +110,8 @@ form {
   background-color: var(--vt-c-white);
 }
 
-label {
-  align-self: start;
-}
-
 .submit-button {
   margin-top: 10px;
+  width: 100%;
 }
 </style>

@@ -33,9 +33,6 @@ const props = defineProps({
   width: 200px;
   margin: 5px;
   background: white;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
   cursor: pointer;
 }
 
@@ -44,10 +41,6 @@ const props = defineProps({
 }
 
 .details {
-  margin: 5px;
-}
-
-.details p {
   margin: 5px;
 }
 </style>

@@ -43,17 +43,17 @@ const onLeave = (el, done) => {
       </div>
     </header>
     <main>
-      <div class="switch" @click="switchForm">
-        <p>{{ message }}</p>
-        <div class="arrow right_arrow">
-          <img src="@/assets/chevron-compact-right.svg" alt="right" />
-        </div>
-      </div>
       <div class="forms">
         <Transition mode="out-in" @enter="onEnter" @leave="onLeave" :css="false">
           <SignupForm v-if="signup" />
           <LoginForm v-else />
         </Transition>
+      </div>
+      <div class="switch" @click="switchForm">
+        <p>{{ message }}</p>
+        <div class="arrow right_arrow">
+          <img src="@/assets/chevron-compact-right.svg" alt="right" />
+        </div>
       </div>
     </main>
   </div>
@@ -64,6 +64,10 @@ h1 {
   font-weight: 500;
   font-size: 2.6rem;
   top: -10px;
+}
+
+.main-wrapper {
+  height: 100vh;
 }
 
 .greetings h1 {
@@ -110,12 +114,19 @@ header {
   .main-wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px 1fr 200px;
+    grid-template-areas: ". ." "left right" ". .";
     padding: 0 4rem;
   }
 
   header {
     display: flex;
     place-items: center;
+    grid-area: left;
+  }
+
+  main {
+    grid-area: right;
   }
 
   .logo {

@@ -102,7 +102,7 @@ const updateTransfer = transfer => {
       <div v-for="t in sortedTransfers" :key="t.id" class="transfer">
         <TransferCard :displayedTransfer="t"
                       :mode="props.mode"
-                      @click.self="updateTransfer(t)"/>
+                      @click="updateTransfer(t)"/>
       </div>
     </div>
     <Teleport to="#teleport-component-to-drawer">
@@ -116,11 +116,6 @@ const updateTransfer = transfer => {
 </template>
 
 <style scoped>
-.transfers-list {
-  display: flex;
-  flex-flow: column nowrap;
-}
-
 .list {
   display: flex;
   flex-flow: column nowrap;

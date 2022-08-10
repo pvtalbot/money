@@ -141,11 +141,6 @@ const deleteTransfer = () => {
 </template>
 
 <style scoped>
-form {
-  display: flex;
-  flex-flow: column nowrap;
-}
-
 .item-container {
   padding: 0 0 10px 0;
   display: flex;

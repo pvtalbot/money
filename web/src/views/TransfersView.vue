@@ -36,8 +36,10 @@ const openCreateForm = v => {
 
 <template>
   <h1>Hello {{firstName}}, this is Expenses manager!</h1>
-  <DatePicker :initialDate="initialDate" ref="mainDatePicker"/>
   <div class="transfers">
+    <div class="datepicker">
+      <DatePicker :initialDate="initialDate" ref="mainDatePicker"/>
+    </div>
     <Teleport to="#teleport-component-to-drawer">
       <Transition name="component">
         <CreateTransferForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)" :mode="mode"/>
@@ -60,13 +62,27 @@ const openCreateForm = v => {
 
 <style scoped>
 .transfers {
-  display: flex;
-  flex-flow: row;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 50px 1fr;
+  grid-template-areas: "header header" "left right";
 }
 
 .revenues, .expenses {
-  margin-left: auto;
-  margin-right: auto;
+  margin: 10px auto auto auto;
+}
+
+.datepicker {
+  grid-area: header;
+  margin: auto;
+}
+
+.revenues {
+  grid-area: left;
+}
+
+.expenses {
+  grid-area: right;
 }
 
 .create-expense, .create-revenue {

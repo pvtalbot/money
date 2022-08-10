@@ -25,56 +25,22 @@ func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
 		VALUES (?, ?, ?, ?)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	res, err := stmt.Exec(user.Name, user.GetHashedPassword(), user.FirstName, user.LastName)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal("Error:", err.Error())
 		return nil, err
 	}
 
 	user.ID = strconv.FormatInt(id, 10)
 
 	return user, nil
-}
-
-func (r UserMariaRepository) FindAll() []*models.User {
-	stmt, err := r.db.Prepare(`
-		SELECT id, name, first_name, last_name
-		FROM users
-	`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	var users []*models.User
-	for rows.Next() {
-		var user models.User
-		err := rows.Scan(&user.ID, &user.Name, &user.FirstName, &user.LastName)
-		if err != nil {
-			log.Fatal(err)
-		}
-		users = append(users, &user)
-	}
-
-	if err = rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	return users
 }
 
 func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
@@ -84,7 +50,7 @@ func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
 		WHERE name = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	row := stmt.QueryRow(username)
 
@@ -109,7 +75,7 @@ func (r UserMariaRepository) FindPasswordByName(username string) (string, error)
 		WHERE name = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	row := stmt.QueryRow(username)
 
@@ -132,7 +98,7 @@ func (r UserMariaRepository) Find(id string) (*models.User, error) {
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	row := stmt.QueryRow(id)

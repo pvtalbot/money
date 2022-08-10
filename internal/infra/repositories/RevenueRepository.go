@@ -28,13 +28,13 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(userId string, 
 		AND date < ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -44,7 +44,7 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(userId string, 
 		var revenueDate time.Time
 		err := rows.Scan(&revenue.ID, &revenue.Amount, &revenueDate)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		revenue.SetDate(revenueDate)
 		revenue.User = models.User{ID: userId}
@@ -52,7 +52,6 @@ func (r RevenueMariaRepository) GetAllRevenuesOfUserBetweenDates(userId string, 
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -65,17 +64,16 @@ func (r RevenueMariaRepository) Create(revenue *models.Revenue, userId string) (
 		VALUES (?, ?, ?)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	res, err := stmt.Exec(revenue.Amount, revenue.GetDate(), userId)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal("Error:", err.Error())
 		return nil, err
 	}
 	revenue.ID = strconv.FormatInt(id, 10)
@@ -91,12 +89,11 @@ func (r RevenueMariaRepository) Update(revenue *models.Revenue) (*models.Revenue
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	_, err = stmt.Exec(revenue.Amount, revenue.GetDate(), revenue.ID)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -111,7 +108,7 @@ func (r RevenueMariaRepository) Find(id string) (*models.Revenue, error) {
 	`)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	row := stmt.QueryRow(id)
 
@@ -138,7 +135,7 @@ func (r RevenueMariaRepository) Delete(id string) error {
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = stmt.Exec(id)

@@ -24,17 +24,16 @@ func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*mod
 		values (?, ?)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	res, err := stmt.Exec(ec.Name, ec.User.ID)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal("Error:", err.Error())
 		return nil, err
 	}
 
@@ -50,13 +49,13 @@ func (r ExpenseCategoryMariaRepository) FindAll(userId string) ([]*models.Expens
 		WHERE user_id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(userId)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -67,13 +66,12 @@ func (r ExpenseCategoryMariaRepository) FindAll(userId string) ([]*models.Expens
 		err := rows.Scan(&ec.ID, &ec.Name)
 
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		result = append(result, &ec)
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -87,7 +85,7 @@ func (r ExpenseCategoryMariaRepository) Find(id string) (*models.ExpenseCategory
 		WHERE id = ?	
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	row := stmt.QueryRow(id)
 

@@ -29,13 +29,13 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(userId string
 	`)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -46,7 +46,7 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(userId string
 		var expenseCategoryId string
 		err := rows.Scan(&expense.ID, &expense.Amount, &expenseDate, &expenseCategoryId)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		expense.SetDate(expenseDate)
 		expense.Category = models.ExpenseCategory{ID: expenseCategoryId}
@@ -55,7 +55,6 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(userId string
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -74,13 +73,12 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(userId
 	`)
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(userId, startDate, endDate)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -90,7 +88,7 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(userId
 		var amount, month, year int
 		err := rows.Scan(&amount, &month, &year)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 		expenseSum := models.ExpenseSum{
@@ -111,17 +109,16 @@ func (r ExpenseMariaRepository) Create(expense *models.Expense, userId, category
 		VALUES (?, ?, ?, ?)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	res, err := stmt.Exec(expense.Amount, expense.GetDate(), userId, categoryId)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal("Error:", err.Error())
 		return nil, err
 	}
 
@@ -137,12 +134,11 @@ func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	_, err = stmt.Exec(expense.Amount, expense.GetDate(), expense.Category.ID, expense.ID)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -156,7 +152,7 @@ func (r ExpenseMariaRepository) Find(id string) (*models.Expense, error) {
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	row := stmt.QueryRow(id)
 
@@ -186,7 +182,7 @@ func (r ExpenseMariaRepository) Delete(id string) error {
 		WHERE id = ?
 	`)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = stmt.Exec(id)

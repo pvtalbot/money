@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -20,7 +19,6 @@ func GenerateToken(username, id string) (string, error) {
 	})
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
-		log.Fatal("Error in generating key")
 		return "", err
 	}
 	return tokenString, nil

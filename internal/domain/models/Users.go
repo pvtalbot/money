@@ -15,7 +15,6 @@ type User struct {
 
 type UserRepository interface {
 	Create(user *User) (*User, error)
-	FindAll() []*User
 	Find(id string) (*User, error)
 	FindByName(username string) (*User, error)
 	FindPasswordByName(username string) (string, error)

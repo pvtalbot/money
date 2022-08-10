@@ -61,19 +61,19 @@ const getInput = () => {
 }
 
 // Apollo mutation to create a revenue
-const { mutate: createTransferMutation } = useMutation(config.mutation);
+const { mutate: createTransferMutation, onDone: onCreateTransferSuccess, onError: onCreateTransferFailed } = useMutation(config.mutation);
 // Wrapper function
 const createTransfer = () => {
   disabled.value = true;
   createTransferMutation({
     input: getInput()
-  }).then(r => {
-    config.cacheTransfer([r.data[config.resultName]]);
-    drawerStore.closeDrawer();
-  }).catch(e => {console.log(e);})
-  .finally(() => {disabled.value = false;})
-
+  }).finally(() => {disabled.value = false;})
 }
+onCreateTransferSuccess(({data}) => {
+  config.cacheTransfer([data[config.resultName]]);
+  drawerStore.closeDrawer();
+})
+onCreateTransferFailed(e => {console.log(e);})
 </script>
 
 <template>

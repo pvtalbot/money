@@ -1,5 +1,7 @@
 <script setup>
-defineProps({
+// Vue
+import { computed } from 'vue';
+const props = defineProps({
   message: String,
   buttonType: {
     type: String,
@@ -10,14 +12,18 @@ defineProps({
     default: false,
   },
 })
+
+const buttonClass = computed(() => {
+  if (props.disabled) return ['disabled'];
+
+  return [];
+});
 </script>
 
 <template>
-  <transition name="button-shadow">
-    <button :type="buttonType" :disabled="disabled">
-      {{ message }}
-    </button>
-  </transition>
+  <button :type="buttonType" :disabled="disabled" :class="buttonClass">
+    {{ message }}
+  </button>
 </template>
 
 <style scoped>
@@ -32,5 +38,10 @@ button {
 
 button:hover {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+button.disabled {
+  background-color: var(--em-c-disabled-button);
+  cursor: not-allowed;
 }
 </style>

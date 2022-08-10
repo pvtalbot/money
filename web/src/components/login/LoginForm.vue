@@ -22,7 +22,7 @@ const disabled = ref(false);
 
 
 // Apollo Mutation to log the user in
-const {mutate: loginMutation} = useMutation(LoginMutation);
+const {mutate: loginMutation, onDone: onLoginSuccess, onError: onLoginFailed } = useMutation(LoginMutation);
 // Apollo Query to get info on the current user (defered after log in)
 const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me);
 // Apollo Query to check the validity of a token. Used when the component is mounted
@@ -31,16 +31,16 @@ const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidate
 // Wrapper function for login mutation
 const login = () => {
   disabled.value = true;
-  let response = loginMutation({login: {username: username.value, password: password.value}});
-  response.then(({data: {login}}) => {
-    if (typeof localStorage !== 'undefined' && login) {
-      localStorage.setItem('accessToken', login)
-    }
-  })
-  .then(() => loadCurrentUser())
+  loginMutation({login: {username: username.value, password: password.value}})
   .finally(() => {disabled.value = false;});
-
 }
+onLoginSuccess(({data: {login}}) => {
+  if (typeof localStorage !== undefined && login) {
+    localStorage.setItem('accessToken', login)
+  }
+  loadCurrentUser();
+})
+onLoginFailed(e => {console.log(e);})
 
 // Check if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in.
 onMounted(() => {

@@ -57,7 +57,7 @@ const getInput = computed(() => {
     input['categoryId'] = categoryId.value;
   }
   return input;
-})
+});
 
 const config = (function() {
   if (props.mode == 'expense') {
@@ -86,32 +86,33 @@ const config = (function() {
 })();
 
 // Apollo mutation to update the transfer
-const { mutate: updateTransferMutation } = useMutation(config.mutation);
+const { mutate: updateTransferMutation, onDone: onUpdateSuccess, onError: onUpdateFailed } = useMutation(config.mutation);
 // Wrapper function
 const update = () => {
   disabled.value = true;
   updateTransferMutation({ input: getInput.value })
-    .then(r => {
-      config.deleteTransfer(props.updatedTransfer);
-      config.cacheTransfer([r.data[config.resultName]]);
-      drawerStore.closeDrawer();
-    })
     .catch(e => { console.log(e); })
     .finally(() => {disabled.value = false;})
   ;
 }
+onUpdateSuccess(({data}) => {
+  config.deleteTransfer(props.updatedTransfer);
+  config.cacheTransfer([data[config.resultName]]);
+  drawerStore.closeDrawer();
+})
+onUpdateFailed(e => {console.log(e)});
 
 // Apollo mutation to delete the transfer
-const { mutate: deleteTransferMutation } = useMutation(config.deleteMutation);
+const { mutate: deleteTransferMutation, onDone: onDeleteSuccess, onError: onDeleteFailed } = useMutation(config.deleteMutation);
 // Wrapper function for the mutation
 const deleteTransfer = () => {
-  deleteTransferMutation({input: {id: props.updatedTransfer.id}})
-    .then(() => {
-      config.deleteTransfer(props.updatedTransfer);
-      drawerStore.closeDrawer();
-    })
-    .catch(e => { console.log(e); })
+  deleteTransferMutation({input: {id: props.updatedTransfer.id}});
 }
+onDeleteSuccess(() => {
+  config.deleteTransfer(props.updatedTransfer);
+  drawerStore.closeDrawer();
+})
+onDeleteFailed(e => {console.log(e);})
 </script> 
 
 <template>

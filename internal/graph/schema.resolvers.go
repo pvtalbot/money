@@ -8,13 +8,16 @@ import (
 	"errors"
 	"log"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
 	"github.com/pvtalbot/money/domain/managers"
+	custom_errors "github.com/pvtalbot/money/errors"
 	"github.com/pvtalbot/money/graph/generated"
 	"github.com/pvtalbot/money/graph/model"
 	"github.com/pvtalbot/money/middlewares"
 	"github.com/pvtalbot/money/pkg/utils"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // Login is the resolver for the login field.
@@ -36,7 +39,14 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 
 	token, err := r.Application.Commands.CreateUser.Handle(cmd)
 	if err != nil {
-		return "", err
+		switch err.(type) {
+		case custom_errors.DuplicateEntityError:
+			responseError := gqlerror.Errorf("username already exists")
+			responseError.Extensions = map[string]interface{}{"code": "createuser-1"}
+			graphql.AddError(ctx, responseError)
+		default:
+			graphql.AddError(ctx, gqlerror.Errorf("internal error"))
+		}
 	}
 
 	return token, nil

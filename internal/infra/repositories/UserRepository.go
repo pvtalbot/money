@@ -3,7 +3,10 @@ package repositories
 import (
 	"strconv"
 
+	"github.com/VividCortex/mysqlerr"
+	"github.com/go-sql-driver/mysql"
 	"github.com/pvtalbot/money/domain/models"
+	"github.com/pvtalbot/money/errors"
 
 	"database/sql"
 	"log"
@@ -30,6 +33,11 @@ func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
 
 	res, err := stmt.Exec(user.Name, user.GetHashedPassword(), user.FirstName, user.LastName)
 	if err != nil {
+		if driverErr, ok := err.(*mysql.MySQLError); ok {
+			if driverErr.Number == mysqlerr.ER_DUP_ENTRY {
+				return nil, errors.DuplicateEntityError{}
+			}
+		}
 		return nil, err
 	}
 
@@ -100,6 +108,7 @@ func (r UserMariaRepository) Find(id string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	row := stmt.QueryRow(id)
 

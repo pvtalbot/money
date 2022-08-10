@@ -1,4 +1,4 @@
-import { ApolloClient, createHttpLink, HttpLink, InMemoryCache } from '@apollo/client/core';
+import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
 import openEndpoints from './openEndpoints';
 
@@ -34,7 +34,15 @@ export const createApolloClient = () => {
     link: authLink.concat(httpLink),
     cache,
     defaultOptions: {
-      fetchPolicy: 'no-cache',
+      watchQuery: {
+        fetchPolicy: 'no-cache',
+      },
+      query: {
+        fetchPolicy: 'no-cache',
+      },
+      mutate: {
+        fetchPolicy: 'no-cache',
+      }
     }
   })
 }

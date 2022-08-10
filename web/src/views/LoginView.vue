@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 // Vue
 import { ref, computed } from 'vue';
 import LoginForm from "@/components/login/LoginForm.vue"
-import SignupForm from '../components/login/SignupForm.vue';
+import SignupForm from '@/components/login/SignupForm.vue';
 
 const signup = ref(false)
 

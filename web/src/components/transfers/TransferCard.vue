@@ -4,7 +4,7 @@ import { useExpenseStore } from '@/stores/expense';
 const expenseStore = useExpenseStore();
 
 const props = defineProps({
-  displayedObject: {
+  displayedTransfer: {
     type: Object,
     required: true,
   },
@@ -19,9 +19,9 @@ const props = defineProps({
 <template>
   <div class="card">
     <div class="details">
-      <p>{{ displayedObject.date.format('D MMM YYYY')}}</p>
-      <p>{{ displayedObject.amount }}</p>
-      <p v-if="mode == 'expense'">{{ expenseStore.getCategory(displayedObject).name }}</p>
+      <p>{{ displayedTransfer.date.format('D MMM YYYY')}}</p>
+      <p>{{ displayedTransfer.amount }}</p>
+      <p v-if="mode == 'expense'">{{ expenseStore.getCategory(displayedTransfer).name }}</p>
     </div>
   </div>
 </template>

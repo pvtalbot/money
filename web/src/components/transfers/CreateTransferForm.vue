@@ -40,7 +40,7 @@ const config = (() => {
     return {
       getCategories: computed(() => store.expensesCategories),
       mutation: CreateExpenseMutation,
-      cacheObject: store.cacheExpenses,
+      cacheTransfer: store.cacheExpenses,
       resultName: 'createExpense',
     }
   } else {
@@ -48,7 +48,7 @@ const config = (() => {
     return {
       getCategories: null,
       mutation: CreateRevenueMutation,
-      cacheObject: store.cacheRevenues,
+      cacheTransfer: store.cacheRevenues,
       resultName: 'createRevenue',
     }
   }
@@ -61,14 +61,14 @@ const getInput = () => {
 }
 
 // Apollo mutation to create a revenue
-const { mutate: createObjectMutation } = useMutation(config.mutation);
+const { mutate: createTransferMutation } = useMutation(config.mutation);
 // Wrapper function
-const createObject = () => {
+const createTransfer = () => {
   disabled.value = true;
-  createObjectMutation({
+  createTransferMutation({
     input: getInput()
   }).then(r => {
-    config.cacheObject([r.data[config.resultName]]);
+    config.cacheTransfer([r.data[config.resultName]]);
     drawerStore.closeDrawer();
   }).catch(e => {console.log(e);})
   .finally(() => {disabled.value = false;})
@@ -79,7 +79,7 @@ const createObject = () => {
 <template>
   <div class="create-revenue-form">
     <h2>Create a new {{ mode }}</h2>
-    <form @submit.prevent="createObject">
+    <form @submit.prevent="createTransfer">
       <div class="item-container">
         <label for="create-revenue-form__amount">Amount</label>
         <input type="number" min=0 step="1" id="create-revenue-form__amount" v-model.number="amount" />

@@ -22,9 +22,9 @@ const router = createRouter({
           component: () => import('@/views/HomeView.vue'),
         },
         {
-          path: 'expenses',
-          name: 'expenses',
-          component: () => import('@/views/ExpensesView.vue'),
+          path: 'transfers',
+          name: 'transfers',
+          component: () => import('@/views/TransfersView.vue'),
         },
         {
           path: 'graphs',

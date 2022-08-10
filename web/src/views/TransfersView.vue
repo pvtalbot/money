@@ -9,8 +9,7 @@ import utc from 'dayjs/plugin/utc';
 
 // Vue
 import { computed, ref } from 'vue';
-import ExpensesList from '@/components/expenses/ExpensesList.vue';
-import RevenueList from '@/components/transfers/RevenueList.vue';
+import TransferList from '@/components/transfers/TransferList.vue';
 import VueButton from '@/components/utils/VueButton.vue';
 import CreateTransferForm from '@/components/transfers/CreateTransferForm.vue';
 import DatePicker from '@/components/utils/DatePicker.vue';
@@ -48,13 +47,13 @@ const openCreateForm = v => {
       <div class="create-revenue">
         <VueButton message="Add a revenue" @click="openCreateForm('revenue')"/>
       </div>
-      <RevenueList :initialDate="dateToProp"/>
+      <TransferList :initialDate="dateToProp" :mode="'revenue'"/>
     </div>
     <div class="expenses">
       <div class="create-expense" @click="openCreateForm('expense')">
         <VueButton message="Add an expense" />
       </div>
-      <ExpensesList :initialDate="dateToProp"/>
+      <TransferList :initialDate="dateToProp" :mode="'expense'"/>
     </div>
   </div>
 </template>

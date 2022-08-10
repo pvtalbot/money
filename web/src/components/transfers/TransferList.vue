@@ -2,7 +2,7 @@
 // Apollo
 import { useQuery } from '@vue/apollo-composable';
 import Revenues from '@/graphql/queries/RevenueList.gql';
-
+import Expenses from '@/graphql/queries/ExpenseList.gql';
 
 // External libraries
 import dayjs from 'dayjs';
@@ -10,6 +10,7 @@ import utc from 'dayjs/plugin/utc'
 
 // Pinia
 import { useRevenueStore } from '@/stores/revenue.js'
+import { useExpenseStore } from '@/stores/expense.js'
 import { useDrawerStore } from '@/stores/drawer.js'
 
 // Vue
@@ -18,24 +19,49 @@ import TransferCard from '@/components/transfers/TransferCard.vue';
 import UpdateTransferForm from '@/components/transfers/UpdateTransferForm.vue';
 
 dayjs.extend(utc);
-const revenueStore = useRevenueStore();
 const drawerStore = useDrawerStore();
 
 const props = defineProps({
   initialDate: {
     required: true,
   },
+  mode: {
+    required: true,
+    type: String,
+    validator: value => ['expense', 'revenue'].includes(value),
+  }
 })
+
+const config = (() => {
+  if (props.mode == 'expense') {
+    const store = useExpenseStore();
+    return {
+      query: Expenses,
+      cacheTransfers: store.cacheExpenses,
+      resultName: 'expenses',
+      displayedTransfers: computed(() => store.getCurrentExpenses(startDate.value)),
+      title: 'Expenses of the month',
+    };
+  } else {
+    const store = useRevenueStore();
+    return {
+      query: Revenues,
+      cacheTransfers: store.cacheRevenues,
+      resultName: 'revenues',
+      displayedTransfers: computed(() => store.getCurrentRevenues(startDate.value)),
+      title: 'Revenues of the month',
+    };
+  }
+})();
 
 const startDate = computed(() => props.initialDate);
 const endDate = computed(() => startDate.value.add(1, 'month'));
 
-const revenueToUpdate = ref(null)
-const COMPONENT_TO_DRAWER = 'UpdateRevenueForm';
+const transferToUpdate = ref(null)
+const COMPONENT_TO_DRAWER = 'UpdateTransferForm' + '__' + props.mode;
 
-const displayedRevenues = computed(() => revenueStore.getCurrentRevenues(startDate.value))
-const sortedRevenues = computed(() => {
-  return Object.values(displayedRevenues.value).sort((a, b) => {
+const sortedTransfers = computed(() => {
+  return Object.values(config.displayedTransfers.value).sort((a, b) => {
     if (a.date.isBefore(b.date)) return 1;
     else if (a.date.isAfter(b.date)) return -1;
 
@@ -43,16 +69,16 @@ const sortedRevenues = computed(() => {
   })
 });
 
-// Apollo Query to get revenues list, hook, watcher
-const { result: revenues, onResult: onRevenueListSucceeded, refetch: refetchRevenues, loading: revenuesLoading } =
-  useQuery(Revenues,
+// Apollo Query to get transfers list, hook, watcher
+const { result: transfers, onResult: onTransferListSucceeded, refetch: refetchTransfers, loading: transfersLoading } =
+  useQuery(config.query,
     { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}}
   );
 
-onRevenueListSucceeded(() => { revenueStore.cacheRevenues(revenues.value.revenues); })
+onTransferListSucceeded(() => { config.cacheTransfers(transfers.value[config.resultName]); })
 
 watch(startDate, () => {
-  refetchRevenues({
+  refetchTransfers({
     input: {
       startDate: startDate.value.toISOString(),
       endDate: endDate.value.toISOString(),
@@ -60,37 +86,37 @@ watch(startDate, () => {
   })
 })
 
-const updateRevenue = revenue => {
+const updateTransfer = transfer => {
   drawerStore.registerComponent(COMPONENT_TO_DRAWER);
-  revenueToUpdate.value = revenue;
+  transferToUpdate.value = transfer;
 }
 </script>
 
 <template>
-  <div class="revenues-list">
-    <div v-if="revenuesLoading.value" class="loader" key="waiting">
+  <div class="transfers-list">
+    <div v-if="transfersLoading.value" class="loader" key="waiting">
       <h2>A minute please, I'm gathering everything!</h2>
     </div>
     <div v-else class="list" key="loaded">
-      <p v-if="sortedRevenues.length > 0">Revenues of the month:</p>
-      <div v-for="revenue in sortedRevenues" :key="revenue.id" class="revenue">
-        <TransferCard :displayedObject="revenue"
-                      :mode="'revenue'"
-                      @click.self="updateRevenue(revenue)"/>
+      <p v-if="sortedTransfers.length > 0">{{ config.title }}</p>
+      <div v-for="t in sortedTransfers" :key="t.id" class="transfer">
+        <TransferCard :displayedTransfer="t"
+                      :mode="props.mode"
+                      @click.self="updateTransfer(t)"/>
       </div>
     </div>
     <Teleport to="#teleport-component-to-drawer">
       <Transition name="component">
         <UpdateTransferForm v-if="drawerStore.isCurrentComponentDisplayed(COMPONENT_TO_DRAWER)"
-        :updatedObject="revenueToUpdate"
-        :mode="'revenue'"/>
+        :updatedTransfer="transferToUpdate"
+        :mode="props.mode"/>
       </Transition>
     </Teleport>
   </div>
 </template>
 
 <style scoped>
-.revenues-list {
+.transfers-list {
   display: flex;
   flex-flow: column nowrap;
 }

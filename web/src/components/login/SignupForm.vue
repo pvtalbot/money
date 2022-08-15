@@ -1,17 +1,14 @@
 <script setup>
 // Apollo
-import { useMutation, useLazyQuery } from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
 import CreateUserMutation from '@/graphql/mutations/CreateUserMutation.gql';
-import Me from '@/graphql/queries/CurrentUser.gql';
+
+// Money
+import { useLoadCurrentUser, storeUserToken } from './LoadCurrentUser';
 
 // Vue
 import { reactive, ref } from 'vue';
-import { useUserStore } from '@/stores/user';
-import { useRouter } from 'vue-router';
 import VueButton from '@/components/utils/VueButton.vue';
-
-const userStore = useUserStore();
-const router = useRouter();
 
 const username = ref("");
 const password = ref("");
@@ -26,9 +23,10 @@ const mapErrors = {
 }
 const getError = code => mapErrors[code] ?? 'Unknown error';
 
+const loadCurrentUser = useLoadCurrentUser();
+
 // Apollo Mutation to create the user
 const {mutate: createUserMutation, onError: onCreateUserError, onDone: onCreateUserSuccess} = useMutation(CreateUserMutation);
-const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me);
 // Wrapper function for the mutation
 const createNewUser = () => {
   disabled.value = true;
@@ -48,21 +46,10 @@ onCreateUserError(e => {
 });
 
 onCreateUserSuccess(({data: {createUser}}) => {
-  if (typeof localStorage !== undefined && createUser) {
-    localStorage.setItem('accessToken', createUser)
-  }
+  storeUserToken(createUser);
   loadCurrentUser();
 });
 
-onCurrentUserSucceeded(() => {
-  if (!currentUser.value) return;
-  userStore.$patch(store => {
-    store.user.firstName = currentUser.value.me.firstName;
-    store.user.lastName = currentUser.value.me.lastName;
-  });
-
-  router.push({name: 'home'});
-})
 </script>
 
 <template>

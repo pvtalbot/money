@@ -2,31 +2,22 @@
 // Apollo
 import { useMutation, useLazyQuery } from '@vue/apollo-composable'
 import LoginMutation from '@/graphql/mutations/LoginMutation.gql'
-import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql'
-import Me from '@/graphql/queries/CurrentUser.gql';
+
+// Money
+import { useLoadCurrentUser, storeUserToken } from './LoadCurrentUser';
 
 // Vue
-import { ref, watch, onMounted } from 'vue';
-import { useUserStore } from '@/stores/user';
-import { useExpenseStore } from '@/stores/expense'
-import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 import VueButton from '@/components/utils/VueButton.vue';
-
-const userStore = useUserStore();
-const expenseStore = useExpenseStore();
-const router = useRouter();
 
 const username = ref("");
 const password = ref("");
 const disabled = ref(false);
 
+const loadCurrentUser = useLoadCurrentUser();
 
 // Apollo Mutation to log the user in
 const {mutate: loginMutation, onDone: onLoginSuccess, onError: onLoginFailed } = useMutation(LoginMutation);
-// Apollo Query to get info on the current user (defered after log in)
-const {result: currentUser, load: loadCurrentUser, onResult: onCurrentUserSucceeded} = useLazyQuery(Me);
-// Apollo Query to check the validity of a token. Used when the component is mounted
-const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidated} = useLazyQuery(ValidateAccessToken)
 
 // Wrapper function for login mutation
 const login = () => {
@@ -35,38 +26,11 @@ const login = () => {
   .finally(() => {disabled.value = false;});
 }
 onLoginSuccess(({data: {login}}) => {
-  if (typeof localStorage !== undefined && login) {
-    localStorage.setItem('accessToken', login)
-  }
+  storeUserToken(login);
   loadCurrentUser();
 })
 onLoginFailed(e => {console.log(e);})
 
-// Check if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in.
-onMounted(() => {
-  if (!localStorage) return;
-  const accessToken = localStorage.getItem('accessToken');
-  if (accessToken == null) return;
-  loadTokenValidity(undefined, {accessToken: accessToken});
-})
-
-// If loadCurrentUser is called and succeed, will then call onCurrentUserSucceeded
-onTokenValidated(() => {
-  if (!tokenValidity.value) return;
-  if (!tokenValidity.value.validateAccessToken) {localStorage.removeItem('accessToken'); return;}
-  loadCurrentUser();
-})
-
-onCurrentUserSucceeded(() => {
-  if (!currentUser.value) return;
-  userStore.$patch((store) => {
-    store.user.firstName = currentUser.value.me.firstName;
-    store.user.lastName = currentUser.value.me.lastName;
-  })
-
-  expenseStore.cacheExpensesCategories(currentUser.value.me.expensesCategories);
-  router.push({name: 'home'});
-})
 </script>
 
 <template>

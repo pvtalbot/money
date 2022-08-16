@@ -30,6 +30,7 @@ func (r UserMariaRepository) Create(user *models.User) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(user.Name, user.GetHashedPassword(), user.FirstName, user.LastName)
 	if err != nil {
@@ -60,6 +61,8 @@ func (r UserMariaRepository) FindByName(username string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	row := stmt.QueryRow(username)
 
 	var user models.User
@@ -85,6 +88,8 @@ func (r UserMariaRepository) FindPasswordByName(username string) (string, error)
 	if err != nil {
 		return "", err
 	}
+	defer stmt.Close()
+
 	row := stmt.QueryRow(username)
 
 	var hashedPassword string

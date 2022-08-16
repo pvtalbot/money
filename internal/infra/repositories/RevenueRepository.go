@@ -66,6 +66,7 @@ func (r RevenueMariaRepository) Create(revenue *models.Revenue, userId string) (
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(revenue.Amount, revenue.GetDate(), userId)
 	if err != nil {
@@ -91,6 +92,7 @@ func (r RevenueMariaRepository) Update(revenue *models.Revenue) (*models.Revenue
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(revenue.Amount, revenue.GetDate(), revenue.ID)
 	if err != nil {
@@ -106,10 +108,11 @@ func (r RevenueMariaRepository) Find(id string) (*models.Revenue, error) {
 		FROM revenues
 		WHERE id = ?
 	`)
-
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	row := stmt.QueryRow(id)
 
 	var revenue models.Revenue
@@ -137,6 +140,7 @@ func (r RevenueMariaRepository) Delete(id string) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(id)
 	if err != nil {

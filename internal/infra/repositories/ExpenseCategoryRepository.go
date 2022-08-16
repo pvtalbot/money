@@ -26,6 +26,7 @@ func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*mod
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(ec.Name, ec.User.ID)
 	if err != nil {
@@ -87,6 +88,8 @@ func (r ExpenseCategoryMariaRepository) Find(id string) (*models.ExpenseCategory
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	row := stmt.QueryRow(id)
 
 	var userId string

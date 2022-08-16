@@ -27,7 +27,6 @@ func (r ExpenseMariaRepository) GetAllExpensesFromUserBetweenDates(userId string
 		AND date > ?
 		AND date < ?
 	`)
-
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +70,6 @@ func (r ExpenseMariaRepository) SumAllExpensesFromUserBetweenDatesByMonth(userId
 		GROUP BY MONTH(date), YEAR(date)
 		ORDER BY YEAR(date), MONTH(date)
 	`)
-
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +109,7 @@ func (r ExpenseMariaRepository) Create(expense *models.Expense, userId, category
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(expense.Amount, expense.GetDate(), userId, categoryId)
 	if err != nil {
@@ -136,6 +135,7 @@ func (r ExpenseMariaRepository) Update(expense *models.Expense) (*models.Expense
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(expense.Amount, expense.GetDate(), expense.Category.ID, expense.ID)
 	if err != nil {
@@ -154,6 +154,8 @@ func (r ExpenseMariaRepository) Find(id string) (*models.Expense, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	row := stmt.QueryRow(id)
 
 	var expense models.Expense
@@ -184,6 +186,7 @@ func (r ExpenseMariaRepository) Delete(id string) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(id)
 	if err != nil {

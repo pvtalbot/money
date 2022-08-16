@@ -6,9 +6,14 @@ import CreateUserMutation from '@/graphql/mutations/CreateUserMutation.gql';
 // Money
 import { useLoadCurrentUser, storeUserToken } from './LoadCurrentUser';
 
+// Pinia
+import { useErrorStore } from '@/stores/errors';
+
 // Vue
 import { reactive, ref } from 'vue';
 import VueButton from '@/components/utils/VueButton.vue';
+
+const errorStore = useErrorStore();
 
 const username = ref("");
 const password = ref("");
@@ -17,11 +22,6 @@ const lastName = ref("");
 const disabled = ref(false);
 
 const errors = reactive([]);
-
-const mapErrors = {
-  'createuser-1': 'An account with this username already exists',
-}
-const getError = code => mapErrors[code] ?? 'Unknown error';
 
 const loadCurrentUser = useLoadCurrentUser();
 
@@ -74,7 +74,7 @@ onCreateUserSuccess(({data: {createUser}}) => {
       <VueButton button-type="submit" message="Submit" :disabled="disabled" />
     </form>
     <div class="item-container errors" v-if="errors.length > 0">
-      <p v-for="e in errors">{{ getError(e) }}</p>
+      <p v-for="e in errors">{{ errorStore.getError(e) }}</p>
     </div>
   </div>
 </template>

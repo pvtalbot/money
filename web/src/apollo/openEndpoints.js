@@ -1,4 +1,5 @@
 const openEndpoints = [
+  'GetAllErrors',
   'Login',
   'ValidateAccessToken',
 ]

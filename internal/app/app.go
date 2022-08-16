@@ -32,6 +32,9 @@ type Commands struct {
 }
 
 type Queries struct {
+	// Errors
+	GetAllErrors queries.GetAllErrorsHandler
+
 	// Expenses
 	FindExpense queries.FindExpenseQueryHandler
 	GetExpenses queries.GetExpensesQueryHandler
@@ -82,6 +85,9 @@ func newApplication(db *sql.DB) Application {
 			Login:      commands.NewLoginHandler(userRepository),
 		},
 		Queries: Queries{
+			// Errors
+			GetAllErrors: queries.GetAllErrorsHandler{},
+
 			// Expenses
 			FindExpense: queries.NewFindExpenseHandler(expenseRepository),
 			GetExpenses: queries.NewGetExpensesHandler(expenseRepository),

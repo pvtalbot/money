@@ -1,9 +1,11 @@
 // Apollo
-import { useLazyQuery } from '@vue/apollo-composable';
+import { useLazyQuery, useQuery } from '@vue/apollo-composable';
 import Me from '@/graphql/queries/CurrentUser.gql';
+import GetAllErrors from '@/graphql/queries/GetAllErrors.gql';
 
 // Pinia
 import { useExpenseStore } from '@/stores/expense';
+import { useErrorStore } from '@/stores/errors';
 import { useUserStore } from '@/stores/user';
 
 // Vue
@@ -33,6 +35,16 @@ const useLoadCurrentUser = () => {
   return loadCurrentUser;
 }
 
+const useGetAllErrors = () => {
+  const errorStore = useErrorStore();
+
+  const { result: errorsList, onResult: onGetAllErrorsSuccess } = useQuery(GetAllErrors);
+
+  onGetAllErrorsSuccess(() => {
+    errorStore.cacheErrors(errorsList.value.getAllErrors);
+  })
+}
+
 const storeUserToken = (token) => {
   if (typeof localStorage !== undefined && token) {
     localStorage.setItem(AUTH_TOKEN, token);
@@ -50,6 +62,7 @@ const removeUserToken = () => {
 }
 
 export { 
+  useGetAllErrors,
   useLoadCurrentUser,
   storeUserToken,
   getUserToken,

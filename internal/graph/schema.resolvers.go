@@ -255,6 +255,19 @@ func (r *mutationResolver) UpdateRevenue(ctx context.Context, input model.Update
 	}, nil
 }
 
+// GetAllErrors is the resolver for the getAllErrors field.
+func (r *queryResolver) GetAllErrors(ctx context.Context) ([]*model.Error, error) {
+	query := queries.GetAllErrors{}
+	errors, _ := r.Application.Queries.GetAllErrors.Handle(query)
+
+	var result []*model.Error
+	for _, e := range errors {
+		result = append(result, &model.Error{Code: e.Code, Translation: e.Translation})
+	}
+
+	return result, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)

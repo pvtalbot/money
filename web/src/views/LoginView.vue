@@ -7,7 +7,7 @@ import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql';
 import { gsap } from "gsap";
 
 // Money
-import { useLoadCurrentUser, getUserToken, removeUserToken } from "@/components/login/LoadCurrentUser";
+import { useLoadCurrentUser, getUserToken, removeUserToken, useGetAllErrors } from "@/components/login/LoadCurrentUser";
 
 // Vue
 import { ref, onMounted, computed } from 'vue';
@@ -15,6 +15,8 @@ import LoginForm from "@/components/login/LoginForm.vue"
 import SignupForm from '@/components/login/SignupForm.vue';
 
 const loadCurrentUser = useLoadCurrentUser();
+const getAllErrors = useGetAllErrors();
+
 // Apollo Query to check the validity of a token. Used on mounted
 const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidated} = useLazyQuery(ValidateAccessToken);
 // Checks if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in

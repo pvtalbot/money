@@ -1,0 +1,6 @@
+query GetAllErrors {
+  getAllErrors {
+    code
+    translation
+  }
+}

@@ -34,7 +34,13 @@ type ExpenseCategory {
   name: String
 }
 
+type Error {
+  code: String!
+  translation: String!
+}
+
 type Query {
+  getAllErrors: [Error!]!
   me: User!
   expenses(input: GetExpensesInput!): [Expense]!
   revenues(input: GetRevenuesInput!): [Revenue]!

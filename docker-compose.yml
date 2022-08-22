@@ -52,8 +52,6 @@ services:
     hostname: db
     networks:
       - net
-    ports:
-      - 3306:3306
     volumes:
       - maria-volume:/var/lib/mysql
     environment:

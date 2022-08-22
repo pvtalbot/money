@@ -1,0 +1,24 @@
+services:
+  money-front:
+    build:
+      context: docker/dev/web
+    volumes:
+      - ./web/:/web/
+      - node_modules-volume:/web/node_modules
+
+  money-back:
+    build:
+      context: docker/dev/app
+    environment:
+      - GOCACHE=/go-cache
+    volumes:
+      - ./internal/:/internal/
+      - ./.go-cache/:/go-cache/
+      - ./.go/pkg/:/go/pkg/
+
+volumes:
+  node_modules-volume:
+
+networks:
+  net:
+    driver: bridge

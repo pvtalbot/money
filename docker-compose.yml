@@ -3,8 +3,7 @@ version: '3.8'
 services:
   money-front:
     build:
-      context: docker/web/
-    working_dir: /web
+      context: web
     hostname: front_money
     container_name: front_money
     tty: true
@@ -13,9 +12,6 @@ services:
     ports:
       - 5173:5173
     stdin_open: true
-    volumes:
-      - ./web/:/web/
-      - node_modules-volume:/web/node_modules/
     networks:
       - net
     
@@ -23,7 +19,7 @@ services:
     depends_on:
       - maria
     build:
-      context: docker/app
+      context: internal
     container_name: back_money
     hostname: back_money
     networks:
@@ -36,15 +32,9 @@ services:
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=money
-      - GOCACHE=/go-cache
     deploy:
       restart_policy:
         condition: on-failure
-    working_dir: /internal
-    volumes:
-      - ./internal/:/internal/
-      - ./.go-cache/:/go-cache/
-      - ./.go/pkg/:/go/pkg/
       
   maria:
     image: mariadb:latest
@@ -62,8 +52,7 @@ services:
 
 volumes:
   maria-volume:
-  node_modules-volume:
 
 networks:
   net:
-    driver: bridge
+    driver: overlay

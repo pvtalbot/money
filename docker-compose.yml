@@ -5,7 +5,8 @@ services:
     image: paulvtbt/money-front:v1
     build:
       context: web
-    hostname: front_money
+      dockerfile: ../docker/prod/web/Dockerfile
+    hostname: front-money
     tty: true
     depends_on:
       - money-back
@@ -21,7 +22,8 @@ services:
       - maria
     build:
       context: internal
-    hostname: back_money
+      dockerfile: ../docker/prod/app/Dockerfile
+    hostname: back-money
     networks:
       - net
     ports:

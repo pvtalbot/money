@@ -9,7 +9,7 @@ const AUTH_TOKEN = 'accessToken';
 const cache = new InMemoryCache()
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost/query',
+  uri: 'http://' + import.meta.env.VITE_GRAPHQL_HOST + '/query',
 })
 
 // Some operations do not require to be logged in (login, validate access token).

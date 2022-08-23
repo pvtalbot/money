@@ -2,6 +2,7 @@ services:
   money-front:
     build:
       context: docker/dev/web
+      dockerfile: Dockerfile
     container_name: front_money
     volumes:
       - ./web/:/web/
@@ -10,6 +11,7 @@ services:
   money-back:
     build:
       context: docker/dev/app
+      dockerfile: Dockerfile
     container_name: back_money
     environment:
       - MODE=dev

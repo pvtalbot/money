@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:18
 
 WORKDIR /web
 ADD start.sh /

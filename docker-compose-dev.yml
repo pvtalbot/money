@@ -2,6 +2,7 @@ services:
   money-front:
     build:
       context: docker/dev/web
+    container_name: front_money
     volumes:
       - ./web/:/web/
       - node_modules-volume:/web/node_modules
@@ -9,12 +10,17 @@ services:
   money-back:
     build:
       context: docker/dev/app
+    container_name: back_money
     environment:
+      - MODE=dev
       - GOCACHE=/go-cache
     volumes:
       - ./internal/:/internal/
       - ./.go-cache/:/go-cache/
       - ./.go/pkg/:/go/pkg/
+
+  maria:
+    container_name: maria-container
 
 volumes:
   node_modules-volume:

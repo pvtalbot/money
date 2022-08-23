@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   money-front:
+    image: paulvtbt/money-front:v1
     build:
       context: web
     hostname: front_money
-    container_name: front_money
     tty: true
     depends_on:
       - money-back
@@ -16,17 +16,18 @@ services:
       - net
     
   money-back:
+    image: paulvtbt/money-back:v1
     depends_on:
       - maria
     build:
       context: internal
-    container_name: back_money
     hostname: back_money
     networks:
       - net
     ports:
       - 80:8080
     environment:
+      - MODE=prod
       - DB_USER=admin_money
       - DB_PASSWORD=sixmillekangourous
       - DB_HOST=db
@@ -38,7 +39,6 @@ services:
       
   maria:
     image: mariadb:latest
-    container_name: maria-container
     hostname: db
     networks:
       - net
@@ -49,6 +49,10 @@ services:
       - MARIADB_DATABASE=money
       - MARIADB_USER=admin_money
       - MARIADB_PASSWORD=sixmillekangourous
+    deploy:
+      placement:
+        constraints:
+          - node.labels.storage == maria
 
 volumes:
   maria-volume:

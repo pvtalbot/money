@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"os"
 
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
@@ -54,7 +55,9 @@ type Queries struct {
 
 func NewApplication() (Application, func()) {
 	dbContainer := database.NewDbContainer()
-	dbContainer.Migrate()
+	if os.Getenv("MODE") == "dev" {
+		dbContainer.Migrate()
+	}
 
 	return newApplication(dbContainer.Db),
 		func() {

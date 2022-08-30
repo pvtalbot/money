@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  reverse-proxy:
+    image: traefik:v2.8
+    command: --providers.docker.swarmMode
+    ports:
+      - "80:80"
+    networks:
+      - net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+         - node.labels.entry == traefik
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.reverse-proxy.loadbalancer.server.port=8088
+
   money-front:
     image: paulvtbt/money-front:v1
     build:
@@ -10,11 +27,14 @@ services:
     tty: true
     depends_on:
       - money-back
-    ports:
-      - 5173:5173
     stdin_open: true
     networks:
       - net
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.money-front.rule=Host(`paulvalentintalbot.com`)
+        - traefik.http.services.money-front.loadbalancer.server.port=80
     
   money-back:
     image: paulvtbt/money-back:v1
@@ -26,10 +46,8 @@ services:
     hostname: back-money
     networks:
       - net
-    ports:
-      - 80:8080
     environment:
-      - MODE=prod
+      - GIN_MODE=release
       - DB_USER=admin_money
       - DB_PASSWORD=sixmillekangourous
       - DB_HOST=db
@@ -38,6 +56,10 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.money-back.loadbalancer.server.port=8080
+        - traefik.http.routers.money-back.rule=Host(`api.paulvalentintalbot.com`)
       
   maria:
     image: mariadb:latest
@@ -51,10 +73,15 @@ services:
       - MARIADB_DATABASE=money
       - MARIADB_USER=admin_money
       - MARIADB_PASSWORD=sixmillekangourous
+    labels:
+      - traefik.enable=false
     deploy:
       placement:
         constraints:
           - node.labels.storage == maria
+      labels:
+        - traefik.enable=false
+        - traefik.http.services.maria.loadbalancer.server.port=3306
 
 volumes:
   maria-volume:

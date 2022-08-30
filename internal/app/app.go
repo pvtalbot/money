@@ -57,7 +57,7 @@ func NewApplication() (Application, func()) {
 	dbContainer := database.NewDbContainer()
 
 	// Does not work with the prod Dockerfile
-	if os.Getenv("MODE") == "dev" {
+	if os.Getenv("GIN_MODE") != "release" {
 		dbContainer.Migrate()
 	}
 

@@ -1,4 +1,9 @@
 services:
+  reverse-proxy:
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8088:8080"
+
   money-front:
     build:
       context: docker/dev/web
@@ -7,6 +12,9 @@ services:
     volumes:
       - ./web/:/web/
       - node_modules-volume:/web/node_modules
+    labels:
+      - "traefik.http.routers.money-front.rule=Host(`paulvalentintalbot.localhost`)"
+      - "traefik.http.services.money-front.loadbalancer.server.port=5173"
 
   money-back:
     build:
@@ -14,12 +22,14 @@ services:
       dockerfile: Dockerfile
     container_name: back_money
     environment:
-      - MODE=dev
       - GOCACHE=/go-cache
     volumes:
       - ./internal/:/internal/
       - ./.go-cache/:/go-cache/
       - ./.go/pkg/:/go/pkg/
+    labels:
+      - "traefik.http.routers.money-back.rule=Host(`api.paulvalentintalbot.localhost`)"
+      - traefik.http.services.money-back.loadbalancer.server.port=8080
 
   maria:
     container_name: maria-container

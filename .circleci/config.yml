@@ -5,7 +5,7 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
+  build:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
@@ -14,13 +14,44 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
+      - run:
+          name: "Docker login"
+          command: "echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin"
+      - run:
+          name: "Build images"
+          command: |
+            TAG=v1.$CIRCLE_BUILD_NUM
+            docker compose build
+            docker image tag paulvtbt/money-front:v1 paulvtbt/money-front:$TAG
+            docker image tag paulvtbt/money-back:v1 paulvtbt/money-back:$TAG
+            docker push paulvtbt/money-front:$TAG
+            docker push paulvtbt/money-back:$TAG
+            docker push paulvtbt/money-front:v1
+            docker push paulvtbt/money-back:v1
+  deployment:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "0a:3b:da:8c:1a:01:b3:5a:3a:09:29:7a:db:bd:52:40"
+      - run:
+          name: "Deploy the stack"
+          command: |
+            ssh $USER@$HOST "cd money && docker stack deploy -c docker-compose.yml money"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  deploy-workflow:
     jobs:
-      - say-hello
+      - build
+      - deployment:
+          requires:
+            - build

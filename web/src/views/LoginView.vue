@@ -3,9 +3,6 @@
 import { useLazyQuery } from "@vue/apollo-composable";
 import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql';
 
-// Gasp
-import { gsap } from "gsap";
-
 // Money
 import { useLoadCurrentUser, getUserToken, removeUserToken, useGetAllErrors } from "@/components/login/LoadCurrentUser";
 
@@ -40,24 +37,6 @@ const signup = ref(false)
 
 const switchForm = () => {signup.value = !signup.value};
 const message = computed(() => signup.value ? 'Go to login' : 'Go to signup')
-
-const onEnter = (el, done) => {
-  gsap.from(el, {
-    transform: 'translateX(-100px)',
-    opacity: 0,
-    onComplete: done,
-    duration: 0.3,
-  })
-}
-
-const onLeave = (el, done) => {
-  gsap.to(el, {
-    transform: 'translateX(100px)',
-    opacity: 0,
-    onComplete: done,
-    duration: 0.3,
-  })
-}
 </script>
 
 <template>
@@ -72,23 +51,32 @@ const onLeave = (el, done) => {
       </div>
     </header>
     <main>
-      <div class="forms">
-        <Transition mode="out-in" @enter="onEnter" @leave="onLeave" :css="false">
-          <SignupForm v-if="signup" />
-          <LoginForm v-else />
-        </Transition>
-      </div>
       <div class="switch" @click="switchForm">
         <p>{{ message }}</p>
         <div class="arrow right_arrow">
           <img src="@/assets/chevron-compact-right.svg" alt="right" />
         </div>
       </div>
+      <div class="forms">
+        <Transition mode="out-in" name="login-form">
+          <SignupForm v-if="signup" />
+          <LoginForm v-else />
+        </Transition>
+      </div>
     </main>
   </div>
 </template>
 
 <style scoped>
+.login-form-leave-active, .login-form-enter-active {
+  transition: all 0.3s ease;
+}
+
+.login-form-leave-to, .login-form-enter-from {
+  transform: translate(100px);
+  opacity: 0.5;
+}
+
 h1 {
   font-weight: 500;
   font-size: 2.6rem;
@@ -107,6 +95,7 @@ main {
     width: 100%;
     display: flex;
     flex-flow: column;
+    justify-content: center;
 }
 
 header {
@@ -120,7 +109,8 @@ header {
 }
 
 .switch {
-  margin: auto;
+  margin-right: auto;
+  margin-left: auto;
   display: flex;
   cursor: pointer;
 }
@@ -135,7 +125,8 @@ header {
 }
 
 .forms {
-  margin: auto;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 @media (min-width: 1024px) {

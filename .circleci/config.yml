@@ -41,7 +41,29 @@ jobs:
       - run:
           name: "Deploy the stack"
           command: |
-            ssh $USER@$HOST "cd money && docker stack deploy -c docker-compose.yml money"
+            ssh $USER@$MANAGER_HOST "cd money && docker stack deploy -c docker-compose.yml money"
+
+  cleanup:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "0a:3b:da:8c:1a:01:b3:5a:3a:09:29:7a:db:bd:52:40"
+            - "c1:76:ff:81:03:6d:a3:7e:75:94:68:7d:4c:35:30:85"
+            - "0f:76:df:5e:e4:64:65:80:d0:43:31:f2:b1:aa:b4:14"
+      - run:
+          name: "Clean manager"
+          command: |
+            ssh $USER@$MANAGER_HOST "docker system prune -f"
+      - run:
+          name: "Clean worker db"
+          command: |
+            ssh $USER@$DB_HOST "docker system prune -f"
+      - run:
+          name: "Clean worker"
+          command: |
+            ssh $USER@$WORKER_HOST "docker system prune -f"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -52,3 +74,6 @@ workflows:
       - deployment:
           requires:
             - build
+      - cleanup:
+          requires:
+            - deployment

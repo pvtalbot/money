@@ -119,8 +119,6 @@ const updateTransfer = transfer => {
 .list {
   display: flex;
   flex-flow: column nowrap;
-  max-height: 80vh;
-  overflow: auto;
 }
 
 .list .expense, .list p {
@@ -133,5 +131,22 @@ const updateTransfer = transfer => {
 
 .component-leave-to, .component-enter-from {
   transform: translate(320px);
+}
+
+@media (min-width:550px) {
+  .list {
+    max-height: 80vh;
+    overflow: auto;
+    /* IE and Edge */
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+  }
+
+  /* Chrome */
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
 }
 </style>

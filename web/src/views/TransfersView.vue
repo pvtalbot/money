@@ -63,9 +63,9 @@ const openCreateForm = v => {
 <style scoped>
 .transfers {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 50px 1fr;
-  grid-template-areas: "header header" "left right";
+  grid-template-columns: 1fr;
+  grid-template-rows: 50px 1fr 1fr;
+  grid-template-areas: "header" "left" "right";
 }
 
 .revenues, .expenses {
@@ -96,5 +96,21 @@ const openCreateForm = v => {
 
 .component-leave-to, .component-enter-from {
   transform: translateX(320px);
+}
+
+@media (max-width: 550px) {
+  .transfers {
+    max-height: 500px;
+    overflow: scroll;
+  }
+}
+
+@media (min-width: 550px) {
+  .transfers {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 50px 1fr;
+    grid-template-areas: "header header" "left right";
+  }
+
 }
 </style>

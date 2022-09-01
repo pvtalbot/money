@@ -1,20 +1,21 @@
 <script setup>
 // Apollo
-import { useMutation, useLazyQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import LoginMutation from '@/graphql/mutations/LoginMutation.gql'
 
 // Money
-import { useLoadCurrentUser, storeUserToken } from './LoadCurrentUser';
+import { storeUserToken } from './LoadCurrentUser';
 
 // Vue
 import { ref } from 'vue';
 import VueButton from '@/components/utils/VueButton.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
 const disabled = ref(false);
-
-const loadCurrentUser = useLoadCurrentUser();
 
 // Apollo Mutation to log the user in
 const {mutate: loginMutation, onDone: onLoginSuccess, onError: onLoginFailed } = useMutation(LoginMutation);
@@ -27,10 +28,9 @@ const login = () => {
 }
 onLoginSuccess(({data: {login}}) => {
   storeUserToken(login);
-  loadCurrentUser();
+  router.push({name: 'home'});
 })
 onLoginFailed(e => {console.log(e);})
-
 </script>
 
 <template>
@@ -38,11 +38,11 @@ onLoginFailed(e => {console.log(e);})
     <form @submit.prevent="login">
       <div class="login-form__item-container">
         <label for="login-form__login">Login</label>
-        <input id="login-form__login" type="text" v-model="username">
+        <input id="login-form__login" type="text" v-model="username" required>
       </div>
       <div class="login-form__item-container">
         <label for="login-form__password">Password</label>
-        <input id="login-form__password" type="password" v-model="password">
+        <input id="login-form__password" type="password" v-model="password" required>
       </div>
       <VueButton button-type="submit" message="Submit" :disabled="disabled"/>
     </form>

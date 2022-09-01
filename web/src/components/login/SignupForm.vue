@@ -4,7 +4,7 @@ import { useMutation } from '@vue/apollo-composable';
 import CreateUserMutation from '@/graphql/mutations/CreateUserMutation.gql';
 
 // Money
-import { useLoadCurrentUser, storeUserToken } from './LoadCurrentUser';
+import { storeUserToken } from './LoadCurrentUser';
 
 // Pinia
 import { useErrorStore } from '@/stores/errors';
@@ -12,8 +12,10 @@ import { useErrorStore } from '@/stores/errors';
 // Vue
 import { reactive, ref } from 'vue';
 import VueButton from '@/components/utils/VueButton.vue';
+import { useRouter } from 'vue-router';
 
 const errorStore = useErrorStore();
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
@@ -22,8 +24,6 @@ const lastName = ref("");
 const disabled = ref(false);
 
 const errors = reactive([]);
-
-const loadCurrentUser = useLoadCurrentUser();
 
 // Apollo Mutation to create the user
 const {mutate: createUserMutation, onError: onCreateUserError, onDone: onCreateUserSuccess} = useMutation(CreateUserMutation);
@@ -47,7 +47,7 @@ onCreateUserError(e => {
 
 onCreateUserSuccess(({data: {createUser}}) => {
   storeUserToken(createUser);
-  loadCurrentUser();
+  router.push({name: 'home'});
 });
 
 </script>
@@ -103,5 +103,4 @@ label {
 .errors {
   color: var(--em-c-pink-1);
 }
-
 </style>

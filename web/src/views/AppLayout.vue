@@ -1,6 +1,13 @@
 <script setup>
+// Pinia
+import { useUserStore } from '@/stores/user.js';
+
+// Vue
 import VueHeader from '@/components/layout/VueHeader.vue';
-import Drawer from '../components/layout/Drawer.vue';
+import Drawer from '@/components/layout/Drawer.vue';
+import UserLoader from '@/components/layout/UserLoader.vue';
+
+const userStore = useUserStore();
 
 // Drawer self-teleports to body
 </script>
@@ -9,7 +16,8 @@ import Drawer from '../components/layout/Drawer.vue';
   <div class="layout">
     <VueHeader/>
     <main>
-      <RouterView/>
+      <UserLoader v-if="!userStore.userLoggedIn"/>
+      <RouterView v-else/>
     </main>
     <Drawer />
   </div>

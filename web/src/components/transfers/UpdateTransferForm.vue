@@ -121,11 +121,11 @@ onDeleteFailed(e => {console.log(e);})
     <form @submit.prevent="update">
       <div class="item-container">
         <label for="update-transfer-form__amount">Amount</label>
-        <input type="number" min="0" step="1" id="update-transfer-form__amount" v-model="amount" />
+        <input type="number" min="0" step="1" id="update-transfer-form__amount" v-model="amount"/>
       </div>
       <div class="item-container">
         <label for="update-transfer-form__date">Date</label>
-        <input class="datepicker" type="date" v-model="date" id="update-transfer-form__date" />
+        <input class="datepicker" type="date" v-model="date" id="update-transfer-form__date"/>
       </div>
       <div class="item-container" v-if="props.mode =='expense'">
         <label for="update-transfer-form__category">Category</label>

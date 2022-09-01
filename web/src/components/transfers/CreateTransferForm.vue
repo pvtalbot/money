@@ -82,11 +82,11 @@ onCreateTransferFailed(e => {console.log(e);})
     <form @submit.prevent="createTransfer">
       <div class="item-container">
         <label for="create-revenue-form__amount">Amount</label>
-        <input type="number" min=0 step="1" id="create-revenue-form__amount" v-model.number="amount" />
+        <input type="number" min=0 step="1" id="create-revenue-form__amount" v-model.number="amount" required/>
       </div>
       <div class="item-container">
         <label for="create-expense-form__date">Date</label>
-        <input class="datepicker" type="date" id="create-expense-form__date" v-model="date" />
+        <input class="datepicker" type="date" id="create-expense-form__date" v-model="date" required/>
       </div>
       <div class="item-container" v-if="mode == 'expense'">
         <label for="create-expense-form__cagegory">Category</label>

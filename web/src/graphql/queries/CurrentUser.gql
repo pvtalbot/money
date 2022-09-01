@@ -8,8 +8,4 @@ query CurrentUser {
       name
     }
   }
-  getAllErrors {
-    code
-    translation
-  }
 }

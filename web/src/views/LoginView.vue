@@ -1,37 +1,18 @@
 <script setup>
-// Apollo
-import { useLazyQuery } from "@vue/apollo-composable";
-import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql';
-
 // Money
-import { useLoadCurrentUser, getUserToken, removeUserToken, useGetAllErrors } from "@/components/login/LoadCurrentUser";
+import { useCheckLocalStorageForToken } from "@/components/login/LoadCurrentUser";
 
 // Vue
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed } from 'vue';
 import LoginForm from "@/components/login/LoginForm.vue"
 import SignupForm from '@/components/login/SignupForm.vue';
+import { useRouter } from 'vue-router';
 
-const loadCurrentUser = useLoadCurrentUser();
-const getAllErrors = useGetAllErrors();
+const router = useRouter();
 
-// Apollo Query to check the validity of a token. Used on mounted
-const {result: tokenValidity, load: loadTokenValidity, onResult: onTokenValidated} = useLazyQuery(ValidateAccessToken);
-// Checks if there is a token in local storage. If yes, checks validity. If the token is still valid, logs the user in
-onMounted(() => {
-  const accessToken = getUserToken();
-  if (accessToken == null) return;
-
-  loadTokenValidity(undefined, {accessToken: accessToken});
-})
-onTokenValidated(() => {
-  if (!tokenValidity.value.validateAccessToken) {
-    removeUserToken();
-    return;
-  }
-
-  loadCurrentUser();
-})
-
+useCheckLocalStorageForToken()
+  .then(() => {router.push({name: 'home'})})
+  .catch(() => {}); // user stays on current page as there is no token
 
 const signup = ref(false)
 

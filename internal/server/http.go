@@ -1,6 +1,8 @@
 package server
 
 import (
+	"os"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
@@ -27,7 +29,9 @@ func setMiddlewares(r *gin.Engine) {
 
 func setHandlers(r *gin.Engine, app app.Application) {
 	r.POST("/query", graphqlHandler(app))
-	r.GET("/", playgroundHandler())
+	if os.Getenv("GIN_MODE") != "release" {
+		r.GET("/", playgroundHandler())
+	}
 }
 
 func graphqlHandler(app app.Application) gin.HandlerFunc {

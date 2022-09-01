@@ -4,7 +4,7 @@ import {
   useCheckLocalStorageForToken,
   useLoadCurrentUser, 
   useGetAllErrors,
- } from '@/components/login/LoadCurrentUser';
+ } from '@/components/login/LoginUtils';
 
 // Vue
 import { useRouter } from 'vue-router';
@@ -18,7 +18,7 @@ useCheckLocalStorageForToken()
   loadCurrentUser();
   loadAllErrors();
  })
- .catch(() => {console.log('oups');router.push({name: 'login'})});
+ .catch(() => {;router.push({name: 'login'})});
 </script>
 
 <template>

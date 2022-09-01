@@ -4,7 +4,7 @@ import { useMutation } from '@vue/apollo-composable'
 import LoginMutation from '@/graphql/mutations/LoginMutation.gql'
 
 // Money
-import { storeUserToken } from './LoadCurrentUser';
+import { storeUserToken } from './LoginUtils';
 
 // Vue
 import { ref } from 'vue';
@@ -18,7 +18,7 @@ const password = ref("");
 const disabled = ref(false);
 
 // Apollo Mutation to log the user in
-const {mutate: loginMutation, onDone: onLoginSuccess, onError: onLoginFailed } = useMutation(LoginMutation);
+const {mutate: loginMutation, onDone: onLoginSuccess } = useMutation(LoginMutation);
 
 // Wrapper function for login mutation
 const login = () => {
@@ -30,7 +30,6 @@ onLoginSuccess(({data: {login}}) => {
   storeUserToken(login);
   router.push({name: 'home'});
 })
-onLoginFailed(e => {console.log(e);})
 </script>
 
 <template>

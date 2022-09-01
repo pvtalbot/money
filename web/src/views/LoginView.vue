@@ -1,6 +1,6 @@
 <script setup>
 // Money
-import { useCheckLocalStorageForToken } from "@/components/login/LoadCurrentUser";
+import { useCheckLocalStorageForToken } from "@/components/login/LoginUtils";
 
 // Vue
 import { ref, computed } from 'vue';

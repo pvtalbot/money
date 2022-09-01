@@ -4,7 +4,7 @@ import { useMutation } from '@vue/apollo-composable';
 import CreateUserMutation from '@/graphql/mutations/CreateUserMutation.gql';
 
 // Money
-import { storeUserToken } from './LoadCurrentUser';
+import { storeUserToken } from './LoginUtils';
 
 // Pinia
 import { useErrorStore } from '@/stores/errors';

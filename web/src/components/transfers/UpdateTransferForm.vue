@@ -86,12 +86,11 @@ const config = (function() {
 })();
 
 // Apollo mutation to update the transfer
-const { mutate: updateTransferMutation, onDone: onUpdateSuccess, onError: onUpdateFailed } = useMutation(config.mutation);
+const { mutate: updateTransferMutation, onDone: onUpdateSuccess } = useMutation(config.mutation);
 // Wrapper function
 const update = () => {
   disabled.value = true;
   updateTransferMutation({ input: getInput.value })
-    .catch(e => { console.log(e); })
     .finally(() => {disabled.value = false;})
   ;
 }
@@ -100,10 +99,9 @@ onUpdateSuccess(({data}) => {
   config.cacheTransfer([data[config.resultName]]);
   drawerStore.closeDrawer();
 })
-onUpdateFailed(e => {console.log(e)});
 
 // Apollo mutation to delete the transfer
-const { mutate: deleteTransferMutation, onDone: onDeleteSuccess, onError: onDeleteFailed } = useMutation(config.deleteMutation);
+const { mutate: deleteTransferMutation, onDone: onDeleteSuccess } = useMutation(config.deleteMutation);
 // Wrapper function for the mutation
 const deleteTransfer = () => {
   deleteTransferMutation({input: {id: props.updatedTransfer.id}});
@@ -112,7 +110,6 @@ onDeleteSuccess(() => {
   config.deleteTransfer(props.updatedTransfer);
   drawerStore.closeDrawer();
 })
-onDeleteFailed(e => {console.log(e);})
 </script> 
 
 <template>

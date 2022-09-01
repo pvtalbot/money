@@ -39,6 +39,11 @@ jobs:
           fingerprints:
             - "0a:3b:da:8c:1a:01:b3:5a:3a:09:29:7a:db:bd:52:40"
       - run:
+          name: "Fetch latest changes for docker-compose"
+          command: |
+            ssh $USER@$MANAGER_HOST "cd money && git fetch --all"
+            ssh $USER@$MANAGER_HOST "cd money && git checkout origin/master -- docker-compose.yml"
+      - run:
           name: "Deploy the stack"
           command: |
             ssh $USER@$MANAGER_HOST "cd money && docker stack deploy -c docker-compose.yml money"

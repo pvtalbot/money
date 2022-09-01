@@ -1,6 +1,6 @@
 <script setup>
 // Apollo
-import { useQuery } from '@vue/apollo-composable';
+import { useLazyQuery } from '@vue/apollo-composable';
 import Revenues from '@/graphql/queries/RevenueList.gql';
 import Expenses from '@/graphql/queries/ExpenseList.gql';
 
@@ -70,15 +70,15 @@ const sortedTransfers = computed(() => {
 });
 
 // Apollo Query to get transfers list, hook, watcher
-const { result: transfers, onResult: onTransferListSucceeded, refetch: refetchTransfers, loading: transfersLoading } =
-  useQuery(config.query,
+const { result: transfers, load: loadTransfers, onResult: onTransferListSucceeded, loading: transfersLoading } =
+  useLazyQuery(config.query,
     { input: { startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString()}}
   );
 
 onTransferListSucceeded(() => { config.cacheTransfers(transfers.value[config.resultName]); })
 
 watch(startDate, () => {
-  refetchTransfers({
+  loadTransfers(undefined, {
     input: {
       startDate: startDate.value.toISOString(),
       endDate: endDate.value.toISOString(),

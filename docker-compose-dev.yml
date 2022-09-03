@@ -23,6 +23,7 @@ services:
     container_name: back_money
     environment:
       - GOCACHE=/go-cache
+      - GIN_MODE=debug
     volumes:
       - ./internal/:/internal/
       - ./.go-cache/:/go-cache/

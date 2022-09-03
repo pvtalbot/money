@@ -1,5 +1,5 @@
 // Apollo
-import { useLazyQuery, useQuery } from '@vue/apollo-composable';
+import { useLazyQuery } from '@vue/apollo-composable';
 import Me from '@/graphql/queries/CurrentUser.gql';
 import GetAllErrors from '@/graphql/queries/GetAllErrors.gql';
 import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql';

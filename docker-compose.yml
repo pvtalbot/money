@@ -48,6 +48,7 @@ services:
       - net
     environment:
       - GIN_MODE=release
+      - PORT=8080
       - DB_USER=admin_money
       - DB_PASSWORD=sixmillekangourous
       - DB_HOST=db

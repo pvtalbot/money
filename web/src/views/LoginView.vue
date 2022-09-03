@@ -1,6 +1,6 @@
 <script setup>
 // Money
-import { useCheckLocalStorageForToken } from "@/components/login/LoginUtils";
+import { useCheckLocalStorageForToken, useGetAllErrors } from "@/components/login/LoginUtils";
 
 // Vue
 import { ref, computed } from 'vue';
@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+useGetAllErrors()();
 useCheckLocalStorageForToken()
   .then(() => {router.push({name: 'home'})})
   .catch(() => {}); // user stays on current page as there is no token

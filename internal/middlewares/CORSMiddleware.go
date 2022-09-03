@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -8,7 +9,12 @@ import (
 )
 
 func CORSMiddleware() gin.HandlerFunc {
-	frontHost := "*"
+	var frontHost string
+	if os.Getenv("GIN_MODE") == "release" {
+		frontHost = "http://paulvalentintalbot.com"
+	} else {
+		frontHost = "http://pvt.localhost"
+	}
 
 	config := cors.Config{
 		AllowOrigins:     []string{frontHost},

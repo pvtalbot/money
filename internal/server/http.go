@@ -17,6 +17,7 @@ func RunHttpServer(app app.Application) {
 
 	setMiddlewares(r)
 	setHandlers(r, app)
+	r.SetTrustedProxies(nil) // Traefik and Docker are here :)
 
 	r.Run()
 }

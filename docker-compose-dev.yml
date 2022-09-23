@@ -1,8 +1,9 @@
 services:
   reverse-proxy:
     command: --api.insecure=true --providers.docker
-    ports:
-      - "8088:8080"
+    labels:
+      - traefik.http.routers.traefik.rule=Host(`traefik.pvt.localhost`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
 
   money-front:
     build:
@@ -13,7 +14,7 @@ services:
       - ./web/:/web/
       - node_modules-volume:/web/node_modules
     labels:
-      - "traefik.http.routers.money-front.rule=Host(`paulvalentintalbot.localhost`)"
+      - "traefik.http.routers.money-front.rule=Host(`pvt.localhost`)"
       - "traefik.http.services.money-front.loadbalancer.server.port=5173"
 
   money-back:
@@ -29,11 +30,24 @@ services:
       - ./.go-cache/:/go-cache/
       - ./.go/pkg/:/go/pkg/
     labels:
-      - "traefik.http.routers.money-back.rule=Host(`api.paulvalentintalbot.localhost`)"
+      - traefik.http.routers.money-back.rule=Host(`api.pvt.localhost`)
       - traefik.http.services.money-back.loadbalancer.server.port=8080
 
   maria:
     container_name: maria-container
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=db
+    labels:
+      - traefik.http.services.pma.loadbalancer.server.port=80
+      - traefik.http.routers.pma.rule=Host(`pma.pvt.localhost`)
+    depends_on:
+      - maria
+    networks:
+      - net
 
 volumes:
   node_modules-volume:

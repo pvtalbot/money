@@ -21,11 +21,20 @@ import (
 )
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	return r.Application.Commands.Login.Handle(commands.Login{
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Token, error) {
+	token, err := r.Application.Commands.Login.Handle(commands.Login{
 		Name:            input.Username,
 		ClaimedPassword: input.Password,
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Token{
+		AuthToken:    token.AuthToken,
+		RefreshToken: token.RefreshToken,
+	}, nil
 }
 
 // CreateUser is the resolver for the CreateUser field.

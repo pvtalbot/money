@@ -10,6 +10,11 @@ type User {
   expensesCategories: [ExpenseCategory]
 }
 
+type Token {
+  authToken: String!
+  refreshToken: String!
+}
+
 type Expense {
   id: ID!
   amount: Int!
@@ -65,7 +70,7 @@ input GetRevenuesInput {
 }
 
 type Mutation {
-  login(input: Login!): String!
+  login(input: Login!): Token!
   createUser(input: CreateUserInput!): String!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!

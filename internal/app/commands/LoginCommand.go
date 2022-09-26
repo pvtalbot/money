@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/pvtalbot/money/domain/models"
-	"github.com/pvtalbot/money/pkg/jwt"
 	"github.com/pvtalbot/money/pkg/utils"
 )
 
@@ -12,31 +11,33 @@ type Login struct {
 }
 
 type LoginHandler struct {
-	r models.UserRepository
+	r               models.UserRepository
+	tokenRepository models.TokenRepository
 }
 
-func NewLoginHandler(r models.UserRepository) LoginHandler {
+func NewLoginHandler(r models.UserRepository, tokenRepository models.TokenRepository) LoginHandler {
 	return LoginHandler{
-		r: r,
+		r:               r,
+		tokenRepository: tokenRepository,
 	}
 }
 
-func (h LoginHandler) Handle(cmd Login) (string, error) {
+func (h LoginHandler) Handle(cmd Login) (*models.Token, error) {
 	hashedPassword, err := h.r.FindPasswordByName(cmd.Name)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	err = utils.CheckPasswordHash(cmd.ClaimedPassword, hashedPassword)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	user, err := h.r.FindByName(cmd.Name)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return jwt.GenerateToken(user.Name, user.ID)
+	return h.tokenRepository.Create(user.ID, user.Name)
 }

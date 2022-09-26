@@ -75,6 +75,11 @@ type Revenue struct {
 	Date   time.Time `json:"date"`
 }
 
+type Token struct {
+	AuthToken    string `json:"authToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 type UpdateExpenseInput struct {
 	ID         string     `json:"id"`
 	Amount     *int       `json:"amount"`

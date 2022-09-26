@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/pvtalbot/money/app/commands"
 	"github.com/pvtalbot/money/app/queries"
 	"github.com/pvtalbot/money/infra/repositories"
 
 	database "github.com/pvtalbot/money/pkg/db/mysql"
+	redisDatabase "github.com/pvtalbot/money/pkg/db/redis"
 )
 
 type Application struct {
@@ -55,22 +57,25 @@ type Queries struct {
 
 func NewApplication() (Application, func()) {
 	dbContainer := database.NewDbContainer()
+	redisContainer := redisDatabase.NewRedisContainer()
 
 	// Does not work with the prod Dockerfile
 	if os.Getenv("GIN_MODE") != "release" {
 		dbContainer.Migrate()
 	}
 
-	return newApplication(dbContainer.Db),
+	return newApplication(dbContainer.Db, redisContainer.Redis),
 		func() {
 			_ = dbContainer.CloseDB()
+			_ = redisContainer.CloseRedisClient()
 		}
 }
 
-func newApplication(db *sql.DB) Application {
+func newApplication(db *sql.DB, redis *redis.Client) Application {
 	expenseRepository := repositories.NewExpenseMariaRepository(db)
 	expenseCategoryRepository := repositories.NewExpenseCategoryMariaRepository(db)
 	revenueRepository := repositories.NewRevenueMariaRepository(db)
+	tokenRepository := repositories.NewTokenRedisRepository(redis)
 	userRepository := repositories.NewUserMariaRepository(db)
 
 	return Application{
@@ -87,7 +92,7 @@ func newApplication(db *sql.DB) Application {
 
 			// Users
 			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),
-			Login:      commands.NewLoginHandler(userRepository),
+			Login:      commands.NewLoginHandler(userRepository, tokenRepository),
 		},
 		Queries: Queries{
 			// Errors

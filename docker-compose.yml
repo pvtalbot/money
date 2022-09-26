@@ -55,6 +55,9 @@ services:
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=money
+      - REDIS_HOST=redis-db
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=deuxmillekangourous
     deploy:
       restart_policy:
         condition: on-failure

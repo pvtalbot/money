@@ -36,6 +36,9 @@ services:
   maria:
     container_name: maria-container
 
+  redis:
+    image: redis:7
+
   phpmyadmin:
     image: phpmyadmin
     restart: always
@@ -46,6 +49,20 @@ services:
       - traefik.http.routers.pma.rule=Host(`pma.pvt.localhost`)
     depends_on:
       - maria
+    networks:
+      - net
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOST=redis-db
+      - REDIS_PASSWORD=deuxmillekangourous
+    labels:
+      - traefik.http.services.redis-commander.loadbalancer.server.port=8081
+      - traefik.http.routers.redis-commander.rule=Host(`redis.pvt.localhost`)
+    depends_on:
+      - redis
     networks:
       - net
 

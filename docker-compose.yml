@@ -40,6 +40,7 @@ services:
     image: paulvtbt/money-back:v1
     depends_on:
       - maria
+      - redis
     build:
       context: internal
       dockerfile: ../docker/prod/app/Dockerfile
@@ -84,8 +85,27 @@ services:
         - traefik.enable=false
         - traefik.http.services.maria.loadbalancer.server.port=3306
 
+  redis:
+    image: redis:7-alpine
+    hostname: redis-db
+    command: redis-server --requirepass deuxmillekangourous --save 60 1
+    networks:
+      - net
+    volumes:
+      - redis-volume:/data
+    labels:
+      - traefik.enable=false
+    deploy:
+      placement:
+        constraints:
+          - node.labels.storagekeyvalue == redis
+      labels:
+        - traefik.enable=false
+        - traefik.http.services.redis.loadbalancer.port=6379
+
 volumes:
   maria-volume:
+  redis-volume:
 
 networks:
   net:

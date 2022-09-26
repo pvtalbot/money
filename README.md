@@ -14,8 +14,9 @@ Once everything is downloaded, you can run the project in local with:
 The following links are available:
 * [pvt.localhost](pvt.localhost): front-end address
 * [api.pvt.localhost](api.pvt.localhost): back-end address. A GraphiQL server is available at this address to make direct calls to the back-end. The API URL is [api.pvt.localhost/query](api.pvt.localhost/query).
-* [traefik.pvt.localhost](traefik.pvt.localhost): dashboard of traefik, to check the reverse proxy.
 * [pma.pvt.localhost](pma.pvt.localhost): PhpMyAdmin server, connected to the database. You can find the credentials in the docker compose files.
+* [redis.pvt.localhost](redis.pvt.localhost): Redis Commander, to check Redis Database
+* [traefik.pvt.localhost](traefik.pvt.localhost): dashboard of traefik, to check the reverse proxy.
 
 
 ## Main stack
@@ -42,6 +43,7 @@ The website is available at http://paulvalentintalbot.com. Please note that to k
 ## Differences with the dev environment
 In production, you won't have:
 * PhpMyAdmin
+* Redis-commander
 * Access to Traefik dashboard
 * Access to GraphiQL
 

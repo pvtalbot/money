@@ -2,7 +2,7 @@
 import { useLazyQuery } from '@vue/apollo-composable';
 import Me from '@/graphql/queries/CurrentUser.gql';
 import GetAllErrors from '@/graphql/queries/GetAllErrors.gql';
-import ValidateAccessToken from '@/graphql/queries/ValidateAccessToken.gql';
+import ValidateAuthToken from '@/graphql/queries/ValidateAuthToken.gql';
 
 // Pinia
 import { useExpenseStore } from '@/stores/expense';
@@ -12,25 +12,26 @@ import { useUserStore } from '@/stores/user';
 // Vue
 import { onMounted } from 'vue';
 
-const AUTH_TOKEN = 'accessToken';
+const AUTH_TOKEN = 'authToken';
+const REFRESH_TOKEN = 'refreshToken';
 
 const useCheckLocalStorageForToken = () =>
   new Promise((resolve, reject) => {
     // Apollo Query to check the validity of a token. Used on mounted
-    const { result: tokenValidity, load, onResult: onTokenValidated } = useLazyQuery(ValidateAccessToken);
+    const { result: tokenValidity, load, onResult: onTokenValidated } = useLazyQuery(ValidateAuthToken);
 
     // Checks if there is a token in local storage. If yes, checks validity.
     // If the token is still valid, logs the user in
     onMounted(() => {
-      const accessToken = getUserToken();
-      if (accessToken == null) reject();
+      const authToken = getUserToken();
+      if (authToken == null) reject();
       else {
-        load(undefined, { accessToken: accessToken });
+        load(undefined, { authToken });
       }
     })
 
     onTokenValidated(() => {
-      if (!tokenValidity.value.validateAccessToken) {
+      if (!tokenValidity.value.validateAuthToken) {
         removeUserToken();
         reject();
       } else {
@@ -50,6 +51,7 @@ const useLoadCurrentUser = () => {
     userStore.$patch(store => {
       store.user.firstName = currentUser.value.me.firstName;
       store.user.lastName = currentUser.value.me.lastName;
+      store.user.id = currentUser.value.me.id;
     })
 
     expenseStore.cacheExpensesCategories(currentUser.value.me.expensesCategories);
@@ -72,7 +74,8 @@ const useGetAllErrors = () => {
 
 const storeUserToken = (token) => {
   if (typeof localStorage !== undefined && token) {
-    localStorage.setItem(AUTH_TOKEN, token);
+    localStorage.setItem(AUTH_TOKEN, token.authToken);
+    localStorage.setItem(REFRESH_TOKEN, token.refreshToken);
   }
 }
 

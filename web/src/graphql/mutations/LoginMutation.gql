@@ -1,3 +1,6 @@
 mutation Login($login: Login!) {
-    login(input: $login)
+    login(input: $login) {
+        authToken
+        refreshToken
+    }
 }

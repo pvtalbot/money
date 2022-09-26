@@ -81,12 +81,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Expenses            func(childComplexity int, input model.GetExpensesInput) int
-		ExpensesSum         func(childComplexity int, input model.GetExpensesSumInput) int
-		GetAllErrors        func(childComplexity int) int
-		Me                  func(childComplexity int) int
-		Revenues            func(childComplexity int, input model.GetRevenuesInput) int
-		ValidateAccessToken func(childComplexity int, accessToken string) int
+		Expenses          func(childComplexity int, input model.GetExpensesInput) int
+		ExpensesSum       func(childComplexity int, input model.GetExpensesSumInput) int
+		GetAllErrors      func(childComplexity int) int
+		Me                func(childComplexity int) int
+		Revenues          func(childComplexity int, input model.GetRevenuesInput) int
+		ValidateAuthToken func(childComplexity int, authToken string) int
 	}
 
 	Revenue struct {
@@ -125,7 +125,7 @@ type QueryResolver interface {
 	Expenses(ctx context.Context, input model.GetExpensesInput) ([]*model.Expense, error)
 	Revenues(ctx context.Context, input model.GetRevenuesInput) ([]*model.Revenue, error)
 	ExpensesSum(ctx context.Context, input model.GetExpensesSumInput) ([]*model.ExpenseSum, error)
-	ValidateAccessToken(ctx context.Context, accessToken string) (bool, error)
+	ValidateAuthToken(ctx context.Context, authToken string) (bool, error)
 }
 type UserResolver interface {
 	ExpensesCategories(ctx context.Context, obj *model.User) ([]*model.ExpenseCategory, error)
@@ -369,17 +369,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Revenues(childComplexity, args["input"].(model.GetRevenuesInput)), true
 
-	case "Query.validateAccessToken":
-		if e.complexity.Query.ValidateAccessToken == nil {
+	case "Query.validateAuthToken":
+		if e.complexity.Query.ValidateAuthToken == nil {
 			break
 		}
 
-		args, err := ec.field_Query_validateAccessToken_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_validateAuthToken_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.ValidateAccessToken(childComplexity, args["accessToken"].(string)), true
+		return e.complexity.Query.ValidateAuthToken(childComplexity, args["authToken"].(string)), true
 
 	case "Revenue.amount":
 		if e.complexity.Revenue.Amount == nil {
@@ -543,8 +543,8 @@ type User {
 }
 
 type Token {
-  authToken: String!
-  refreshToken: String!
+  authToken: String
+  refreshToken: String
 }
 
 type Expense {
@@ -582,7 +582,7 @@ type Query {
   expenses(input: GetExpensesInput!): [Expense]!
   revenues(input: GetRevenuesInput!): [Revenue]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
-  validateAccessToken(accessToken: String!): Boolean!
+  validateAuthToken(authToken: String!): Boolean!
 }
 
 input GetExpensesInput {
@@ -849,18 +849,18 @@ func (ec *executionContext) field_Query_revenues_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_validateAccessToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_validateAuthToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["accessToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessToken"))
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["accessToken"] = arg0
+	args["authToken"] = arg0
 	return args, nil
 }
 
@@ -2186,8 +2186,8 @@ func (ec *executionContext) fieldContext_Query_expensesSum(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_validateAccessToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_validateAccessToken(ctx, field)
+func (ec *executionContext) _Query_validateAuthToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_validateAuthToken(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2200,7 +2200,7 @@ func (ec *executionContext) _Query_validateAccessToken(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ValidateAccessToken(rctx, fc.Args["accessToken"].(string))
+		return ec.resolvers.Query().ValidateAuthToken(rctx, fc.Args["authToken"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2217,7 +2217,7 @@ func (ec *executionContext) _Query_validateAccessToken(ctx context.Context, fiel
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_validateAccessToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_validateAuthToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -2234,7 +2234,7 @@ func (ec *executionContext) fieldContext_Query_validateAccessToken(ctx context.C
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_validateAccessToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_validateAuthToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2523,14 +2523,11 @@ func (ec *executionContext) _Token_authToken(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Token_authToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2567,14 +2564,11 @@ func (ec *executionContext) _Token_refreshToken(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Token_refreshToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5424,7 +5418,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "validateAccessToken":
+		case "validateAuthToken":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -5433,7 +5427,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_validateAccessToken(ctx, field)
+				res = ec._Query_validateAuthToken(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5526,16 +5520,10 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Token_authToken(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "refreshToken":
 
 			out.Values[i] = ec._Token_refreshToken(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

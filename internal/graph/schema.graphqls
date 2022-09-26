@@ -11,8 +11,8 @@ type User {
 }
 
 type Token {
-  authToken: String!
-  refreshToken: String!
+  authToken: String
+  refreshToken: String
 }
 
 type Expense {
@@ -50,7 +50,7 @@ type Query {
   expenses(input: GetExpensesInput!): [Expense]!
   revenues(input: GetRevenuesInput!): [Revenue]!
   expensesSum(input: GetExpensesSumInput!): [ExpenseSum]!
-  validateAccessToken(accessToken: String!): Boolean!
+  validateAuthToken(authToken: String!): Boolean!
 }
 
 input GetExpensesInput {

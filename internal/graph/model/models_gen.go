@@ -76,8 +76,8 @@ type Revenue struct {
 }
 
 type Token struct {
-	AuthToken    string `json:"authToken"`
-	RefreshToken string `json:"refreshToken"`
+	AuthToken    *string `json:"authToken"`
+	RefreshToken *string `json:"refreshToken"`
 }
 
 type UpdateExpenseInput struct {

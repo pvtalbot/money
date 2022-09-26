@@ -1,7 +1,7 @@
 const openEndpoints = [
   'GetAllErrors',
   'Login',
-  'ValidateAccessToken',
+  'ValidateAuthToken',
 ]
 
 export default openEndpoints;

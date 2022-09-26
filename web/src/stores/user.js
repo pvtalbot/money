@@ -5,6 +5,7 @@ export const useUserStore = defineStore('users', () => {
   const user = ref({
     firstName: "",
     lastName: "",
+    id: "",
   });
 
   const userLoggedIn = computed(() => !!user.value.firstName)

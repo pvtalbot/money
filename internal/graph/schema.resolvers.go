@@ -32,8 +32,8 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	}
 
 	return &model.Token{
-		AuthToken:    token.AuthToken,
-		RefreshToken: token.RefreshToken,
+		AuthToken:    &token.AuthToken,
+		RefreshToken: &token.RefreshToken,
 	}, nil
 }
 
@@ -384,9 +384,9 @@ func (r *queryResolver) ExpensesSum(ctx context.Context, input model.GetExpenses
 	return expensesSum, nil
 }
 
-// ValidateAccessToken is the resolver for the validateAccessToken field.
-func (r *queryResolver) ValidateAccessToken(ctx context.Context, accessToken string) (bool, error) {
-	return managers.ValidateToken(accessToken), nil
+// ValidateAuthToken is the resolver for the validateAuthToken field.
+func (r *queryResolver) ValidateAuthToken(ctx context.Context, authToken string) (bool, error) {
+	return managers.ValidateToken(authToken), nil
 }
 
 // ExpensesCategories is the resolver for the expensesCategories field.

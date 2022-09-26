@@ -1,3 +1,0 @@
-query ValidateAccessToken($accessToken: String!) {
-  validateAccessToken(accessToken: $accessToken)
-}

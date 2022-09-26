@@ -4,7 +4,7 @@ import { setContext } from '@apollo/client/link/context';
 import { logErrorMessages } from '@vue/apollo-util';
 import openEndpoints from './openEndpoints';
 
-const AUTH_TOKEN = 'accessToken';
+const AUTH_TOKEN = 'authToken';
 
 const cache = new InMemoryCache()
 

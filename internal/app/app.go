@@ -91,7 +91,7 @@ func newApplication(db *sql.DB, redis *redis.Client) Application {
 			UpdateRevenue: commands.NewUpdateRevenueHandler(revenueRepository),
 
 			// Users
-			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository),
+			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository, tokenRepository),
 			Login:      commands.NewLoginHandler(userRepository, tokenRepository),
 		},
 		Queries: Queries{

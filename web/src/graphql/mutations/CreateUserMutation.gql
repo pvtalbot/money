@@ -1,3 +1,6 @@
 mutation CreateUser($input: CreateUserInput!) {
-  createUser(input: $input)
+  createUser(input: $input) {
+    authToken
+    refreshToken
+  }
 }

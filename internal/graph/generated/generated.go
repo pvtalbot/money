@@ -111,7 +111,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Login(ctx context.Context, input model.Login) (*model.Token, error)
-	CreateUser(ctx context.Context, input model.CreateUserInput) (string, error)
+	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.Token, error)
 	CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error)
 	DeleteExpense(ctx context.Context, input model.DeleteExpenseInput) (*model.Expense, error)
 	UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error)
@@ -603,7 +603,7 @@ input GetRevenuesInput {
 
 type Mutation {
   login(input: Login!): Token!
-  createUser(input: CreateUserInput!): String!
+  createUser(input: CreateUserInput!): Token!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!
@@ -1476,9 +1476,9 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Token)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNToken2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1488,7 +1488,13 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "authToken":
+				return ec.fieldContext_Token_authToken(ctx, field)
+			case "refreshToken":
+				return ec.fieldContext_Token_refreshToken(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Token", field.Name)
 		},
 	}
 	defer func() {

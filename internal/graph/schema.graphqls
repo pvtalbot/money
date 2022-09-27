@@ -71,7 +71,7 @@ input GetRevenuesInput {
 
 type Mutation {
   login(input: Login!): Token!
-  createUser(input: CreateUserInput!): String!
+  createUser(input: CreateUserInput!): Token!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!

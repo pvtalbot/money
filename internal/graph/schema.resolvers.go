@@ -64,6 +64,24 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	}, nil
 }
 
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (*model.Token, error) {
+	cmd := commands.RefreshToken{
+		UserId:       input.UserID,
+		RefreshToken: input.RefreshToken,
+	}
+
+	token, err := r.Application.Commands.RefreshToken.Handle(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Token{
+		AuthToken:    &token.AuthToken,
+		RefreshToken: &token.RefreshToken,
+	}, nil
+}
+
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.CreateExpenseInput) (*model.Expense, error) {
 	user, err := middlewares.ExtractUserFromContext(ctx)

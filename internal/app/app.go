@@ -30,8 +30,9 @@ type Commands struct {
 	UpdateRevenue commands.UpdateRevenueHandler
 
 	// Users
-	CreateUser commands.CreateUserHandler
-	Login      commands.LoginHandler
+	CreateUser   commands.CreateUserHandler
+	Login        commands.LoginHandler
+	RefreshToken commands.RefreshTokenHandler
 }
 
 type Queries struct {
@@ -91,8 +92,9 @@ func newApplication(db *sql.DB, redis *redis.Client) Application {
 			UpdateRevenue: commands.NewUpdateRevenueHandler(revenueRepository),
 
 			// Users
-			CreateUser: commands.NewCreateUserHandler(userRepository, expenseCategoryRepository, tokenRepository),
-			Login:      commands.NewLoginHandler(userRepository, tokenRepository),
+			CreateUser:   commands.NewCreateUserHandler(userRepository, expenseCategoryRepository, tokenRepository),
+			Login:        commands.NewLoginHandler(userRepository, tokenRepository),
+			RefreshToken: commands.NewRefreshTokenHandler(tokenRepository, userRepository),
 		},
 		Queries: Queries{
 			// Errors

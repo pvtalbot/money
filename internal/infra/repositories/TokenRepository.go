@@ -12,11 +12,13 @@ import (
 
 type TokenRedisRepository struct {
 	redis *redis.Client
+	ctx   context.Context
 }
 
 func NewTokenRedisRepository(redis *redis.Client) TokenRedisRepository {
 	return TokenRedisRepository{
 		redis: redis,
+		ctx:   context.Background(),
 	}
 }
 
@@ -28,14 +30,26 @@ func (r TokenRedisRepository) Create(userId, userName string) (*models.Token, er
 
 	refreshToken := randSeq(100)
 
-	ctx := context.Background()
 	key := "user:" + userId
-	r.redis.HSet(ctx, key, "lastRefreshToken", refreshToken)
-	r.redis.Expire(ctx, key, 7*24*time.Hour)
+	r.redis.HSet(r.ctx, key, "lastRefreshToken", refreshToken)
+	r.redis.Expire(r.ctx, key, 7*24*time.Hour)
 
 	return &models.Token{
 		AuthToken:    authToken,
 		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (r TokenRedisRepository) Find(userId string) (*models.Token, error) {
+	key := "user:" + userId
+	result := r.redis.HGet(r.ctx, key, "lastRefreshToken")
+
+	if err := result.Err(); err != nil {
+		return nil, err
+	}
+
+	return &models.Token{
+		RefreshToken: result.Val(),
 	}, nil
 }
 

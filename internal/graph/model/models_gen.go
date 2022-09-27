@@ -69,6 +69,11 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+type RefreshTokenInput struct {
+	UserID       string `json:"userId"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 type Revenue struct {
 	ID     string    `json:"id"`
 	Amount int       `json:"amount"`

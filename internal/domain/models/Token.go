@@ -7,4 +7,5 @@ type Token struct {
 
 type TokenRepository interface {
 	Create(userId, userName string) (*Token, error)
+	Find(userId string) (*Token, error)
 }

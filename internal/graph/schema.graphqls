@@ -69,9 +69,15 @@ input GetRevenuesInput {
   endDate: Time!
 }
 
+input RefreshTokenInput {
+  userId: ID!
+  refreshToken: String!
+}
+
 type Mutation {
   login(input: Login!): Token!
   createUser(input: CreateUserInput!): Token!
+  refreshToken(input: RefreshTokenInput!): Token!
   createExpense(input: CreateExpenseInput!): Expense!
   deleteExpense(input: DeleteExpenseInput!): Expense!
   updateExpense(input: UpdateExpenseInput!): Expense!

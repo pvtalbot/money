@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"math/rand"
+	"time"
 
 	"github.com/go-redis/redis/v9"
 	"github.com/pvtalbot/money/domain/models"
@@ -28,7 +29,9 @@ func (r TokenRedisRepository) Create(userId, userName string) (*models.Token, er
 	refreshToken := randSeq(100)
 
 	ctx := context.Background()
-	r.redis.HSet(ctx, "user:"+userId, "lastRefreshToken", refreshToken)
+	key := "user:" + userId
+	r.redis.HSet(ctx, key, "lastRefreshToken", refreshToken)
+	r.redis.Expire(ctx, key, 7*24*time.Hour)
 
 	return &models.Token{
 		AuthToken:    authToken,

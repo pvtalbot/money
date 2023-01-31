@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type CreateExpenseCategoryInput struct {
+	Name string `json:"name"`
+}
+
 type CreateExpenseInput struct {
 	Amount     int       `json:"amount"`
 	Date       time.Time `json:"date"`

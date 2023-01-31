@@ -18,7 +18,7 @@ func NewExpenseCategoryMariaRepository(db *sql.DB) ExpenseCategoryMariaRepositor
 	}
 }
 
-func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*models.ExpenseCategory, error) {
+func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory, userId string) (*models.ExpenseCategory, error) {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO expenses_categories(name, user_id) 
 		values (?, ?)
@@ -28,7 +28,7 @@ func (r ExpenseCategoryMariaRepository) Create(ec *models.ExpenseCategory) (*mod
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(ec.Name, ec.User.ID)
+	res, err := stmt.Exec(ec.Name, userId)
 	if err != nil {
 		return nil, err
 	}

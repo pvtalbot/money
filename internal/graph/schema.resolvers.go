@@ -255,6 +255,31 @@ func (r *mutationResolver) UpdateRevenue(ctx context.Context, input model.Update
 	}, nil
 }
 
+// CreateExpenseCategory is the resolver for the createExpenseCategory field.
+func (r *mutationResolver) CreateExpenseCategory(ctx context.Context, input model.CreateExpenseCategoryInput) (*model.ExpenseCategory, error) {
+	user, err := middlewares.ExtractUserFromContext(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := commands.CreateExpenseCategory{
+		Name:   input.Name,
+		UserId: user.ID,
+	}
+
+	category, err := r.Application.Commands.CreateExpenseCategory.Handle(cmd)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ExpenseCategory{
+		ID:   category.ID,
+		Name: category.Name,
+	}, nil
+}
+
 // GetAllErrors is the resolver for the getAllErrors field.
 func (r *queryResolver) GetAllErrors(ctx context.Context) ([]*model.Error, error) {
 	query := queries.GetAllErrors{}

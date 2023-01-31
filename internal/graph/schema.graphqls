@@ -73,6 +73,7 @@ type Mutation {
   createRevenue(input: CreateRevenueInput!): Revenue!
   deleteRevenue(input: DeleteRevenueInput!): Revenue!
   updateRevenue(input: UpdateRevenueInput!): Revenue!
+  createExpenseCategory(input: CreateExpenseCategoryInput!): ExpenseCategory!
 }
 
 input DeleteExpenseInput {
@@ -107,6 +108,10 @@ input CreateExpenseInput {
   amount: Int!
   date: Time!
   categoryId: ID!
+}
+
+input CreateExpenseCategoryInput {
+  name: String!
 }
 
 input CreateRevenueInput {

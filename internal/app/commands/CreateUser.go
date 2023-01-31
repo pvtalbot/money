@@ -41,7 +41,7 @@ func (h CreateUserHandler) Handle(cmd CreateUser) (string, error) {
 
 	categories := managers.GetDefaultCategories(user)
 	for _, c := range categories {
-		_, err = h.ec.Create(&c)
+		_, err = h.ec.Create(&c, user.ID)
 		if err != nil {
 			return "", err
 		}

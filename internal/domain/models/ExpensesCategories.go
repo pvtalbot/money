@@ -7,7 +7,7 @@ type ExpenseCategory struct {
 }
 
 type ExpenseCategoryRepository interface {
-	Create(expenseCategory *ExpenseCategory) (*ExpenseCategory, error)
+	Create(expenseCategory *ExpenseCategory, userId string) (*ExpenseCategory, error)
 	FindAll(userId string) ([]*ExpenseCategory, error)
 	Find(id string) (*ExpenseCategory, error)
 }

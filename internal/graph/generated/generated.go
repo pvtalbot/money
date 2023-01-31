@@ -70,14 +70,15 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateExpense func(childComplexity int, input model.CreateExpenseInput) int
-		CreateRevenue func(childComplexity int, input model.CreateRevenueInput) int
-		CreateUser    func(childComplexity int, input model.CreateUserInput) int
-		DeleteExpense func(childComplexity int, input model.DeleteExpenseInput) int
-		DeleteRevenue func(childComplexity int, input model.DeleteRevenueInput) int
-		Login         func(childComplexity int, input model.Login) int
-		UpdateExpense func(childComplexity int, input model.UpdateExpenseInput) int
-		UpdateRevenue func(childComplexity int, input model.UpdateRevenueInput) int
+		CreateExpense         func(childComplexity int, input model.CreateExpenseInput) int
+		CreateExpenseCategory func(childComplexity int, input model.CreateExpenseCategoryInput) int
+		CreateRevenue         func(childComplexity int, input model.CreateRevenueInput) int
+		CreateUser            func(childComplexity int, input model.CreateUserInput) int
+		DeleteExpense         func(childComplexity int, input model.DeleteExpenseInput) int
+		DeleteRevenue         func(childComplexity int, input model.DeleteRevenueInput) int
+		Login                 func(childComplexity int, input model.Login) int
+		UpdateExpense         func(childComplexity int, input model.UpdateExpenseInput) int
+		UpdateRevenue         func(childComplexity int, input model.UpdateRevenueInput) int
 	}
 
 	Query struct {
@@ -113,6 +114,7 @@ type MutationResolver interface {
 	CreateRevenue(ctx context.Context, input model.CreateRevenueInput) (*model.Revenue, error)
 	DeleteRevenue(ctx context.Context, input model.DeleteRevenueInput) (*model.Revenue, error)
 	UpdateRevenue(ctx context.Context, input model.UpdateRevenueInput) (*model.Revenue, error)
+	CreateExpenseCategory(ctx context.Context, input model.CreateExpenseCategoryInput) (*model.ExpenseCategory, error)
 }
 type QueryResolver interface {
 	GetAllErrors(ctx context.Context) ([]*model.Error, error)
@@ -229,6 +231,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateExpense(childComplexity, args["input"].(model.CreateExpenseInput)), true
+
+	case "Mutation.createExpenseCategory":
+		if e.complexity.Mutation.CreateExpenseCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createExpenseCategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateExpenseCategory(childComplexity, args["input"].(model.CreateExpenseCategoryInput)), true
 
 	case "Mutation.createRevenue":
 		if e.complexity.Mutation.CreateRevenue == nil {
@@ -440,6 +454,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreateExpenseCategoryInput,
 		ec.unmarshalInputCreateExpenseInput,
 		ec.unmarshalInputCreateRevenueInput,
 		ec.unmarshalInputCreateUserInput,
@@ -586,6 +601,7 @@ type Mutation {
   createRevenue(input: CreateRevenueInput!): Revenue!
   deleteRevenue(input: DeleteRevenueInput!): Revenue!
   updateRevenue(input: UpdateRevenueInput!): Revenue!
+  createExpenseCategory(input: CreateExpenseCategoryInput!): ExpenseCategory!
 }
 
 input DeleteExpenseInput {
@@ -622,6 +638,10 @@ input CreateExpenseInput {
   categoryId: ID!
 }
 
+input CreateExpenseCategoryInput {
+  name: String!
+}
+
 input CreateRevenueInput {
   amount: Int!
   date: Time!
@@ -644,6 +664,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createExpenseCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateExpenseCategoryInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateExpenseCategoryInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐCreateExpenseCategoryInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createExpense_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1853,6 +1888,67 @@ func (ec *executionContext) fieldContext_Mutation_updateRevenue(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateRevenue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createExpenseCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createExpenseCategory(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateExpenseCategory(rctx, fc.Args["input"].(model.CreateExpenseCategoryInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ExpenseCategory)
+	fc.Result = res
+	return ec.marshalNExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createExpenseCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ExpenseCategory_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ExpenseCategory_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ExpenseCategory", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createExpenseCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4468,6 +4564,34 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateExpenseCategoryInput(ctx context.Context, obj interface{}) (model.CreateExpenseCategoryInput, error) {
+	var it model.CreateExpenseCategoryInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateExpenseInput(ctx context.Context, obj interface{}) (model.CreateExpenseInput, error) {
 	var it model.CreateExpenseInput
 	asMap := map[string]interface{}{}
@@ -5161,6 +5285,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createExpenseCategory":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createExpenseCategory(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5793,6 +5926,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateExpenseCategoryInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐCreateExpenseCategoryInput(ctx context.Context, v interface{}) (model.CreateExpenseCategoryInput, error) {
+	res, err := ec.unmarshalInputCreateExpenseCategoryInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateExpenseInput2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐCreateExpenseInput(ctx context.Context, v interface{}) (model.CreateExpenseInput, error) {
 	res, err := ec.unmarshalInputCreateExpenseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5932,6 +6070,10 @@ func (ec *executionContext) marshalNExpense2ᚖgithubᚗcomᚋpvtalbotᚋmoney�
 		return graphql.Null
 	}
 	return ec._Expense(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNExpenseCategory2githubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx context.Context, sel ast.SelectionSet, v model.ExpenseCategory) graphql.Marshaler {
+	return ec._ExpenseCategory(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNExpenseCategory2ᚖgithubᚗcomᚋpvtalbotᚋmoneyᚋgraphᚋmodelᚐExpenseCategory(ctx context.Context, sel ast.SelectionSet, v *model.ExpenseCategory) graphql.Marshaler {

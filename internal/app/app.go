@@ -22,6 +22,9 @@ type Commands struct {
 	DeleteExpense commands.DeleteExpenseHandler
 	UpdateExpense commands.UpdateExpenseHandler
 
+	// Expenses Categories
+	CreateExpenseCategory commands.CreateExpenseCategoryHandler
+
 	// Revenues
 	CreateRevenue commands.CreateRevenueHandler
 	DeleteRevenue commands.DeleteRevenueHandler
@@ -79,6 +82,9 @@ func newApplication(db *sql.DB) Application {
 			CreateExpense: commands.NewCreateExpenseHandler(expenseRepository),
 			DeleteExpense: commands.NewDeleteExpenseHandler(expenseRepository),
 			UpdateExpense: commands.NewUpdateExpenseHandler(expenseRepository),
+
+			// Expenses Categories
+			CreateExpenseCategory: commands.NewCreateExpenseCategoryHandler(expenseCategoryRepository),
 
 			// Revenues
 			CreateRevenue: commands.NewCreateRevenueHandler(revenueRepository),
